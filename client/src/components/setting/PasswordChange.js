@@ -8,7 +8,7 @@ export default function PasswordChange() {
       <br />
       <Link to="/setting/signout">Signout</Link>
       <br />
-      <Link to="/calendar">Home</Link>
+      <Link to="/main">Home</Link>
     </>
   );
 }

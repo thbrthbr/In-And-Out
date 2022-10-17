@@ -8,7 +8,7 @@ export default function Signout() {
       <br />
       <Link to="/setting">ProfileChange</Link>
       <br />
-      <Link to="/calendar">Home</Link>
+      <Link to="/main">Home</Link>
     </>
   );
 }
