@@ -3,7 +3,7 @@ export default function IdentifyPhone() {
   return (
     <>
       <div>IdentifyPhone</div>
-      <Link to="/">Login</Link>
+      <Link to="/initiate">RecoverInitiate</Link>
     </>
   );
 }
