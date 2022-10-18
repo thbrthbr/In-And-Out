@@ -19,16 +19,7 @@ import Inout from "./components/main/Inout";
 import Report from "./components/main/Report";
 import Error from "./components/Error";
 
-import LoginSharedLayout from "./components/layout/LoginSharedLayout";
-import SettingSharedLayout from "./components/layout/SettingSharedLayout";
-import MainSharedLayout from "./components/layout/MainSharedLayout";
 import Layout from "./components/common/Layout";
-
-const Center = styled.div`
-  height: 92vh;
-  display: flex;
-  flex-direction: row;
-`;
 
 function App() {
   return (
@@ -48,18 +39,6 @@ function App() {
           <Route path="/signout" element={<Signout />}></Route>
           <Route path="*" element={<Error />}></Route>
         </Route>
-
-        {/* <Route path="main" element={<MainSharedLayout />}>
-          <Route index element={<Calendar />}></Route>
-          <Route path="report" element={<Report />}></Route>
-          <Route path="inout" element={<Inout />}></Route>
-        </Route> */}
-
-        {/* <Route path="setting" element={<SettingSharedLayout />}>
-          <Route index element={<ProfileChange />}></Route>
-          <Route path="password_change" element={<PasswordChange />}></Route>
-          <Route path="signout" element={<Signout />}></Route>
-        </Route> */}
       </Routes>
     </BrowserRouter>
   );
