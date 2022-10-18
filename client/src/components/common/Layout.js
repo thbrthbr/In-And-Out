@@ -8,11 +8,25 @@ const Container = styled.div`
   height: 90vh;
 `;
 
+const LoginContainer = styled.div`
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 export default function Layout() {
   const loc = useLocation();
+  const loginRouterURL = [
+    "/",
+    "/initiate",
+    "/signin",
+    "/identify_email",
+    "/identify_phone",
+  ];
   const mainRouterURL = ["/calendar", "/inout", "/report"];
   const settingRouterURL = ["/profile_change", "/password_change", "/signout"];
-  console.log(loc);
+
   return (
     <div>
       <Header />
@@ -24,7 +38,14 @@ export default function Layout() {
           {settingRouterURL.includes(loc.pathname) && (
             <Sidebar menu={"setting"}></Sidebar>
           )}
-          <Outlet />
+
+          {loginRouterURL.includes(loc.pathname) ? (
+            <LoginContainer>
+              <Outlet />
+            </LoginContainer>
+          ) : (
+            <Outlet />
+          )}
         </Container>
       </main>
     </div>

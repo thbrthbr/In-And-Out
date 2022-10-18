@@ -1,7 +1,6 @@
 // import logo from "./logo.svg";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import styled from "styled-components";
 
 import Login from "./components/login/Login";
 import Signin from "./components/login/Signin";
@@ -23,7 +22,7 @@ import Layout from "./components/common/Layout";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Login />}></Route>
