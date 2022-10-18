@@ -1,8 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-// import Screen from "./Screen";
-import ProfileChange from "../setting/ProfileChange";
 import styled from "styled-components";
 
 const Container = styled.div`

@@ -21,8 +21,6 @@ import Error from "./components/Error";
 
 import Layout from "./components/common/Layout";
 
-import Screen from "./components/common/Screen";
-
 function App() {
   return (
     <BrowserRouter>
@@ -36,9 +34,9 @@ function App() {
           <Route path="/calendar" element={<Calendar />}></Route>
           <Route path="/report" element={<Report />}></Route>
           <Route path="/inout" element={<Inout />}></Route>
-          <Route path="/profile_change" element={<Screen />}></Route>
-          <Route path="/password_change" element={<Screen />}></Route>
-          <Route path="/signout" element={<Screen />}></Route>
+          <Route path="/profile_change" element={<ProfileChange />}></Route>
+          <Route path="/password_change" element={<PasswordChange />}></Route>
+          <Route path="/signout" element={<Signout />}></Route>
           <Route path="*" element={<Error />}></Route>
         </Route>
       </Routes>
