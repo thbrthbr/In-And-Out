@@ -4,11 +4,11 @@ export default function PasswordChange() {
   return (
     <>
       <div>PasswordChange</div>
-      <Link to="/setting">ProfileChange</Link>
+      <Link to="/profile_change">ProfileChange</Link>
       <br />
-      <Link to="/setting/signout">Signout</Link>
+      <Link to="/signout">Signout</Link>
       <br />
-      <Link to="/main">Home</Link>
+      <Link to="/calendar">Home</Link>
     </>
   );
 }

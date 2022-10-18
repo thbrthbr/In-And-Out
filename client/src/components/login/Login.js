@@ -7,7 +7,7 @@ export default function Login() {
       <br />
       <Link to="/identify_email">IdentifyEmail</Link>
       <br />
-      <Link to="/main">Login</Link>
+      <Link to="/calendar">Login</Link>
     </>
   );
 }

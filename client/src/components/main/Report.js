@@ -4,11 +4,11 @@ export default function Report() {
   return (
     <>
       <div>Report</div>
-      <Link to="/setting">ProfileChange</Link>
+      <Link to="/profile_change">Setting</Link>
       <br />
-      <Link to="/main">Calendar</Link>
+      <Link to="/calendar">Calendar</Link>
       <br />
-      <Link to="/main/inout">Inout</Link>
+      <Link to="/inout">Inout</Link>
     </>
   );
 }
