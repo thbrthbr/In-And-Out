@@ -11,33 +11,36 @@ export default function Signout() {
   return (
     <>
       <Page>
-        {placeholders.map((list) => (
-          <TextInput>
-            <input
-              placeholder={list.placeholder}
+        <form>
+          {placeholders.map((list) => (
+            <TextInput>
+              <input
+                placeholder={list.placeholder}
+                style={{
+                  padding: 0,
+                  border: "none",
+                  fontSize: "30px",
+                  width: "500px",
+                  height: "40px",
+                }}
+                type={list.type}
+              />
+            </TextInput>
+          ))}
+          <ButtonInput>
+            <button
               style={{
-                padding: 0,
-                border: "none",
                 fontSize: "30px",
                 width: "500px",
                 height: "40px",
+                cursor: "pointer",
               }}
-              type={list.type}
-            />
-          </TextInput>
-        ))}
-
-        <ButtonInput>
-          <button
-            style={{
-              fontSize: "30px",
-              width: "500px",
-              height: "40px",
-            }}
-          >
-            탈퇴하기
-          </button>
-        </ButtonInput>
+              type="submit"
+            >
+              탈퇴하기
+            </button>
+          </ButtonInput>
+        </form>
       </Page>
     </>
   );

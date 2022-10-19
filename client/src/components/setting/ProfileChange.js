@@ -14,34 +14,36 @@ export default function ProfileChange() {
   return (
     <>
       <Page>
-        {placeholders.map((list) => (
-          <TextInput>
-            <input
-              placeholder={list.placeholder}
+        <form>
+          {placeholders.map((list) => (
+            <TextInput>
+              <input
+                placeholder={list.placeholder}
+                style={{
+                  padding: 0,
+                  border: "none",
+                  fontSize: "30px",
+                  width: "500px",
+                  height: "40px",
+                }}
+                type="text"
+              />
+            </TextInput>
+          ))}
+          <ButtonInput>
+            <button
               style={{
-                padding: 0,
-                border: "none",
                 fontSize: "30px",
                 width: "500px",
                 height: "40px",
+                cursor: "pointer",
               }}
-              type="text"
-            />
-          </TextInput>
-        ))}
-
-        <ButtonInput>
-          <button
-            style={{
-              fontSize: "30px",
-
-              width: "500px",
-              height: "40px",
-            }}
-          >
-            제출
-          </button>
-        </ButtonInput>
+              type="submit"
+            >
+              제출
+            </button>
+          </ButtonInput>
+        </form>
       </Page>
     </>
   );
