@@ -103,10 +103,38 @@ const signInSchema = yup.object({
   //   }),
 });
 
+const profileChangeSchema = yup.object({
+  // email: yup
+  //   .string()
+  //   .email("유효하지 않은 이메일입니다.")
+  //   .required("이메일 입력은 필수입니다."),
+
+  name: yup.string().required("닉네임 입력은 필수입니다."),
+
+  phone: yup
+    .string()
+    .required("전화번호 입력은 필수입니다.")
+    .matches(
+      /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/,
+      "전화번호 양식에 맞게 입력해주세요"
+    ),
+
+  birthday: yup
+    .string()
+    .required("생년월일 입력은 필수 입니다.")
+    .matches(
+      /^(19[0-9][0-9]|20\d{2})-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/,
+      "생년월일 양식에 맞게 입력해주세요"
+    ),
+  residence: yup.string().required("거주지 입력은 필수 입니다"),
+  gender: yup.string().required("성별 선택은 필수 입니다."),
+});
+
 export {
   signInSchema,
   loginSchema,
   identifyEmailSchema,
   identifyPhoneSchema,
   recoverInitiateSchema,
+  profileChangeSchema,
 };
