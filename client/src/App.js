@@ -10,9 +10,9 @@ import RecoverInitiate from "./components/login/RecoverInitiate";
 
 import Calendar from "./components/main/Calendar";
 
-import ProfileChange from "./components/setting/ProfileChange";
-import PasswordChange from "./components/setting/PasswordChange";
-import Signout from "./components/setting/Signout";
+// import ProfileChange from "./components/setting/ProfileChange";
+// import PasswordChange from "./components/setting/PasswordChange";
+// import Signout from "./components/setting/Signout";
 
 import Inout from "./components/main/Inout";
 import Report from "./components/main/Report";

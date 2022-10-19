@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 const Side = styled.div`
@@ -32,6 +32,7 @@ const SideButton = styled.div`
 `;
 
 export default function Sidebar({ menu }) {
+  const loc = useLocation();
   const mainMenus = [
     { name: "달력", path: "/calendar" },
     { name: "수입/지출", path: "/inout" },
@@ -54,7 +55,13 @@ export default function Sidebar({ menu }) {
           to={menu.path}
           key={idx}
         >
-          <SideButton style={{ backgroundColor: "white" }}>
+          <SideButton
+            style={
+              loc.pathname == menu.path
+                ? { backgroundColor: "pink" }
+                : { backgroundColor: "white" }
+            }
+          >
             {menu.name}
           </SideButton>
         </NavLink>
