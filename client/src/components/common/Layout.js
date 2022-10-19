@@ -11,10 +11,14 @@ const Container = styled.div`
 `;
 
 const LoginContainer = styled.div`
-  width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 0 auto;
+  margin-top: 25px;
+  width: 35%;
+  height: 95%;
+  background-color: #d9d9d9;
 `;
 
 export default function Layout() {
