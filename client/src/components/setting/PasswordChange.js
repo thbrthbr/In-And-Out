@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -7,16 +6,16 @@ import { recoverInitiateSchema } from "../../schema/form_validation";
 export default function PasswordChange() {
   // const [button, setButton] = useState();
 
-  const placeholders = [
-    { placeholder: "이전 비밀번호" },
-    { placeholder: "새 비밀번호" },
-    { placeholder: "새 비밀번호 확인" },
-  ];
-  const valueIds = [
-    { valueId: "이전 비밀번호" },
-    { valueId: "새 비밀번호" },
-    { valueId: "새 비밀번호 확인" },
-  ];
+  // const placeholders = [
+  //   { placeholder: "이전 비밀번호" },
+  //   { placeholder: "새 비밀번호" },
+  //   { placeholder: "새 비밀번호 확인" },
+  // ];
+  // const valueIds = [
+  //   { valueId: "이전 비밀번호" },
+  //   { valueId: "새 비밀번호" },
+  //   { valueId: "새 비밀번호 확인" },
+  // ];
   //나중에 form으로 데이터 보낼 때 쓸 input id들
 
   const {

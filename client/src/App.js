@@ -33,7 +33,8 @@ function App() {
           <Route path="/identify_phone" element={<IdentifyPhone />}></Route>
           <Route path="/initiate" element={<RecoverInitiate />}></Route>
           <Route path="/calendar" element={<Calendar />}></Route>
-          <Route path="/report" element={<Report />}></Route>
+          <Route path="/report/monthly" element={<Report />}></Route>
+          <Route path="/report/yearly" element={<Report />}></Route>
           <Route path="/inout" element={<Inout />}></Route>
           <Route path="/profile_change" element={<Screen />}></Route>
           <Route path="/password_change" element={<Screen />}></Route>

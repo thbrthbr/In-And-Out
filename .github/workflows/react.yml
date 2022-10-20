@@ -26,4 +26,4 @@ jobs:
           git config --global user.email '1z3r091@gmail.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} 
           npm run deploy
-          working-directory: ${{ env.working-directory }}
+        working-directory: ${{ env.working-directory }}

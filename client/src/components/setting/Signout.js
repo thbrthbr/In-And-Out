@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 import { useForm } from "react-hook-form";
@@ -18,7 +17,7 @@ export default function Signout() {
     alert("submit");
   };
 
-  const valueIds = [{ valueId: "비밀번호" }, { valueId: "비밀번호 확인" }];
+  // const valueIds = [{ valueId: "비밀번호" }, { valueId: "비밀번호 확인" }];
   //나중에 form으로 데이터 보낼 때 쓸 input id들
 
   return (
