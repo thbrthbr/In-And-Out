@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
@@ -55,11 +55,42 @@ const drawChart = (ctx, config) => {
 export default function Report() {
   const canvasRef = useRef(null);
   const loc = useLocation();
+
+  const graphTypes = ["bar", "doughnut"];
+  const [graphTypeChecked, setGraphTypeChecked] = useState([true, false]);
+
+  let checked = -1;
+  let uncheck = -1;
+  const handleOnChange = (position) => {
+    for (let i = 0; i < graphTypeChecked.length; i++) {
+      if (graphTypeChecked[i]) checked = i;
+    }
+
+    const updateGraphTypeChecked = graphTypeChecked.map((item, idx) => {
+      if (checked >= 0) {
+        if (idx === position && checked !== position) {
+          uncheck = checked;
+          checked = idx;
+          return !item;
+        }
+        return item;
+      } else {
+        return idx === position ? !item : item;
+      }
+    });
+
+    const updateGraphTypeUnChecked = updateGraphTypeChecked.map((item, idx) => {
+      return idx === uncheck ? !item : item;
+    });
+
+    setGraphTypeChecked(updateGraphTypeUnChecked);
+  };
   // const [data, setData] = useState([]);
   let data = [];
   let chartType = "doughnut"; // default: doghnut, checkbox에 따라 변함 - state로 관리 해야될듯
   let labels = [];
 
+  // 임시적으로 데이터 처리
   if (loc.pathname === "/report/monthly") {
     data = [10, 20, 15, 5, 50];
     labels = [
@@ -136,9 +167,6 @@ export default function Report() {
   useEffect(() => {
     let charId;
     if (canvasRef.current) {
-      // if (chartRef.current) drawChart(chartRef.current, "hi");
-      // const ctx = document.getElementById("myChart");
-
       charId = drawChart(canvasRef.current, config);
     }
     return () => {
@@ -183,7 +211,24 @@ export default function Report() {
       <br />
       <Link to="/">Logout</Link>
 
-      <input type="checkbox"></input>
+      <ul>
+        {graphTypes.map((type, idx) => {
+          return (
+            <li key={idx}>
+              <input
+                type="checkbox"
+                value={type}
+                name={type}
+                checked={graphTypeChecked[idx]}
+                onChange={() => handleOnChange(idx)}
+              />
+              {type === "bar" && "막대형"}
+              {type === "doughnut" && "파이형"}
+            </li>
+          );
+        })}
+      </ul>
+
       <canvas id="myChart" width={1000} height={500} ref={canvasRef}></canvas>
     </div>
   );
