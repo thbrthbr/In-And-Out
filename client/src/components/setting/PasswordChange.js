@@ -40,10 +40,10 @@ export default function PasswordChange() {
               placeholder="이전 비밀번호"
               style={{
                 padding: 0,
-                border: "none",
-                fontSize: "30px",
-                width: "500px",
-                height: "40px",
+                outline: "none",
+                fontSize: "20px",
+                width: "296px",
+                height: "30px",
               }}
               type="password"
             />
@@ -53,10 +53,10 @@ export default function PasswordChange() {
               placeholder="새 비밀번호"
               style={{
                 padding: 0,
-                border: "none",
-                fontSize: "30px",
-                width: "500px",
-                height: "40px",
+                outline: "none",
+                fontSize: "20px",
+                width: "296px",
+                height: "30px",
               }}
               type="password"
               {...register("pw")}
@@ -69,10 +69,10 @@ export default function PasswordChange() {
               placeholder="새 비밀번호 확인"
               style={{
                 padding: 0,
-                border: "none",
-                fontSize: "30px",
-                width: "500px",
-                height: "40px",
+                outline: "none",
+                fontSize: "20px",
+                width: "296px",
+                height: "30px",
               }}
               type="password"
               {...register("passwordConfirm")}
@@ -82,9 +82,9 @@ export default function PasswordChange() {
           <ButtonInput>
             <button
               style={{
-                fontSize: "30px",
-                width: "500px",
-                height: "40px",
+                fontSize: "20px",
+                width: "300px",
+                height: "30px",
                 cursor: "pointer",
               }}
               type="submit"
@@ -110,16 +110,16 @@ const Page = styled.div`
 
 const TextInput = styled.div`
   margin-top: 30px;
-  width: 500px;
-  height: 100px;
-
+  width: 300px;
+  height: 50px;
   display: flex;
   flex-direction: column;
 `;
 
 const ButtonInput = styled.div`
-  width: 500px;
-  height: 100px;
+  margin-top: 30px;
+  width: 300px;
+  height: 50px;
   display: flex;
   align-items: center;
 `;
