@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import React, { useRef, useState, useMemo } from "react";
+import React, { useRef, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -62,6 +61,7 @@ export default function ProfileChange() {
       <BigPage>
         <Photo>
           <img
+            alt="프로필사진"
             src={imageFile ? imageFile : defaultUser}
             style={{ width: "200px" }}
           />

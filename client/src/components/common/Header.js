@@ -12,6 +12,7 @@ export default function Header() {
       }}
     >
       <img
+        alt="로고"
         onClick={() => navigate("/")}
         style={{ width: "200px", cursor: "pointer" }}
         src={logo}

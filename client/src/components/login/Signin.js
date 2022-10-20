@@ -16,11 +16,6 @@ export default function Signin() {
     console.log(data);
   };
 
-  const radioOptions = [
-    { label: "남자", value: "male" },
-    { label: "여자", value: "female" },
-  ];
-
   return (
     <div>
       <div>Signin Page</div>
