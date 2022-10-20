@@ -2,7 +2,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 // import Screen from "./Screen";
-import ProfileChange from "../setting/ProfileChange";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -30,7 +29,12 @@ export default function Layout() {
     "/identify_email",
     "/identify_phone",
   ];
-  const mainRouterURL = ["/calendar", "/inout", "/report"];
+  const mainRouterURL = [
+    "/calendar",
+    "/inout",
+    "/report/monthly",
+    "/report/yearly",
+  ];
   const settingRouterURL = ["/profile_change", "/password_change", "/signout"];
 
   return (

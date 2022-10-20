@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { profileChangeSchema } from "../../schema/form_validation";
@@ -29,14 +27,14 @@ export default function ProfileChange() {
     { value: "남자" },
   ];
 
-  const valueIds = [
-    { valueId: "이메일" },
-    { valueId: "닉네임" },
-    { valueId: "전화번호" },
-    { valueId: "생년월일" },
-    { valueId: "거주지" },
-    { valueId: "성별" },
-  ];
+  // const valueIds = [
+  //   { valueId: "이메일" },
+  //   { valueId: "닉네임" },
+  //   { valueId: "전화번호" },
+  //   { valueId: "생년월일" },
+  //   { valueId: "거주지" },
+  //   { valueId: "성별" },
+  // ];
   //나중에 form으로 데이터 보낼 때 쓸 Inputs id들
 
   return (
@@ -44,7 +42,11 @@ export default function ProfileChange() {
       <BigPage>
         <form>
           <Photo>
-            <img src={defaultUser} style={{ width: "200px" }} />
+            <img
+              alt="프로필사진"
+              src={defaultUser}
+              style={{ width: "200px" }}
+            />
             <button type="submit">이미지 수정</button>
           </Photo>
         </form>
