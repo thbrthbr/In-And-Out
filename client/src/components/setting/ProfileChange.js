@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+import React, { useRef, useState, useMemo } from "react";
+
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { profileChangeSchema } from "../../schema/form_validation";
@@ -37,19 +40,43 @@ export default function ProfileChange() {
   // ];
   //나중에 form으로 데이터 보낼 때 쓸 Inputs id들
 
+  const [imageFile, setImageFile] = useState(null);
+  const fileInput = useRef();
+
+  const handleButtonClick = (e) => {
+    fileInput.current.click();
+  };
+
+  const handleChange = () => {
+    const reader = new FileReader();
+    const file = fileInput.current.files[0];
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setImageFile(reader.result);
+    };
+  };
+
   return (
     <>
       <BigPage>
-        <form>
-          <Photo>
-            <img
-              alt="프로필사진"
-              src={defaultUser}
-              style={{ width: "200px" }}
-            />
-            <button type="submit">이미지 수정</button>
-          </Photo>
-        </form>
+        <Photo>
+          <img
+            src={imageFile ? imageFile : defaultUser}
+            style={{ width: "200px" }}
+          />
+          <File onClick={handleButtonClick} htmlFor="input-file">
+            이미지 업로드
+          </File>
+          <input
+            type="file"
+            id="input-file"
+            accept="image/*"
+            ref={fileInput}
+            style={{ display: "none" }}
+            onChange={handleChange}
+          />
+        </Photo>
         <Page>
           <form onSubmit={handleSubmit(onSubmit)}>
             <TextInputs>
@@ -110,31 +137,53 @@ export default function ProfileChange() {
               <Categories>성별</Categories>
               <div
                 style={{
-                  width: "200px",
+                  width: "300px",
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "space-between",
                 }}
               >
-                <label>
-                  <Inputs
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <div
+                    style={{
+                      marginRight: "10px",
+                    }}
+                  >
+                    여자
+                  </div>
+                  <Radio
                     type="radio"
                     name="gender"
                     value="female"
                     checked
                     {...register("gender")}
                   />
-                  여자
-                </label>
-                <label>
-                  <Inputs
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <div
+                    style={{
+                      marginRight: "10px",
+                    }}
+                  >
+                    남자
+                  </div>
+                  <Radio
                     type="radio"
                     name="gender"
                     value="male"
                     {...register("gender")}
                   />
-                  남자
-                </label>
+                </div>
               </div>
               <Alert role="alert">{errors.gender?.message}</Alert>
             </TextInputs>
@@ -142,9 +191,9 @@ export default function ProfileChange() {
             <ButtonInputs>
               <button
                 style={{
-                  fontSize: "30px",
-                  width: "500px",
-                  height: "40px",
+                  fontSize: "20px",
+                  width: "300px",
+                  height: "30px",
                   cursor: "pointer",
                 }}
                 type="submit"
@@ -159,16 +208,36 @@ export default function ProfileChange() {
   );
 }
 
-const Categories = styled.h3`
+const Radio = styled.input`
+  width: 30px;
+  height: 30px;
+`;
+
+const File = styled.button`
+  font-size: 15px;
+  width: 200px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  background-color: white;
+  cursor: pointer;
+  &:active {
+    background-color: pink;
+  }
+`;
+
+const Categories = styled.h4`
   margin: 0px;
 `;
 
 const Inputs = styled.input`
   margin-top: 5px;
   outline: none;
+  width: 296px;
   padding: 0;
-  font-size: 30px;
-  width: "500px";
+  font-size: 20px;
 `;
 
 const Alert = styled.span`
@@ -200,7 +269,7 @@ const TextInputs = styled.div`
   font-size: 20px;
   // align-items: center;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 30px;
 `;
 
 const ButtonInputs = styled.div`

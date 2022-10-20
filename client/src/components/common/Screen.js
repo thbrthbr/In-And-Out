@@ -18,8 +18,8 @@ export default function Screen() {
 const ScreenDefault = styled.div`
   margin-left: 25px;
   margin-top: 25px;
-  width: 85%;
-  height: 95%;
+  width: 2048px;
+
   background-color: #d9d9d9;
   font-size: 100px;
   position: relative;

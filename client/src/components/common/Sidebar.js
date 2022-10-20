@@ -7,6 +7,7 @@ const Side = styled.div`
   align-items: center;
   // justify-content: center;
   width: 200px;
+  height: 100%;
   background-color: #d9d9d9;
 `;
 
