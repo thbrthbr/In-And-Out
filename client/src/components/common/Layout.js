@@ -30,7 +30,12 @@ export default function Layout() {
     "/identify_email",
     "/identify_phone",
   ];
-  const mainRouterURL = ["/calendar", "/inout", "/report"];
+  const mainRouterURL = [
+    "/calendar",
+    "/inout",
+    "/report/monthly",
+    "/report/yearly",
+  ];
   const settingRouterURL = ["/profile_change", "/password_change", "/signout"];
 
   return (
