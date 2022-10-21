@@ -1,14 +1,19 @@
 import logo from "../../img/logo.png";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import useStore from "../../store/store.js";
+import defaultUser from "../../img/default-user.jpg";
 
 export default function Header() {
+  const { profileImage } = useStore();
   const navigate = useNavigate();
+
   return (
-    <header
+    <HeaderLayout
       style={{
         background: "lightgray",
-        padding: 16,
-        fontSize: 24,
+        height: "100px",
+        paddingLeft: 16,
       }}
     >
       <img
@@ -17,6 +22,46 @@ export default function Header() {
         style={{ width: "200px", cursor: "pointer" }}
         src={logo}
       />
-    </header>
+      <ProfImg>
+        <img
+          alt="프로필사진"
+          onClick={() => navigate("/profile_change")}
+          src={profileImage ? profileImage : defaultUser}
+          style={{ width: "100px", height: "100px", objectFit: "cover" }}
+        />
+      </ProfImg>
+      {/* <Temp>
+        <div>로그아웃</div>
+        <div>설정</div>
+      </Temp> */}
+    </HeaderLayout>
   );
 }
+
+// const Temp = styled.div`
+//   width: 48px;
+//   text-align: center;
+//   height: 20px;
+//   font-size: 10px;
+//   right: 10%;
+//   top: 0%;
+//   position: absolute;
+// `;
+
+const ProfImg = styled.div`
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 5%;
+  cursor: pointer;
+`;
+
+const HeaderLayout = styled.header`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+`;

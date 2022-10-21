@@ -1,5 +1,6 @@
 // import logo from "./logo.svg";
 import "./App.css";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./components/login/Login";
@@ -21,6 +22,20 @@ import Error from "./components/Error";
 import Layout from "./components/common/Layout";
 
 import Screen from "./components/common/Screen";
+// import { createStore } from "redux";
+
+// import { Provider, useSelector, useDispatch, connect } from "react-redux";
+
+// function reducer(currentState, action) {
+//   if (currentState === undefined) {
+//     return {};
+//   }
+//   const newState = { ...currentState };
+
+//   return newState;
+// }
+
+// const store = createStore(reducer);
 
 function App() {
   return (

@@ -22,5 +22,4 @@ const ScreenDefault = styled.div`
 
   background-color: #d9d9d9;
   font-size: 100px;
-  position: relative;
 `;
