@@ -57,34 +57,16 @@ export default function Report() {
   const loc = useLocation();
 
   const graphTypes = ["bar", "doughnut"];
-  const [graphTypeChecked, setGraphTypeChecked] = useState([true, false]);
+  const [graphTypeChecked, setGraphTypeChecked] = useState({
+    chart: "bar",
+    checked: true,
+  });
 
-  let checked = -1;
-  let uncheck = -1;
-  const handleOnChange = (position) => {
-    for (let i = 0; i < graphTypeChecked.length; i++) {
-      if (graphTypeChecked[i]) checked = i;
-    }
-
-    const updateGraphTypeChecked = graphTypeChecked.map((item, idx) => {
-      if (checked >= 0) {
-        if (idx === position && checked !== position) {
-          uncheck = checked;
-          checked = idx;
-          return !item;
-        }
-        return item;
-      } else {
-        return idx === position ? !item : item;
-      }
-    });
-
-    const updateGraphTypeUnChecked = updateGraphTypeChecked.map((item, idx) => {
-      return idx === uncheck ? !item : item;
-    });
-
-    setGraphTypeChecked(updateGraphTypeUnChecked);
+  const handleOnChange = (e) => {
+    if (e.target.checked)
+      setGraphTypeChecked({ chart: e.target.name, checked: true });
   };
+  // console.log(graphTypeChecked);
   // const [data, setData] = useState([]);
   let data = [];
   let chartType = "doughnut"; // default: doghnut, checkbox에 따라 변함 - state로 관리 해야될듯
@@ -219,8 +201,8 @@ export default function Report() {
                 type="checkbox"
                 value={type}
                 name={type}
-                checked={graphTypeChecked[idx]}
-                onChange={() => handleOnChange(idx)}
+                checked={graphTypeChecked.chart === type && true}
+                onChange={handleOnChange}
               />
               {type === "bar" && "막대형"}
               {type === "doughnut" && "파이형"}
