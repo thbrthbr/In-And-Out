@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import styled from "styled-components";
+import Checkbox from "./Checkbox";
+import ChartCanvas from "./ChartCanvas";
 
 import {
   Chart,
@@ -62,14 +64,22 @@ export default function Report() {
     checked: true,
   });
 
+  const [yearlyOption, setYearlyOption] = useState({
+    option: "chart",
+    checked: true,
+  });
+
+  const yearlyOptions = ["table", "chart"];
+
   const handleOnChange = (e) => {
-    if (e.target.checked)
-      setGraphTypeChecked({ chart: e.target.name, checked: true });
+    if (e.target.name === "monthly" && e.target.checked) {
+      setGraphTypeChecked({ chart: e.target.value, checked: true });
+    } else if (e.target.name === "yearly" && e.target.checked) {
+      setYearlyOption({ option: e.target.value, checked: true });
+    }
   };
-  // console.log(graphTypeChecked);
-  // const [data, setData] = useState([]);
+
   let data = [];
-  let chartType = "doughnut"; // default: doghnut, checkbox에 따라 변함 - state로 관리 해야될듯
   let labels = [];
 
   // 임시적으로 데이터 처리
@@ -93,8 +103,8 @@ export default function Report() {
     ];
   }
 
-  const config = {
-    type: chartType,
+  const doughnutConfig = {
+    type: "doughnut",
     data: {
       datasets: [
         {
@@ -146,13 +156,86 @@ export default function Report() {
     },
   };
 
+  const barConfig = {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          axis: "y",
+          label: "My First Dataset",
+          data: data,
+          fill: false,
+          backgroundColor: [
+            "rgba(255, 99, 132, 0.2)",
+            "rgba(255, 159, 64, 0.2)",
+            "rgba(255, 205, 86, 0.2)",
+            "rgba(75, 192, 192, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+          ],
+          borderColor: [
+            "rgb(255, 99, 132)",
+            "rgb(255, 159, 64)",
+            "rgb(255, 205, 86)",
+            "rgb(75, 192, 192)",
+            "rgb(54, 162, 235)",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: false,
+      indexAxis: "y",
+      // Elements options apply to all of the options unless overridden in a dataset
+      // In this case, we are setting the border of each horizontal bar to be 2px wide
+      elements: {
+        bar: {
+          borderWidth: 2,
+        },
+      },
+      plugins: {
+        legend: {
+          position: "right",
+        },
+        title: {
+          display: true,
+          text: "Chart.js Horizontal Bar Chart",
+        },
+      },
+    },
+  };
+
+  const lineConfig = {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "My First Dataset",
+          data: data,
+          fill: false,
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1,
+        },
+      ],
+    },
+  };
+
   useEffect(() => {
     let charId;
     if (canvasRef.current) {
-      charId = drawChart(canvasRef.current, config);
+      charId = drawChart(
+        canvasRef.current,
+        loc.pathname === "/report/monthly"
+          ? graphTypeChecked.chart === "bar"
+            ? barConfig
+            : doughnutConfig
+          : lineConfig
+      );
     }
     return () => {
-      charId.destroy();
+      charId && charId.destroy();
     };
   });
 
@@ -193,25 +276,51 @@ export default function Report() {
       <br />
       <Link to="/">Logout</Link>
 
-      <ul>
-        {graphTypes.map((type, idx) => {
-          return (
-            <li key={idx}>
-              <input
-                type="checkbox"
-                value={type}
-                name={type}
-                checked={graphTypeChecked.chart === type && true}
-                onChange={handleOnChange}
-              />
-              {type === "bar" && "막대형"}
-              {type === "doughnut" && "파이형"}
-            </li>
-          );
-        })}
-      </ul>
+      {loc.pathname === "/report/monthly" && (
+        <div>
+          <ul>
+            {graphTypes.map((type, idx) => {
+              return (
+                <li key={idx}>
+                  <Checkbox
+                    type={type}
+                    name={"monthly"}
+                    checked={graphTypeChecked.chart === type ? true : false}
+                    handleOnChange={handleOnChange}
+                  />
+                  {type === "bar" && "막대형"}
+                  {type === "doughnut" && "파이형"}
+                </li>
+              );
+            })}
+          </ul>
+          <ChartCanvas width={1000} height={500} ref={canvasRef} />
+        </div>
+      )}
 
-      <canvas id="myChart" width={1000} height={500} ref={canvasRef}></canvas>
+      {loc.pathname === "/report/yearly" && (
+        <div>
+          <ul>
+            {yearlyOptions.map((type, idx) => {
+              return (
+                <li key={idx}>
+                  <Checkbox
+                    type={type}
+                    name={"yearly"}
+                    checked={yearlyOption.option === type ? true : false}
+                    handleOnChange={handleOnChange}
+                  />
+                  {type === "table" && "표"}
+                  {type === "chart" && "그래프"}
+                </li>
+              );
+            })}
+          </ul>
+          {yearlyOption.option === "chart" && (
+            <ChartCanvas width={1000} height={500} ref={canvasRef} />
+          )}
+        </div>
+      )}
     </div>
   );
 }
