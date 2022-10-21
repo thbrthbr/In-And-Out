@@ -3,6 +3,9 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schema/form_validation";
 
+import { useDispatch, useSelector } from "react-redux";
+import { login, logout } from "../../features/login";
+
 export default function Login() {
   const {
     register,
@@ -15,6 +18,11 @@ export default function Login() {
   const onSubmit = (data) => {
     alert("submit");
   };
+
+  const loginState = useSelector((state) => state.login.value);
+  const dispatch = useDispatch();
+  const handleLogin = () => dispatch(login());
+  const handleLogout = () => dispatch(logout());
 
   return (
     <div>
@@ -50,6 +58,9 @@ export default function Login() {
       <br />
       <Link to="/identify_email">RecoverPassword</Link>
       <br />
+      <p>{loginState ? "로그인됨" : "로그아웃됨"}</p>
+      <button onClick={handleLogin}>login</button>
+      <button onClick={handleLogout}>logout</button>
     </div>
   );
 }
