@@ -1,8 +1,12 @@
-import { useRef, useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+
+import { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import Checkbox from "./Checkbox";
 import ChartCanvas from "./ChartCanvas";
+
+import "react-data-grid/lib/styles.css";
+import DataGrid from "react-data-grid";
 
 import {
   Chart,
@@ -222,6 +226,36 @@ export default function Report() {
     },
   };
 
+  const columns = [
+    { key: "date", name: "기간" },
+    { key: "jan", name: "1월" },
+    { key: "feb", name: "2월" },
+    { key: "mar", name: "3월" },
+    { key: "apr", name: "4월" },
+    { key: "may", name: "5월" },
+    { key: "jun", name: "6월" },
+    { key: "jul", name: "7월" },
+    { key: "aug", name: "8월" },
+    { key: "sep", name: "9월" },
+    { key: "oct", name: "10월" },
+    { key: "nov", name: "11월" },
+    { key: "dec", name: "12월" },
+    { key: "sum", name: "합계" },
+  ];
+
+  const rows = [];
+  const rowData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  const addRows = (rowData) => {
+    const obj = {};
+    Object.entries(columns).forEach((column) => {
+      obj[column[1].key] = rowData[column[0]];
+    });
+    // console.log(obj);
+    rows.push(obj);
+  };
+  addRows(rowData);
+  console.log(rows);
+
   useEffect(() => {
     let charId;
     if (canvasRef.current) {
@@ -294,6 +328,7 @@ export default function Report() {
               );
             })}
           </ul>
+
           <ChartCanvas width={1000} height={500} ref={canvasRef} />
         </div>
       )}
@@ -316,8 +351,15 @@ export default function Report() {
               );
             })}
           </ul>
+          {yearlyOption.option === "table" && (
+            <div>
+              <DataGrid columns={columns} rows={rows} />
+            </div>
+          )}
           {yearlyOption.option === "chart" && (
-            <ChartCanvas width={1000} height={500} ref={canvasRef} />
+            <div>
+              <ChartCanvas width={1000} height={500} ref={canvasRef} />
+            </div>
           )}
         </div>
       )}
