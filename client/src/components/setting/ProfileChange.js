@@ -5,7 +5,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { profileChangeSchema } from "../../schema/form_validation";
 
 import styled from "styled-components";
-import defaultUser from "../../img/default-user.png";
+import defaultUser from "../../img/default-user.jpg";
+import useStore from "../../store/store.js";
 
 export default function ProfileChange() {
   const {
@@ -39,7 +40,8 @@ export default function ProfileChange() {
   // ];
   //나중에 form으로 데이터 보낼 때 쓸 Inputs id들
 
-  const [imageFile, setImageFile] = useState(null);
+  const { profileImage, setprofileImage } = useStore();
+
   const fileInput = useRef();
 
   const handleButtonClick = (e) => {
@@ -52,7 +54,7 @@ export default function ProfileChange() {
 
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      setImageFile(reader.result);
+      setprofileImage(reader.result);
     };
   };
 
@@ -62,7 +64,7 @@ export default function ProfileChange() {
         <Photo>
           <img
             alt="프로필사진"
-            src={imageFile ? imageFile : defaultUser}
+            src={profileImage ? profileImage : defaultUser}
             style={{ width: "200px" }}
           />
           <File onClick={handleButtonClick} htmlFor="input-file">
