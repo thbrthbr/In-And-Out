@@ -5,7 +5,7 @@ import { loginSchema } from "../../schema/form_validation";
 
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout, userLogin } from "../../features/login";
-import { persistor } from "../../index";
+import { persistor } from "../../store";
 
 export default function Login() {
   const {
