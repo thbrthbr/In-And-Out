@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PURGE } from "redux-persist";
 import axios from "axios";
+import storage from "redux-persist/lib/storage";
 
 const fetchUser = () => {
   return new Promise((resolve) => {
@@ -43,6 +45,10 @@ export const loginSlice = createSlice({
     [userLogin.rejected]: (state, action) => {
       console.log("rejected");
       state.loggedIn = false;
+    },
+    [userLogin.PURGE]: (state, action) => {
+      console.log("removed");
+      storage.remove("loggedIn");
     },
   },
 });
