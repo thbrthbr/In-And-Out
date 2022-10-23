@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { combineReducers } from "redux";
 import {
@@ -33,3 +34,5 @@ export const store = configureStore({
   //   login: loginReducer,
   // },
 });
+
+export const persistor = persistStore(store);
