@@ -4,9 +4,17 @@ import styled from "styled-components";
 import useStore from "../../store/store.js";
 import defaultUser from "../../img/default-user.jpg";
 
+import { useDispatch, useSelector } from "react-redux";
+import { login, logout, userLogin } from "../../features/login";
+
 export default function Header() {
   const { profileImage } = useStore();
   const navigate = useNavigate();
+
+  const loginState = useSelector((state) => state.login.loggedIn);
+  const dispatch = useDispatch();
+  const handleLogin = () => dispatch(userLogin());
+  const handleLogout = () => dispatch(logout());
 
   return (
     <HeaderLayout
@@ -22,14 +30,19 @@ export default function Header() {
         style={{ width: "200px", cursor: "pointer" }}
         src={logo}
       />
-      <ProfImg>
-        <img
-          alt="프로필사진"
-          onClick={() => navigate("/profile_change")}
-          src={profileImage ? profileImage : defaultUser}
-          style={{ width: "100px", height: "100px", objectFit: "cover" }}
-        />
-      </ProfImg>
+      {loginState && (
+        <ProfImg>
+          <img
+            alt="프로필사진"
+            onClick={() => navigate("/profile_change")}
+            src={profileImage ? profileImage : defaultUser}
+            style={{ width: "100px", height: "100px", objectFit: "cover" }}
+          />
+        </ProfImg>
+      )}
+      <p>{loginState ? "로그인됨" : "로그아웃됨"}</p>
+      <button onClick={handleLogin}>login</button>
+      <button onClick={handleLogout}>logout</button>
       {/* <Temp>
         <div>로그아웃</div>
         <div>설정</div>

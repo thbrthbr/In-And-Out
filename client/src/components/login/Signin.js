@@ -3,9 +3,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signInSchema } from "../../schema/form_validation";
 
-import { useDispatch, useSelector } from "react-redux";
-import { login, logout } from "../../features/login";
-
 export default function Signin() {
   const {
     register,
@@ -19,17 +16,9 @@ export default function Signin() {
     console.log(data);
   };
 
-  const loginState = useSelector((state) => state.login.value);
-  const dispatch = useDispatch();
-  const handleLogin = () => dispatch(login());
-  const handleLogout = () => dispatch(logout());
-
   return (
     <div>
       <div>Signin Page</div>
-      <p>{loginState ? "로그인됨" : "로그아웃됨"}</p>
-      <button onClick={handleLogin}>login</button>
-      <button onClick={handleLogout}>logout</button>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
           <input

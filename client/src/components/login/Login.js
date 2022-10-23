@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schema/form_validation";
 
 import { useDispatch, useSelector } from "react-redux";
-import { login, logout } from "../../features/login";
+import { login, logout, userLogin } from "../../features/login";
 
 export default function Login() {
   const {
@@ -19,9 +19,9 @@ export default function Login() {
     alert("submit");
   };
 
-  const loginState = useSelector((state) => state.login.value);
+  const loginState = useSelector((state) => state.login.loggedIn);
   const dispatch = useDispatch();
-  const handleLogin = () => dispatch(login());
+  const handleLogin = () => dispatch(userLogin());
   const handleLogout = () => dispatch(logout());
 
   return (
