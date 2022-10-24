@@ -51,7 +51,7 @@ const columns = [
   },
 ];
 
-const rowss = [
+let rowss = [
   {
     id: 1,
     date: "10/6/2022",
@@ -95,7 +95,9 @@ export default function Inout() {
     // console.log(rows);
     // console.log([...selectedRows]);
     const newRows = rows.slice();
-    setRows(newRows.filter((row, idx) => !selectedRows.has(row.id)));
+    const filteredRow = newRows.filter((row, idx) => !selectedRows.has(row.id));
+    setRows(filteredRow);
+    rowss = filteredRow;
   }
 
   return (
