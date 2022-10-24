@@ -23,7 +23,7 @@ const RenderHeader = ({ currentMonth, prevMonth, nextMonth }) => {
 
 const RenderDays = () => {
   const days = [];
-  const date = ["Sun", "Mon", "Thu", "Wed", "Thrs", "Fri", "Sat"];
+  const date = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   for (let i = 0; i < 7; i++) {
     days.push(
@@ -36,7 +36,13 @@ const RenderDays = () => {
   return <div className="days row">{days}</div>;
 };
 
-const RenderCells = ({ currentMonth, selectedDate, onDateClick }) => {
+const RenderCells = ({
+  currentMonth,
+  selectedDate,
+  onDateClick,
+  onDiaryClick,
+  showWrittenDiary,
+}) => {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart);
@@ -88,10 +94,13 @@ const RenderCells = ({ currentMonth, selectedDate, onDateClick }) => {
               justifyContent: "space-between",
             }}
           >
-            <Icon icon="arcticons:diary" onClick={() => alert("diary")}></Icon>
+            <Icon
+              icon="arcticons:diary"
+              onClick={() => onDiaryClick(!showWrittenDiary)}
+            ></Icon>
             <Icon
               icon="cil:magnifying-glass"
-              onClick={() => alert("glass")}
+              onClick={() => console.log("glass")}
             ></Icon>
           </div>
         </div>
@@ -108,7 +117,7 @@ const RenderCells = ({ currentMonth, selectedDate, onDateClick }) => {
   return <div className="body">{rows}</div>;
 };
 
-export const FullCalendar = () => {
+export const FullCalendar = ({ onDiaryClick, writtenDiary }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -133,6 +142,8 @@ export const FullCalendar = () => {
         currentMonth={currentMonth}
         selectedDate={selectedDate}
         onDateClick={onDateClick}
+        onDiaryClick={onDiaryClick}
+        showWrittenDiary={writtenDiary}
       />
     </div>
   );
