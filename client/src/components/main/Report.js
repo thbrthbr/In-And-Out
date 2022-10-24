@@ -68,18 +68,43 @@ export default function Report() {
     checked: true,
   });
 
+  const yearlyOptions = ["table", "chart"];
   const [yearlyOption, setYearlyOption] = useState({
     option: "chart",
     checked: true,
   });
 
-  const yearlyOptions = ["table", "chart"];
+  const costOptions = ["income", "expenditure"];
+  const [costOption, setCostOption] = useState({
+    option: "income",
+    checked: true,
+  });
+
+  const checkboxMap = {
+    monthly(e) {
+      setGraphTypeChecked({ chart: e.target.value, checked: true });
+    },
+    yearly(e) {
+      setYearlyOption({ option: e.target.value, checked: true });
+    },
+    cost(e) {
+      setCostOption({ option: e.target.value, checked: true });
+    },
+  };
+
+  const handleCheckbox = (checkboxType, e) => {
+    checkboxMap[checkboxType](e);
+  };
 
   const handleOnChange = (e) => {
-    if (e.target.name === "monthly" && e.target.checked) {
-      setGraphTypeChecked({ chart: e.target.value, checked: true });
-    } else if (e.target.name === "yearly" && e.target.checked) {
-      setYearlyOption({ option: e.target.value, checked: true });
+    if (e.target.checked) {
+      if (e.target.name === "monthly") {
+        handleCheckbox("monthly", e);
+      } else if (e.target.name === "yearly") {
+        handleCheckbox("yearly", e);
+      } else if (e.target.name === "cost") {
+        handleCheckbox("cost", e);
+      }
     }
   };
 
@@ -312,22 +337,43 @@ export default function Report() {
 
       {loc.pathname === "/report/monthly" && (
         <div>
-          <ul>
-            {graphTypes.map((type, idx) => {
-              return (
-                <li key={idx}>
-                  <Checkbox
-                    type={type}
-                    name={"monthly"}
-                    checked={graphTypeChecked.chart === type ? true : false}
-                    handleOnChange={handleOnChange}
-                  />
-                  {type === "bar" && "막대형"}
-                  {type === "doughnut" && "파이형"}
-                </li>
-              );
-            })}
-          </ul>
+          <div>
+            <ul>
+              {graphTypes.map((type, idx) => {
+                return (
+                  <li key={idx}>
+                    <Checkbox
+                      type={type}
+                      name={"monthly"}
+                      checked={graphTypeChecked.chart === type ? true : false}
+                      handleOnChange={handleOnChange}
+                    />
+                    {type === "bar" && "막대형"}
+                    {type === "doughnut" && "파이형"}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div>
+            <ul>
+              {costOptions.map((type, idx) => {
+                return (
+                  <li key={idx}>
+                    <Checkbox
+                      type={type}
+                      name={"cost"}
+                      checked={costOption.option === type ? true : false}
+                      handleOnChange={handleOnChange}
+                    />
+                    {type === "income" && "수입"}
+                    {type === "expenditure" && "지출"}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
           <ChartCanvas width={1000} height={500} ref={canvasRef} />
         </div>
