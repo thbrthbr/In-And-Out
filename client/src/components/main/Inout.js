@@ -54,7 +54,7 @@ const columns = [
 const rowss = [
   {
     id: 1,
-    date: "",
+    date: "10/6/2022",
     history: "Lasagne",
     cash: "4000",
     card: "32000",
@@ -83,8 +83,19 @@ export default function Inout() {
       memo: "",
     };
     setRows([...rows, newData]);
-    // rowss.push(newData); // 요렇게 하면 다른 화면 이동 후에도 저장가능한듯?
+    console.log(selectedRows);
+    rowss.push(newData); // 요렇게 하면 다른 화면 이동 후에도 저장가능한듯?
     // console.log(rows);
+  }
+
+  function saveData() {
+    alert("saved");
+  }
+  function deleteData() {
+    // console.log(rows);
+    // console.log([...selectedRows]);
+    const newRows = rows.slice();
+    setRows(newRows.filter((row, idx) => !selectedRows.has(row.id)));
   }
 
   return (
@@ -113,8 +124,8 @@ export default function Inout() {
         // onCopy={handleCopy}
       />
       <button onClick={getNewData}>Add</button>
-      <button>저장</button>
-      <button>삭제</button>
+      <button onClick={saveData}>저장</button>
+      <button onClick={deleteData}>삭제</button>
     </div>
   );
 }
