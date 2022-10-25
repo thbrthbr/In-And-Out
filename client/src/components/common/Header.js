@@ -1,20 +1,22 @@
 import logo from "../../img/logo.png";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import useStore from "../../store/store.js";
+import { useStore, useStore2 } from "../../store/store.js";
 import defaultUser from "../../img/default-user.jpg";
-
-import { useDispatch, useSelector } from "react-redux";
-import { login, logout, userLogin } from "../../features/login";
 
 export default function Header() {
   const { profileImage } = useStore();
+
   const navigate = useNavigate();
 
-  const loginState = useSelector((state) => state.login.loggedIn);
-  const dispatch = useDispatch();
-  const handleLogin = () => dispatch(userLogin());
-  const handleLogout = () => dispatch(logout());
+  const { logState, setLogState, tempFunc } = useStore2();
+
+  function loginHandler() {
+    setLogState(true);
+  }
+  function logoutHandler() {
+    setLogState(false);
+  }
 
   return (
     <HeaderLayout
@@ -30,7 +32,7 @@ export default function Header() {
         style={{ width: "200px", cursor: "pointer" }}
         src={logo}
       />
-      {loginState && (
+      {logState && (
         <ProfImg>
           <img
             alt="프로필사진"
@@ -40,9 +42,12 @@ export default function Header() {
           />
         </ProfImg>
       )}
-      <p>{loginState ? "로그인됨" : "로그아웃됨"}</p>
-      <button onClick={handleLogin}>login</button>
-      <button onClick={handleLogout}>logout</button>
+      {logState ? (
+        <button onClick={logoutHandler}>logout</button>
+      ) : (
+        <button onClick={loginHandler}>login</button>
+      )}
+
       {/* <Temp>
         <div>로그아웃</div>
         <div>설정</div>
