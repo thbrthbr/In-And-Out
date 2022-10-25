@@ -16,12 +16,16 @@ const Container = styled.div`
 export default function Calendar() {
   const [showWrittenDiary, setShowWrittenDiary] = useState(false);
   const [showNewDiary, setShowNewDiary] = useState(false);
+  const [diaryDate, setDiaryDate] = useState("");
+  const [detailDate, setDetailDate] = useState("");
 
   return (
     <Container>
       <FullCalendar
         onDiaryClick={setShowWrittenDiary}
         writtenDiary={showWrittenDiary}
+        setDiaryDate={setDiaryDate}
+        setDetailDate={setDetailDate}
       />
       <Icon
         icon="heroicons:pencil-square"
@@ -34,6 +38,7 @@ export default function Calendar() {
           <Diary
             newDiary={showNewDiary}
             writtenDiary={showWrittenDiary}
+            diaryDate={diaryDate}
           ></Diary>
         </DiaryModal>
       )}
@@ -42,6 +47,7 @@ export default function Calendar() {
           <Diary
             newDiary={showNewDiary}
             writtenDiary={showWrittenDiary}
+            diaryDate={diaryDate}
           ></Diary>
         </DiaryModal>
       )}

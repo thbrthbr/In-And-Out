@@ -108,12 +108,20 @@
       }
       .col.cell.valid {
         &:hover {
-          cursor: pointer;
+          // cursor: pointer;
           transition: 0.2s ease-in-out;
           box-shadow: 1.5px 1.5px 0px 0px transparentize(#686868, 0.1);
           transform: scale(1.01);
           border: none;
           background: transparentize(#c4c4c4, 0.5);
+        }
+        svg {
+          &:hover {
+            cursor: pointer;
+            transition: 0.2s ease-in-out;
+            transform: scale(1.15);
+            color: #686868;
+          }
         }
       }
       .col.cell.selected {
@@ -123,6 +131,14 @@
         background: #f3c5b6;
         color: #aa5b42;
         font-weight: 600;
+        svg {
+          &:hover {
+            cursor: pointer;
+            transition: 0.2s ease-in-out;
+            transform: scale(1.15);
+            color: #686868;
+          }
+        }
       }
     }
   }

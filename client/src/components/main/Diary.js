@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import DatePicker from "react-datepicker";
 
 const Container = styled.div`
   display: flex;
@@ -18,12 +19,15 @@ const Container = styled.div`
   }
 `;
 
-export default function Diary({ newDiary, writtenDiary }) {
+export default function Diary({ newDiary, writtenDiary, diaryDate }) {
   const [textValue, setTextValue] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
 
   const handleSetValue = (e) => {
     setTextValue(e.target.value);
   };
+
+  // diaryDate가지고 데이터 요청
 
   return (
     <div>
@@ -33,6 +37,7 @@ export default function Diary({ newDiary, writtenDiary }) {
             <textarea value={"12312312312312"} disabled></textarea>
           </div>
           <div>
+            <div>{diaryDate}</div>
             <div>
               <img
                 style={{ width: "80%", height: "300px", marginTop: "15px" }}
@@ -60,6 +65,10 @@ export default function Diary({ newDiary, writtenDiary }) {
             <textarea value={"12312312312312"} disabled></textarea>
           </div>
           <div>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+            />
             <div
               style={{
                 width: "80%",

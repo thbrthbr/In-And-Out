@@ -42,6 +42,8 @@ const RenderCells = ({
   onDateClick,
   onDiaryClick,
   showWrittenDiary,
+  setDiaryDate,
+  setDetailDate,
 }) => {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -69,7 +71,7 @@ const RenderCells = ({
               : "valid"
           }`}
           key={day}
-          onClick={() => onDateClick(parse(cloneDay))}
+          // onClick={() => onDateClick(parse(cloneDay, "YYYYMMDD", new Date()))}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -96,11 +98,19 @@ const RenderCells = ({
           >
             <Icon
               icon="arcticons:diary"
-              onClick={() => onDiaryClick(!showWrittenDiary)}
+              id={day.toLocaleDateString()}
+              onClick={(e) => {
+                onDiaryClick(!showWrittenDiary);
+                setDiaryDate(e.target.id);
+              }}
             ></Icon>
             <Icon
               icon="cil:magnifying-glass"
-              onClick={() => console.log("glass")}
+              id={day.toLocaleDateString()}
+              onClick={(e) => {
+                console.log(e.target.id);
+                setDetailDate(e.target.id);
+              }}
             ></Icon>
           </div>
         </div>
@@ -117,7 +127,12 @@ const RenderCells = ({
   return <div className="body">{rows}</div>;
 };
 
-export const FullCalendar = ({ onDiaryClick, writtenDiary }) => {
+export const FullCalendar = ({
+  onDiaryClick,
+  writtenDiary,
+  setDiaryDate,
+  setDetailDate,
+}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -128,6 +143,7 @@ export const FullCalendar = ({ onDiaryClick, writtenDiary }) => {
     setCurrentMonth(addMonths(currentMonth, 1));
   };
   const onDateClick = (day) => {
+    console.log(1, day);
     setSelectedDate(day);
   };
   return (
@@ -144,6 +160,8 @@ export const FullCalendar = ({ onDiaryClick, writtenDiary }) => {
         onDateClick={onDateClick}
         onDiaryClick={onDiaryClick}
         showWrittenDiary={writtenDiary}
+        setDiaryDate={setDiaryDate}
+        setDetailDate={setDetailDate}
       />
     </div>
   );
