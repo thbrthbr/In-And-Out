@@ -8,6 +8,14 @@ import ChartCanvas from "./ChartCanvas";
 import "react-data-grid/lib/styles.css";
 import DataGrid from "react-data-grid";
 
+import axios from "axios";
+
+import {
+  doughnutOption,
+  barOption,
+  lineOption,
+} from "../../option/graphOptions";
+
 import {
   Chart,
   BarElement,
@@ -58,23 +66,118 @@ const drawChart = (ctx, config) => {
   return new Chart(ctx, config);
 };
 
+const graphTypes = ["bar", "doughnut"];
+const yearlyOptions = ["table", "chart"];
+const costOptions = ["income", "expense"];
+
+const columns = [
+  { key: "date", name: "기간" },
+  { key: "jan", name: "1월" },
+  { key: "feb", name: "2월" },
+  { key: "mar", name: "3월" },
+  { key: "apr", name: "4월" },
+  { key: "may", name: "5월" },
+  { key: "jun", name: "6월" },
+  { key: "jul", name: "7월" },
+  { key: "aug", name: "8월" },
+  { key: "sep", name: "9월" },
+  { key: "oct", name: "10월" },
+  { key: "nov", name: "11월" },
+  { key: "dec", name: "12월" },
+  { key: "sum", name: "합계" },
+];
+
+let data = []; //useState로 관리? -> getData -> setData로 처리해 rerendering
+let labels = [];
+const rows = [];
+
+const rowData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const addRows = (rowData) => {
+  const obj = {};
+  Object.entries(columns).forEach((column) => {
+    obj[column[1].key] = rowData[column[0]];
+  });
+  // console.log(obj);
+  rows.push(obj);
+};
+
+const doughnutConfig = {
+  type: "doughnut",
+  data: {
+    datasets: [
+      {
+        data: [],
+        backgroundColor: [
+          "rgb(255, 99, 132)",
+          "rgb(255, 159, 64)",
+          "rgb(255, 205, 86)",
+          "rgb(75, 192, 192)",
+          "rgb(54, 162, 235)",
+        ],
+      },
+    ],
+    labels: [],
+  },
+  options: doughnutOption,
+};
+
+const barConfig = {
+  type: "bar",
+  data: {
+    labels: [],
+    datasets: [
+      {
+        axis: "y",
+        label: "My First Dataset",
+        data: [],
+        fill: false,
+        backgroundColor: [
+          "rgb(255, 99, 132)",
+          "rgb(255, 159, 64)",
+          "rgb(255, 205, 86)",
+          "rgb(75, 192, 192)",
+          "rgb(54, 162, 235)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: barOption,
+};
+
+const lineConfig = {
+  type: "line",
+  data: {
+    labels: [],
+    datasets: [
+      {
+        label: "My First Dataset",
+        data: [],
+        fill: false,
+        borderColor: "rgb(75, 192, 192)",
+        tension: 0.1,
+      },
+    ],
+  },
+  options: lineOption,
+};
+
+function getData() {}
+
 export default function Report() {
   const canvasRef = useRef(null);
   const loc = useLocation();
 
-  const graphTypes = ["bar", "doughnut"];
   const [graphTypeChecked, setGraphTypeChecked] = useState({
-    chart: "bar",
+    option: "bar",
     checked: true,
   });
 
-  const yearlyOptions = ["table", "chart"];
   const [yearlyOption, setYearlyOption] = useState({
     option: "chart",
     checked: true,
   });
 
-  const costOptions = ["income", "expenditure"];
   const [costOption, setCostOption] = useState({
     option: "income",
     checked: true,
@@ -82,7 +185,7 @@ export default function Report() {
 
   const checkboxMap = {
     monthly(e) {
-      setGraphTypeChecked({ chart: e.target.value, checked: true });
+      setGraphTypeChecked({ option: e.target.value, checked: true });
     },
     yearly(e) {
       setYearlyOption({ option: e.target.value, checked: true });
@@ -108,186 +211,43 @@ export default function Report() {
     }
   };
 
-  let data = [];
-  let labels = [];
-
-  // 임시적으로 데이터 처리
-  if (loc.pathname === "/report/monthly") {
-    data = [10, 20, 15, 5, 50];
-    labels = [
-      "주거 - 10% 100,000",
-      "주거 - 10% 100,000",
-      "주거 - 10% 100,000",
-      "주거 - 10% 100,000",
-      "주거 - 10% 100,000",
-    ];
-  } else if (loc.pathname === "/report/yearly") {
-    data = [20, 30, 10, 30, 10];
-    labels = [
-      "주거 - 20% 200,000",
-      "주거 - 20% 200,000",
-      "주거 - 20% 200,000",
-      "주거 - 20% 200,000",
-      "주거 - 20% 200,000",
-    ];
-  }
-
-  const doughnutConfig = {
-    type: "doughnut",
-    data: {
-      datasets: [
-        {
-          data: data,
-          backgroundColor: [
-            "rgb(255, 99, 132)",
-            "rgb(255, 159, 64)",
-            "rgb(255, 205, 86)",
-            "rgb(75, 192, 192)",
-            "rgb(54, 162, 235)",
-          ],
-        },
-      ],
-      labels: labels,
-    },
-    options: {
-      responsive: false,
-      tooltips: {
-        callbacks: {
-          label: function (tooltipItem, data) {
-            var dataset = data.datasets[tooltipItem.datasetIndex];
-            var total = dataset.data.reduce(function (
-              previousValue,
-              currentValue,
-              currentIndex,
-              array
-            ) {
-              return previousValue + currentValue;
-            });
-            var currentValue = dataset.data[tooltipItem.index];
-            var precentage = Math.floor((currentValue / total) * 100 + 0.5);
-            return precentage + "%";
-          },
-        },
-      },
-      plugins: {
-        datalabels: {
-          formatter: (value) => {
-            if (value < 1) return "";
-            return `${value} %`;
-          },
-        },
-        legend: {
-          display: true,
-          position: "right",
-          align: "start",
-        },
-      },
-    },
-  };
-
-  const barConfig = {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          axis: "y",
-          label: "My First Dataset",
-          data: data,
-          fill: false,
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.2)",
-            "rgba(255, 159, 64, 0.2)",
-            "rgba(255, 205, 86, 0.2)",
-            "rgba(75, 192, 192, 0.2)",
-            "rgba(54, 162, 235, 0.2)",
-          ],
-          borderColor: [
-            "rgb(255, 99, 132)",
-            "rgb(255, 159, 64)",
-            "rgb(255, 205, 86)",
-            "rgb(75, 192, 192)",
-            "rgb(54, 162, 235)",
-          ],
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      responsive: false,
-      indexAxis: "y",
-      // Elements options apply to all of the options unless overridden in a dataset
-      // In this case, we are setting the border of each horizontal bar to be 2px wide
-      elements: {
-        bar: {
-          borderWidth: 2,
-        },
-      },
-      plugins: {
-        legend: {
-          position: "right",
-        },
-        title: {
-          display: true,
-          text: "Chart.js Horizontal Bar Chart",
-        },
-      },
-    },
-  };
-
-  const lineConfig = {
-    type: "line",
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: "My First Dataset",
-          data: data,
-          fill: false,
-          borderColor: "rgb(75, 192, 192)",
-          tension: 0.1,
-        },
-      ],
-    },
-  };
-
-  const columns = [
-    { key: "date", name: "기간" },
-    { key: "jan", name: "1월" },
-    { key: "feb", name: "2월" },
-    { key: "mar", name: "3월" },
-    { key: "apr", name: "4월" },
-    { key: "may", name: "5월" },
-    { key: "jun", name: "6월" },
-    { key: "jul", name: "7월" },
-    { key: "aug", name: "8월" },
-    { key: "sep", name: "9월" },
-    { key: "oct", name: "10월" },
-    { key: "nov", name: "11월" },
-    { key: "dec", name: "12월" },
-    { key: "sum", name: "합계" },
-  ];
-
-  const rows = [];
-  const rowData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-  const addRows = (rowData) => {
-    const obj = {};
-    Object.entries(columns).forEach((column) => {
-      obj[column[1].key] = rowData[column[0]];
-    });
-    // console.log(obj);
-    rows.push(obj);
-  };
-  addRows(rowData);
-  console.log(rows);
-
   useEffect(() => {
     let charId;
+    if (loc.pathname === "/report/monthly") {
+      getData();
+      data = [10, 20, 15, 5, 50];
+      labels = [
+        "주거 - 10% 100,000",
+        "주거 - 10% 100,000",
+        "주거 - 10% 100,000",
+        "주거 - 10% 100,000",
+        "주거 - 10% 100,000",
+      ];
+    } else if (loc.pathname === "/report/yearly") {
+      getData();
+      data = [20, 30, 10, 30, 10];
+      labels = [
+        "주거 - 20% 200,000",
+        "주거 - 20% 200,000",
+        "주거 - 20% 200,000",
+        "주거 - 20% 200,000",
+        "주거 - 20% 200,000",
+      ];
+    }
+    doughnutConfig.data.labels = labels;
+    doughnutConfig.data.datasets[0].data = data;
+    barConfig.data.labels = labels;
+    barConfig.data.datasets[0].data = data;
+    lineConfig.data.labels = labels;
+    lineConfig.data.datasets[0].data = data;
+    addRows(rowData);
+    console.log(rows);
+
     if (canvasRef.current) {
       charId = drawChart(
         canvasRef.current,
         loc.pathname === "/report/monthly"
-          ? graphTypeChecked.chart === "bar"
+          ? graphTypeChecked.option === "bar"
             ? barConfig
             : doughnutConfig
           : lineConfig
@@ -326,15 +286,6 @@ export default function Report() {
         </NavLink>
       </NavLinkContainer>
 
-      <div>Report</div>
-      <Link to="/profile_change">Setting</Link>
-      <br />
-      <Link to="/calendar">Calendar</Link>
-      <br />
-      <Link to="/inout">Inout</Link>
-      <br />
-      <Link to="/">Logout</Link>
-
       {loc.pathname === "/report/monthly" && (
         <div>
           <div>
@@ -345,7 +296,7 @@ export default function Report() {
                     <Checkbox
                       type={type}
                       name={"monthly"}
-                      checked={graphTypeChecked.chart === type ? true : false}
+                      checked={graphTypeChecked.option === type ? true : false}
                       handleOnChange={handleOnChange}
                     />
                     {type === "bar" && "막대형"}
@@ -368,7 +319,7 @@ export default function Report() {
                       handleOnChange={handleOnChange}
                     />
                     {type === "income" && "수입"}
-                    {type === "expenditure" && "지출"}
+                    {type === "expense" && "지출"}
                   </li>
                 );
               })}
