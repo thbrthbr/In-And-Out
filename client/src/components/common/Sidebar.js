@@ -36,7 +36,7 @@ export default function Sidebar({ menu }) {
   const loc = useLocation();
   const mainMenus = [
     { name: "달력", path: ["/calendar"] },
-    { name: "수입/지출", path: ["/inout"] },
+    { name: "수입/지출", path: ["/inout/income", "/inout/expense"] },
     { name: "보고서", path: ["/report/monthly", "/report/yearly"] },
   ];
 
@@ -58,7 +58,7 @@ export default function Sidebar({ menu }) {
         >
           <SideButton
             style={
-              menu.name !== "보고서"
+              menu.name === "달력"
                 ? loc.pathname === menu.path[0]
                   ? { backgroundColor: "pink" }
                   : { backgroundColor: "white" }
