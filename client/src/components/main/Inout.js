@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 
 import "react-data-grid/lib/styles.css";
 import DataGrid, { SelectColumn, textEditor } from "react-data-grid";
 import dropDownEditor from "../../editor/dropDownEditor";
 import DateEditor from "../../editor/DateEditor";
+
+import axios from "axios";
 
 const columns = [
   SelectColumn,
@@ -47,11 +48,12 @@ const columns = [
   {
     key: "memo",
     name: "메모",
+    width: 500,
     editor: textEditor,
   },
 ];
 
-let rowss = [
+let dataRow = [
   {
     id: 1,
     date: "10/6/2022",
@@ -67,12 +69,19 @@ function rowKeyGetter(row) {
   return row.id;
 }
 
-let num = 2;
+function getData() {}
+
+let num = dataRow.length;
 export default function Inout() {
-  const [rows, setRows] = useState(rowss);
+  const [rows, setRows] = useState(dataRow); // 나중에 빈배열로 처리
   const [selectedRows, setSelectedRows] = useState(() => new Set());
-  // console.log("rerender");
-  function getNewData() {
+
+  useEffect(() => {
+    // 데이터 불러오기
+    getData(); // dataRow에 받은 데이터 저장한 후 저장 할때 dataRow를 서버에 보내면 될듯
+  });
+
+  function createNewRow() {
     const newData = {
       id: num++,
       date: "",
@@ -84,7 +93,7 @@ export default function Inout() {
     };
     setRows([...rows, newData]);
     console.log(selectedRows);
-    rowss.push(newData); // 요렇게 하면 다른 화면 이동 후에도 저장가능한듯?
+    dataRow.push(newData); // 요렇게 하면 다른 화면 이동 후에도 저장가능한듯?
     // console.log(rows);
   }
 
@@ -97,7 +106,7 @@ export default function Inout() {
     const newRows = rows.slice();
     const filteredRow = newRows.filter((row, idx) => !selectedRows.has(row.id));
     setRows(filteredRow);
-    rowss = filteredRow;
+    dataRow = filteredRow;
   }
 
   return (
@@ -114,10 +123,8 @@ export default function Inout() {
         }}
         selectedRows={selectedRows}
         onSelectedRowsChange={setSelectedRows}
-
-        // onCopy={handleCopy}
       />
-      <button onClick={getNewData}>Add</button>
+      <button onClick={createNewRow}>Add</button>
       <button onClick={saveData}>저장</button>
       <button onClick={deleteData}>삭제</button>
     </div>
