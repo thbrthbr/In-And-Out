@@ -1,3 +1,5 @@
+import { withTheme } from "styled-components";
+
 const doughnutOption = {
   responsive: false,
   tooltips: {
@@ -44,13 +46,25 @@ const barOption = {
     },
   },
   plugins: {
-    legend: {
-      position: "right",
-      display: false,
+    datalabels: {
+      formatter: (value) => {
+        if (value < 1) return "";
+        return `${value} %`;
+      },
     },
-    title: {
-      display: false,
-      text: "Chart.js Horizontal Bar Chart",
+    legend: {
+      display: true,
+      position: "right",
+      align: "start",
+      labels: {
+        generateLabels: (chart) => {
+          return chart.data.labels.map((label, index) => ({
+            text: label,
+            fillStyle: chart.data.datasets[0].backgroundColor[index],
+            hidden: false,
+          }));
+        },
+      },
     },
   },
 };
