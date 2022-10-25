@@ -7,6 +7,9 @@ import ChartCanvas from "./ChartCanvas";
 
 import "react-data-grid/lib/styles.css";
 import DataGrid from "react-data-grid";
+import DateHeader from "../common/DateHeader";
+
+import { addMonths, subMonths, addYears, subYears } from "date-fns";
 
 import axios from "axios";
 
@@ -167,6 +170,22 @@ function getData() {}
 export default function Report() {
   const canvasRef = useRef(null);
   const loc = useLocation();
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentYear, setCurrentYear] = useState(new Date());
+
+  const prevMonth = () => {
+    setCurrentMonth(subMonths(currentMonth, 1));
+  };
+  const nextMonth = () => {
+    setCurrentMonth(addMonths(currentMonth, 1));
+  };
+
+  const prevYear = () => {
+    setCurrentYear(subYears(currentYear, 1));
+  };
+  const nextYear = () => {
+    setCurrentYear(addYears(currentYear, 1));
+  };
 
   const [graphTypeChecked, setGraphTypeChecked] = useState({
     option: "bar",
@@ -325,7 +344,12 @@ export default function Report() {
               })}
             </ul>
           </div>
-
+          <DateHeader
+            type={"month"}
+            currentTime={currentMonth}
+            prev={prevMonth}
+            next={nextMonth}
+          />
           <ChartCanvas width={1000} height={500} ref={canvasRef} />
         </div>
       )}
@@ -355,6 +379,11 @@ export default function Report() {
           )}
           {yearlyOption.option === "chart" && (
             <div>
+              <DateHeader
+                currentTime={currentYear}
+                prev={prevYear}
+                next={nextYear}
+              />
               <ChartCanvas width={1000} height={500} ref={canvasRef} />
             </div>
           )}
