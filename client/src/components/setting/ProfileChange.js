@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -6,7 +6,7 @@ import { profileChangeSchema } from "../../schema/form_validation";
 
 import styled from "styled-components";
 import defaultUser from "../../img/default-user.jpg";
-import useStore from "../../store/store.js";
+import { useStore, useStore2, loginStore } from "../../store/store.js";
 
 export default function ProfileChange() {
   const {
@@ -21,26 +21,9 @@ export default function ProfileChange() {
     alert("submit");
   };
 
-  const values = [
-    { value: "inandout1234@gmail.com" },
-    { value: "리제로" },
-    { value: "010-1010-1010" },
-    { value: "1999-05-17" },
-    { value: "미국" },
-    { value: "남자" },
-  ];
-
-  // const valueIds = [
-  //   { valueId: "이메일" },
-  //   { valueId: "닉네임" },
-  //   { valueId: "전화번호" },
-  //   { valueId: "생년월일" },
-  //   { valueId: "거주지" },
-  //   { valueId: "성별" },
-  // ];
-  //나중에 form으로 데이터 보낼 때 쓸 Inputs id들
-
   const { profileImage, setprofileImage } = useStore();
+  const { id, nickname, phoneNumber, birthdate, residence, gender } =
+    loginStore();
 
   const fileInput = useRef();
 
@@ -86,7 +69,7 @@ export default function ProfileChange() {
               <Inputs
                 spellCheck={false}
                 type="text"
-                defaultValue={values[0].value}
+                defaultValue={id}
                 readOnly
               />
             </TextInputs>
@@ -96,7 +79,7 @@ export default function ProfileChange() {
               <Inputs
                 spellCheck={false}
                 type="text"
-                defaultValue={values[1].value}
+                defaultValue={nickname}
                 {...register("name")}
               />
               <Alert role="alert">{errors.name?.message}</Alert>
@@ -107,7 +90,7 @@ export default function ProfileChange() {
               <Inputs
                 spellCheck={false}
                 type="text"
-                defaultValue={values[2].value}
+                defaultValue={phoneNumber}
                 {...register("phone")}
               />
               <Alert role="alert">{errors.phone?.message}</Alert>
@@ -118,7 +101,7 @@ export default function ProfileChange() {
               <Inputs
                 spellCheck={false}
                 type="text"
-                defaultValue={values[3].value}
+                defaultValue={birthdate}
                 {...register("birthday")}
               />
               <Alert role="alert">{errors.birthday?.message}</Alert>
@@ -129,7 +112,7 @@ export default function ProfileChange() {
               <Inputs
                 spellCheck={false}
                 type="text"
-                defaultValue={values[4].value}
+                defaultValue={residence}
                 {...register("residence")}
               />
               <Alert role="alert">{errors.residence?.message}</Alert>
@@ -162,7 +145,7 @@ export default function ProfileChange() {
                     type="radio"
                     name="gender"
                     value="female"
-                    checked
+                    defaultChecked={gender === "여자" ? true : false}
                     {...register("gender")}
                   />
                 </div>
@@ -183,6 +166,7 @@ export default function ProfileChange() {
                     type="radio"
                     name="gender"
                     value="male"
+                    defaultChecked={gender === "남자" ? true : false}
                     {...register("gender")}
                   />
                 </div>
