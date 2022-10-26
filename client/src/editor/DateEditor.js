@@ -11,6 +11,7 @@ export default function DateEditor({ row, onRowChange }) {
       name="startDate"
       portalId="root-portal"
       placeholder="Date"
+      autoFocus
       // value={startDate.toLocaleDateString()}
       onChange={(date) => {
         // setStartDate(date);

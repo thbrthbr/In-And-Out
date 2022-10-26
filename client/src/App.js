@@ -50,7 +50,8 @@ function App() {
           <Route path="/calendar" element={<Calendar />}></Route>
           <Route path="/report/monthly" element={<Report />}></Route>
           <Route path="/report/yearly" element={<Report />}></Route>
-          <Route path="/inout" element={<Inout />}></Route>
+          <Route path="/inout/income" element={<Inout />}></Route>
+          <Route path="/inout/expense" element={<Inout />}></Route>
           <Route path="/profile_change" element={<Screen />}></Route>
           <Route path="/password_change" element={<Screen />}></Route>
           <Route path="/signout" element={<Screen />}></Route>

@@ -31,7 +31,8 @@ export default function Layout() {
   ];
   const mainRouterURL = [
     "/calendar",
-    "/inout",
+    "/inout/income",
+    "/inout/expense",
     "/report/monthly",
     "/report/yearly",
   ];
