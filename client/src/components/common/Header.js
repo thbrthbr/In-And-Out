@@ -9,7 +9,7 @@ export default function Header() {
 
   const navigate = useNavigate();
 
-  const { logState, setLogState, tempFunc } = useStore2();
+  const { logState, setLogState } = useStore2();
 
   function loginHandler() {
     setLogState(true);
@@ -43,9 +43,9 @@ export default function Header() {
         </ProfImg>
       )}
       {logState ? (
-        <button onClick={logoutHandler}>logout</button>
+        <button onClick={logoutHandler}>logoutState</button>
       ) : (
-        <button onClick={loginHandler}>login</button>
+        <button onClick={loginHandler}>loginState</button>
       )}
 
       {/* <Temp>

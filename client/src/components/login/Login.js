@@ -4,12 +4,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schema/form_validation";
 
-import {
-  useStore,
-  useStore2,
-  useStore3,
-  loginStore,
-} from "../../store/store.js";
+import { useStore2, useStore3, loginStore } from "../../store/store.js";
 
 export default function Login() {
   const {
@@ -25,6 +20,7 @@ export default function Login() {
   const {
     id,
     setId,
+    nickname,
     setNickname,
     setPhoneNumber,
     setBirthdate,
@@ -44,21 +40,31 @@ export default function Login() {
       setResidence(result.residence);
       setGender(result.gender);
       setLogState(true);
-      alert("반갑습니다");
+      // alert("반갑습니다");
     }
   };
 
   function loginHandler() {
     setLogState(true);
+    console.log(localStorage.getItem("login-stuff"));
   }
   function logoutHandler() {
     setLogState(false);
+    sessionStorage.clear();
+    setId("");
+    setNickname("");
+    setPhoneNumber("");
+    setBirthdate("");
+    setResidence("");
+    setGender("");
+    console.log(id);
+    // console.log(localStorage.getItem("login-stuff"));
   }
 
   return (
     <div>
       {logState ? (
-        <div> {id} </div>
+        <div> {nickname}님 반갑습니다 </div>
       ) : (
         <>
           <div>Login Page</div>
