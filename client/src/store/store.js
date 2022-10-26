@@ -9,10 +9,16 @@ const useStore = create(
 );
 
 const useStore2 = create(
-  persist((set) => ({
-    logState: false,
-    setLogState: (input) => set({ logState: input }),
-  }))
+  persist(
+    (set) => ({
+      logState: false,
+      setLogState: (input) => set({ logState: input }),
+    }),
+    {
+      name: "logState",
+      getStorage: () => sessionStorage,
+    }
+  )
 );
 
 const useStore3 = create((set) => ({
@@ -34,22 +40,28 @@ const useStore3 = create((set) => ({
 }));
 
 const loginStore = create(
-  persist((set) => ({
-    id: "",
-    setId: (input) => set({ id: input }),
-    password: "",
-    setPassword: (input) => set({ password: input }),
-    nickname: "",
-    setNickname: (input) => set({ nickname: input }),
-    phoneNumber: "",
-    setPhoneNumber: (input) => set({ phoneNumber: input }),
-    birthdate: "",
-    setBirthdate: (input) => set({ birthdate: input }),
-    residence: "",
-    setResidence: (input) => set({ residence: input }),
-    gender: "",
-    setGender: (input) => set({ gender: input }),
-  }))
+  persist(
+    (set) => ({
+      id: "",
+      setId: (input) => set({ id: input }),
+      password: "",
+      setPassword: (input) => set({ password: input }),
+      nickname: "",
+      setNickname: (input) => set({ nickname: input }),
+      phoneNumber: "",
+      setPhoneNumber: (input) => set({ phoneNumber: input }),
+      birthdate: "",
+      setBirthdate: (input) => set({ birthdate: input }),
+      residence: "",
+      setResidence: (input) => set({ residence: input }),
+      gender: "",
+      setGender: (input) => set({ gender: input }),
+    }),
+    {
+      name: "login-stuff",
+      getStorage: () => sessionStorage,
+    }
+  )
 );
 
 export { useStore, useStore2, useStore3, loginStore };
