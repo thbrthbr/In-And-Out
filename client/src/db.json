@@ -1,1 +1,109 @@
-{ "profile": { "name": "aa" } }
+{
+  "report": {
+    "income": [
+      {
+        "category": "수입1",
+        "category_sum": 500000,
+        "category_ratio": 0.5
+      },
+      {
+        "category": "수입2",
+        "category_sum": 200000,
+        "category_ratio": 0.2
+      },
+      {
+        "category": "수입3",
+        "category_sum": 300000,
+        "category_ratio": 0.3
+      }
+    ],
+    "expense": [
+      {
+        "category": "지출1",
+        "category_sum": 500000,
+        "category_ratio": 0.5
+      },
+      {
+        "category": "지출2",
+        "category_sum": 200000,
+        "category_ratio": 0.2
+      },
+      {
+        "category": "지출3",
+        "category_sum": 300000,
+        "category_ratio": 0.3
+      }
+    ]
+  },
+  "income": {
+    "category": [
+      {
+        "detailIncomeCategoryId": 1,
+        "detailIncomeCategoryName": "없음"
+      }
+    ],
+    "income": [
+      {
+        "incomeId": 1,
+        "incomeDate": "12/12/22",
+        "incomeItem": "월급",
+        "incomeAmount": 20000,
+        "incomeCategoryName": "월급",
+        "incomeMemo": "good"
+      },
+      {
+        "incomeId": 2,
+        "incomeDate": "12/12/22",
+        "incomeItem": "월급",
+        "incomeAmount": 20000,
+        "incomeCategoryName": "월급",
+        "incomeMemo": "good"
+      },
+      {
+        "incomeId": 3,
+        "incomeDate": "12/12/22",
+        "incomeItem": "월급",
+        "incomeAmount": 20000,
+        "incomeCategoryName": "월급",
+        "incomeMemo": "good"
+      }
+    ]
+  },
+  "expense": {
+    "category": [
+      {
+        "detailExpenseCategoryId": 1,
+        "detailExpenseCategoryName": "없음"
+      }
+    ],
+    "expense": [
+      {
+        "expenseId": 1,
+        "expenseDate": "11/12/22",
+        "expenseItem": "사과",
+        "expenseCash": 10000,
+        "expenseCard": 50000,
+        "expenseCategoryName": "음식",
+        "expenseMemo": "good"
+      },
+      {
+        "expenseId": 2,
+        "expenseDate": "11/12/22",
+        "expenseItem": "사과",
+        "expenseCash": 10000,
+        "expenseCard": 50000,
+        "expenseCategoryName": "음식",
+        "expenseMemo": "good"
+      },
+      {
+        "expenseId": 3,
+        "expenseDate": "11/12/22",
+        "expenseItem": "사과",
+        "expenseCash": 10000,
+        "expenseCard": 50000,
+        "expenseCategoryName": "음식",
+        "expenseMemo": "good"
+      }
+    ]
+  }
+}

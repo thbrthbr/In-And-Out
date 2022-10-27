@@ -24,10 +24,10 @@ const NavLinkContainer = styled.div`
   display: flex;
 `;
 
-const columns = [
+const incomeColumns = [
   SelectColumn,
   {
-    key: "date",
+    key: "incomeDate",
     name: "날짜",
     width: 200,
     formatter(props) {
@@ -36,22 +36,17 @@ const columns = [
     editor: DateEditor,
   },
   {
-    key: "history",
+    key: "incomeItem",
     name: "사용내역",
     editor: textEditor,
   },
   {
-    key: "cash",
-    name: "현금",
+    key: "incomeAmount",
+    name: "금액",
     editor: textEditor,
   },
   {
-    key: "card",
-    name: "카드",
-    editor: textEditor,
-  },
-  {
-    key: "category",
+    key: "incomeCategoryName",
     name: "분류",
     formatter(props) {
       return <>{props.row.category}</>;
@@ -63,7 +58,53 @@ const columns = [
     },
   },
   {
-    key: "memo",
+    key: "incomeMemo",
+    name: "메모",
+    width: 500,
+    editor: textEditor,
+  },
+];
+
+const expenseColumns = [
+  SelectColumn,
+  {
+    key: "expenseDate",
+    name: "날짜",
+    width: 200,
+    formatter(props) {
+      return <>{props.row.date}</>;
+    },
+    editor: DateEditor,
+  },
+  {
+    key: "expenseItem",
+    name: "사용내역",
+    editor: textEditor,
+  },
+  {
+    key: "expenseCash",
+    name: "현금",
+    editor: textEditor,
+  },
+  {
+    key: "expenseCard",
+    name: "카드",
+    editor: textEditor,
+  },
+  {
+    key: "expenseCategoryName",
+    name: "분류",
+    formatter(props) {
+      return <>{props.row.category}</>;
+    },
+    resizable: true,
+    editor: dropDownEditor,
+    editorOptions: {
+      editOnClick: true,
+    },
+  },
+  {
+    key: "expenseMemo",
     name: "메모",
     width: 500,
     editor: textEditor,
@@ -72,13 +113,22 @@ const columns = [
 
 let dataRow = [
   {
-    id: 1,
-    date: "10/6/2022",
-    history: "Lasagne",
-    cash: "4000",
-    card: "32000",
-    category: "식비",
-    memo: "good",
+    expenseId: 1,
+    expenseDate: "10/6/2022",
+    expenseItem: "Lasagne",
+    expenseCash: "4000",
+    expenseCard: "32000",
+    expenseCategoryName: "식비",
+    expenseMemo: "good",
+  },
+  {
+    expenseId: 2,
+    expenseDate: "10/6/2022",
+    expenseItem: "Lasagne",
+    expenseCash: "4000",
+    expenseCard: "32000",
+    expenseCategoryName: "식비",
+    expenseMemo: "good",
   },
 ];
 
@@ -86,23 +136,51 @@ function rowKeyGetter(row) {
   return row.id;
 }
 
-function getData() {
-  console.log("getdata");
-}
-
 let num = dataRow.length;
 export default function Inout() {
-  const [rows, setRows] = useState(dataRow); // 나중에 빈배열로 처리
+  const [rows, setRows] = useState([]); // 나중에 빈배열로 처리
   const [selectedRows, setSelectedRows] = useState(() => new Set());
   const loc = useLocation();
 
+  async function getData(path) {
+    if (path === "/inout/income") {
+      const res = await axios.get("http://localhost:5000/income");
+      console.log(res.data.income);
+      const incomeData = res.data.income;
+      const newData = incomeData.map((item) => {
+        return {
+          ...item,
+          date: item.incomeDate,
+          category: item.incomeCategoryName,
+        };
+      });
+      setRows(newData);
+    } else if (path === "/inout/expense") {
+      const res = await axios.get("http://localhost:5000/expense");
+      console.log(res.data.expense);
+      const expenseData = res.data.expense;
+      console.log(expenseData);
+      // setRows(expenseData);
+      const newData = expenseData.map((item) => {
+        return {
+          ...item,
+          date: item.expenseDate,
+          category: item.expenseCategoryName,
+        };
+      });
+      setRows(newData);
+      // setRows(...rows, [0].expenseData
+    }
+    console.log("getdata");
+  }
+
   useEffect(() => {
     // 데이터 불러오기
-    getData(); // dataRow에 받은 데이터 저장한 후 저장 할때 dataRow를 서버에 보내면 될듯
-  }, [loc.pathname]);
+    getData(loc.pathname); // dataRow에 받은 데이터 저장한 후 저장 할때 dataRow를 서버에 보내면 될듯
+  }, [loc]);
 
   function createNewRow() {
-    const newData = {
+    const newIncomeData = {
       id: num++,
       date: "",
       history: "",
@@ -111,9 +189,19 @@ export default function Inout() {
       category: "",
       memo: "",
     };
-    setRows([...rows, newData]);
+
+    const newExpenseData = {
+      id: num++,
+      date: "",
+      history: "",
+      cash: "",
+      card: "",
+      category: "",
+      memo: "",
+    };
+    setRows([...rows, newIncomeData]);
     console.log(selectedRows);
-    dataRow.push(newData); // 요렇게 하면 다른 화면 이동 후에도 저장가능한듯?
+    dataRow.push(newIncomeData); // 요렇게 하면 다른 화면 이동 후에도 저장가능한듯?
     // console.log(rows);
   }
 
@@ -160,7 +248,9 @@ export default function Inout() {
       {
         <div>
           <DataGrid
-            columns={columns}
+            columns={
+              loc.pathname === "/inout/income" ? incomeColumns : expenseColumns
+            }
             rows={rows}
             rowGetter={(i) => rows[i]}
             rowKeyGetter={rowKeyGetter}

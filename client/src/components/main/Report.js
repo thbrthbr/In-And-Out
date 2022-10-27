@@ -1,6 +1,6 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import Checkbox from "./Checkbox";
 import ChartCanvas from "./ChartCanvas";
@@ -90,8 +90,8 @@ const columns = [
   { key: "sum", name: "합계" },
 ];
 
-let data = []; //useState로 관리? -> getData -> setData로 처리해 rerendering
-let labels = [];
+// let data = []; //useState로 관리? -> getData -> setData로 처리해 rerendering
+// let labels = [];
 const rows = [];
 
 const rowData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
@@ -165,13 +165,13 @@ const lineConfig = {
   options: lineOption,
 };
 
-function getData() {}
-
 export default function Report() {
   const canvasRef = useRef(null);
   const loc = useLocation();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date());
+  const [data, setData] = useState([]);
+  const [label, setLabel] = useState([]);
 
   const prevMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -230,38 +230,50 @@ export default function Report() {
     }
   };
 
-  useEffect(() => {
-    let charId;
-    if (loc.pathname === "/report/monthly") {
-      getData();
-      data = [10, 20, 15, 5, 50];
-      labels = [
-        "주거 - 10% 100,000",
-        "주거 - 10% 100,000",
-        "주거 - 10% 100,000",
-        "주거 - 10% 100,000",
-        "주거 - 10% 100,000",
-      ];
-    } else if (loc.pathname === "/report/yearly") {
-      getData();
-      data = [20, 30, 10, 30, 10];
-      labels = [
-        "주거 - 20% 200,000",
-        "주거 - 20% 200,000",
-        "주거 - 20% 200,000",
-        "주거 - 20% 200,000",
-        "주거 - 20% 200,000",
-      ];
-    }
-    doughnutConfig.data.labels = labels;
-    doughnutConfig.data.datasets[0].data = data;
-    barConfig.data.labels = labels;
-    barConfig.data.datasets[0].data = data;
-    lineConfig.data.labels = labels;
-    lineConfig.data.datasets[0].data = data;
-    addRows(rowData);
-    console.log(rows);
+  const setMonthlyData = (fetchedData) => {
+    const newData = [];
+    const newLabel = [];
+    fetchedData.map((element, idx) => {
+      newData[idx] = element.category_ratio * 100;
+      newLabel[idx] = `${element.category} - ${element.category_sum}`;
+    });
 
+    return [newData, newLabel];
+  };
+  const getData = async (path) => {
+    if (path === "/report/monthly") {
+      try {
+        const res = await axios({ url: "http://localhost:5000/report" });
+
+        const fetchedData = res.data[costOption.option];
+        const [newData, newLabel] = setMonthlyData(fetchedData);
+
+        doughnutConfig.data.labels = newLabel;
+        doughnutConfig.data.datasets[0].data = newData;
+        barConfig.data.labels = newLabel;
+        barConfig.data.datasets[0].data = newData;
+        lineConfig.data.labels = newLabel;
+        lineConfig.data.datasets[0].data = newData;
+        // charId.update();
+        setData(newData);
+        setLabel(newLabel);
+      } catch (err) {
+        console.log(err);
+      }
+    } else if (path === "/report/yearly") {
+    }
+  };
+
+  useEffect(() => {
+    getData(loc.pathname);
+
+    addRows(rowData);
+    //console.log(rows);
+  }, []);
+
+  useEffect(() => {
+    console.log(data, label);
+    let charId;
     if (canvasRef.current) {
       charId = drawChart(
         canvasRef.current,
@@ -276,6 +288,10 @@ export default function Report() {
       charId && charId.destroy();
     };
   });
+
+  useEffect(() => {
+    getData(loc.pathname);
+  }, [costOption]);
 
   return (
     <div>
