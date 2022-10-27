@@ -6,7 +6,12 @@ import { profileChangeSchema } from "../../schema/form_validation";
 
 import styled from "styled-components";
 import defaultUser from "../../img/default-user.jpg";
-import { useStore, useStore2, loginStore } from "../../store/store.js";
+import {
+  useStore,
+  useStore2,
+  loginStore,
+  backUpStore,
+} from "../../store/store.js";
 
 export default function ProfileChange() {
   const {
@@ -17,13 +22,67 @@ export default function ProfileChange() {
     resolver: yupResolver(profileChangeSchema),
   });
 
-  const onSubmit = (data) => {
-    alert("submit");
-  };
+  // const onSubmit = (data) => {
+  //   alert("submit");
+  // };
 
   const { profileImage, setprofileImage } = useStore();
-  const { id, nickname, phoneNumber, birthdate, residence, gender } =
-    loginStore();
+  const {
+    id,
+    setId,
+    password,
+    nickname,
+    setNickname,
+    phoneNumber,
+    setPhoneNumber,
+    birthdate,
+    setBirthdate,
+    residence,
+    setResidence,
+    gender,
+    setGender,
+  } = loginStore();
+
+  const {
+    BU_id,
+    setBU_Id,
+    BU_password,
+    setBU_Password,
+    BU_nickname,
+    setBU_Nickname,
+    BU_phoneNumber,
+    setBU_PhoneNumber,
+    BU_birthdate,
+    setBU_Birthdate,
+    BU_residence,
+    setBU_Residence,
+    BU_gender,
+    setBU_Gender,
+  } = backUpStore();
+
+  const backUP = () => {
+    if (id !== "") {
+      setBU_Id(id);
+    }
+    if (password !== "") {
+      setBU_Password(password);
+    }
+    if (nickname !== "") {
+      setBU_Nickname(nickname);
+    }
+    if (phoneNumber !== "") {
+      setBU_PhoneNumber(phoneNumber);
+    }
+    if (birthdate !== "") {
+      setBU_Birthdate(birthdate);
+    }
+    if (residence !== "") {
+      setBU_Residence(residence);
+    }
+    if (gender !== "") {
+      setBU_Gender(gender);
+    }
+  };
 
   const fileInput = useRef();
 
@@ -40,6 +99,56 @@ export default function ProfileChange() {
       setprofileImage(reader.result);
     };
   };
+
+  async function put() {
+    const response = await fetch(`http://localhost:4000/users/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        password: password,
+        nickname: nickname == "" ? BU_nickname : nickname,
+        phoneNumber: phoneNumber == "" ? BU_phoneNumber : phoneNumber,
+        birthdate: birthdate == "" ? BU_birthdate : birthdate,
+        residence: residence == "" ? BU_residence : residence,
+        gender: gender,
+      }),
+    });
+
+    console.log(response);
+
+    if (response.ok) {
+      alert("수정완료");
+    } else {
+      alert("오류");
+    }
+  }
+
+  const onSubmit = async (e) => {
+    // e.preventDefault();
+    put();
+    // console.log(JSON.stringify(e));
+    console.log(BU_birthdate);
+  };
+
+  const onNameHandler = (event) => {
+    setNickname(event.currentTarget.value);
+  };
+  const onPhoneNumberHandler = (event) => {
+    setPhoneNumber(event.currentTarget.value);
+  };
+  const onBirthdateHandler = (event) => {
+    setBirthdate(event.currentTarget.value);
+  };
+  const onResidenceHandler = (event) => {
+    setResidence(event.currentTarget.value);
+  };
+  const onGenderHandler = (event) => {
+    setGender(event.currentTarget.value);
+  };
+
+  useEffect(() => {
+    backUP();
+  }, []);
 
   return (
     <>
@@ -79,8 +188,8 @@ export default function ProfileChange() {
               <Inputs
                 spellCheck={false}
                 type="text"
-                defaultValue={nickname}
-                {...register("name")}
+                defaultValue={nickname == "" ? BU_nickname : nickname}
+                {...register("name", { onChange: onNameHandler })}
               />
               <Alert role="alert">{errors.name?.message}</Alert>
             </TextInputs>
@@ -90,8 +199,8 @@ export default function ProfileChange() {
               <Inputs
                 spellCheck={false}
                 type="text"
-                defaultValue={phoneNumber}
-                {...register("phone")}
+                defaultValue={phoneNumber == "" ? BU_phoneNumber : phoneNumber}
+                {...register("phone", { onChange: onPhoneNumberHandler })}
               />
               <Alert role="alert">{errors.phone?.message}</Alert>
             </TextInputs>
@@ -101,8 +210,8 @@ export default function ProfileChange() {
               <Inputs
                 spellCheck={false}
                 type="text"
-                defaultValue={birthdate}
-                {...register("birthday")}
+                defaultValue={birthdate == "" ? BU_birthdate : birthdate}
+                {...register("birthday", { onChange: onBirthdateHandler })}
               />
               <Alert role="alert">{errors.birthday?.message}</Alert>
             </TextInputs>
@@ -112,8 +221,8 @@ export default function ProfileChange() {
               <Inputs
                 spellCheck={false}
                 type="text"
-                defaultValue={residence}
-                {...register("residence")}
+                defaultValue={residence == "" ? BU_residence : residence}
+                {...register("residence", { onChange: onResidenceHandler })}
               />
               <Alert role="alert">{errors.residence?.message}</Alert>
             </TextInputs>
@@ -145,8 +254,8 @@ export default function ProfileChange() {
                     type="radio"
                     name="gender"
                     value="female"
-                    defaultChecked={gender === "여자" ? true : false}
-                    {...register("gender")}
+                    defaultChecked={gender === "female" ? true : false}
+                    {...register("gender", { onChange: onGenderHandler })}
                   />
                 </div>
                 <div
@@ -166,8 +275,8 @@ export default function ProfileChange() {
                     type="radio"
                     name="gender"
                     value="male"
-                    defaultChecked={gender === "남자" ? true : false}
-                    {...register("gender")}
+                    defaultChecked={gender === "male" ? true : false}
+                    {...register("gender", { onChange: onGenderHandler })}
                   />
                 </div>
               </div>

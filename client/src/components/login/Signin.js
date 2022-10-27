@@ -65,15 +65,6 @@ export default function Signin() {
   }
 
   const onSubmit = (data) => {
-    // console.log(data);
-
-    // setGender(data["gender"]);
-    // setId(data["email"]);
-    // setPassword(data["pw"]);
-    // setNickname(data["name"]);
-    // setPhoneNumber(data["phone"]);
-    // setBirthdate(data["birthday"]);
-    // setResidence(data["residence"]);
     post();
     console.log(id);
   };
