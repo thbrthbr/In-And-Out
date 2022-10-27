@@ -64,4 +64,29 @@ const loginStore = create(
   )
 );
 
-export { useStore, useStore2, useStore3, loginStore };
+const backUpStore = create(
+  persist(
+    (set) => ({
+      BU_id: "",
+      setBU_Id: (input) => set({ BU_id: input }),
+      BU_password: "",
+      setBU_Password: (input) => set({ BU_password: input }),
+      BU_nickname: "",
+      setBU_Nickname: (input) => set({ BU_nickname: input }),
+      BU_phoneNumber: "",
+      setBU_PhoneNumber: (input) => set({ BU_phoneNumber: input }),
+      BU_birthdate: "",
+      setBU_Birthdate: (input) => set({ BU_birthdate: input }),
+      BU_residence: "",
+      setBU_Residence: (input) => set({ BU_residence: input }),
+      BU_gender: "",
+      setBU_Gender: (input) => set({ BU_gender: input }),
+    }),
+    {
+      name: "BU-login-stuff",
+      getStorage: () => sessionStorage,
+    }
+  )
+);
+
+export { useStore, useStore2, useStore3, loginStore, backUpStore };

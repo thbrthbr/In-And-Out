@@ -3,8 +3,24 @@ import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { recoverInitiateSchema } from "../../schema/form_validation";
+import { loginStore, useStore2 } from "../../store/store.js";
+import { useNavigate } from "react-router-dom";
 
 export default function Signout() {
+  const navigate = useNavigate();
+  const {
+    id,
+    setId,
+    setPassword,
+    setNickname,
+    setPhoneNumber,
+    setBirthdate,
+    setResidence,
+    setGender,
+  } = loginStore();
+
+  const { setLogState } = useStore2();
+
   const {
     register,
     handleSubmit,
@@ -13,12 +29,38 @@ export default function Signout() {
     resolver: yupResolver(recoverInitiateSchema),
   });
 
-  const onSubmit = (data) => {
-    alert("submit");
-  };
+  async function signout() {
+    await fetch(`http://localhost:4000/users/${id}`, {
+      method: "DELETE",
+    });
 
-  // const valueIds = [{ valueId: "비밀번호" }, { valueId: "비밀번호 확인" }];
-  //나중에 form으로 데이터 보낼 때 쓸 input id들
+    alert("회원 탈퇴 완료");
+  }
+
+  const onSubmit = async (e) => {
+    const response = await fetch(`http://localhost:4000/users`);
+    if (response.ok) {
+      const users = await response.json();
+      const user = users.find((user) => user.id === id);
+      if (user.password !== e["pw"]) {
+        alert("비밀번호가 맞지 않습니다.");
+        throw new Error("아이디 또는 비밀번호가 일치하지 않습니다.");
+      }
+    } else {
+      throw new Error("서버 통신이 원할하지 않습니다.");
+    }
+    await signout();
+    setLogState(false);
+    setId("X");
+    setNickname("X");
+    setPhoneNumber("X");
+    setBirthdate("X");
+    setResidence("X");
+    setGender("X");
+    setPassword("X");
+    sessionStorage.clear();
+    navigate("/");
+  };
 
   return (
     <>
