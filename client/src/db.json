@@ -36,46 +36,60 @@
     ]
   },
   "income": {
-    "category": [
-      {
-        "detailIncomeCategoryId": 1,
-        "detailIncomeCategoryName": "없음"
-      }
-    ],
     "income": [
       {
         "incomeId": 1,
         "incomeDate": "12/12/22",
         "incomeItem": "월급",
-        "incomeAmount": 20000,
         "incomeCategoryName": "월급",
-        "incomeMemo": "good"
+        "incomeAmount": 20000,
+        "incomeMemo": "good",
+        "date": "12/12/22",
+        "category": "월급"
       },
       {
         "incomeId": 2,
         "incomeDate": "12/12/22",
         "incomeItem": "월급",
-        "incomeAmount": 20000,
         "incomeCategoryName": "월급",
-        "incomeMemo": "good"
+        "incomeAmount": 20000,
+        "incomeMemo": "good",
+        "date": "12/12/22",
+        "category": "월급"
       },
       {
         "incomeId": 3,
         "incomeDate": "12/12/22",
         "incomeItem": "월급",
-        "incomeAmount": 20000,
         "incomeCategoryName": "월급",
-        "incomeMemo": "good"
+        "incomeAmount": "111",
+        "incomeMemo": "good",
+        "date": "12/12/22",
+        "category": "월급"
+      },
+      {
+        "incomeId": 5,
+        "incomeDate": "",
+        "incomeItem": "122",
+        "incomeCategoryName": "",
+        "incomeAmount": "111",
+        "incomeMemo": "111",
+        "date": "9/28/2022",
+        "category": "교통비"
+      },
+      {
+        "incomeId": 7,
+        "incomeDate": "",
+        "incomeCategoryName": "",
+        "incomeItem": "",
+        "incomeAmount": "222",
+        "incomeMemo": "",
+        "date": "9/27/2022",
+        "category": ""
       }
     ]
   },
   "expense": {
-    "category": [
-      {
-        "detailExpenseCategoryId": 1,
-        "detailExpenseCategoryName": "없음"
-      }
-    ],
     "expense": [
       {
         "expenseId": 1,
@@ -84,7 +98,9 @@
         "expenseCash": 10000,
         "expenseCard": 50000,
         "expenseCategoryName": "음식",
-        "expenseMemo": "good"
+        "expenseMemo": "good",
+        "date": "11/12/22",
+        "category": "음식"
       },
       {
         "expenseId": 2,
@@ -93,7 +109,9 @@
         "expenseCash": 10000,
         "expenseCard": 50000,
         "expenseCategoryName": "음식",
-        "expenseMemo": "good"
+        "expenseMemo": "good",
+        "date": "11/12/22",
+        "category": "음식"
       },
       {
         "expenseId": 3,
@@ -102,7 +120,18 @@
         "expenseCash": 10000,
         "expenseCard": 50000,
         "expenseCategoryName": "음식",
-        "expenseMemo": "good"
+        "expenseMemo": "good",
+        "date": "11/12/22",
+        "category": "음식"
+      },
+      {
+        "expenseId": 5,
+        "expenseDate": "",
+        "expenseItem": "",
+        "expenseCash": "",
+        "expenseCard": "1111",
+        "expenseCategoryName": "",
+        "expenseMemo": ""
       }
     ]
   }

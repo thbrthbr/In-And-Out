@@ -10,6 +10,12 @@ import { NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
 
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import PacmanLoader from "react-spinners/PacmanLoader";
+
+const INCOME_API_URL = "http://localhost:5000/income";
+const EXPENSE_API_URL = "http://localhost:5000/expense";
+
 const SideButton = styled.div`
   width: 180px;
   height: 50px;
@@ -111,112 +117,170 @@ const expenseColumns = [
   },
 ];
 
-let dataRow = [
-  {
-    expenseId: 1,
-    expenseDate: "10/6/2022",
-    expenseItem: "Lasagne",
-    expenseCash: "4000",
-    expenseCard: "32000",
-    expenseCategoryName: "식비",
-    expenseMemo: "good",
-  },
-  {
-    expenseId: 2,
-    expenseDate: "10/6/2022",
-    expenseItem: "Lasagne",
-    expenseCash: "4000",
-    expenseCard: "32000",
-    expenseCategoryName: "식비",
-    expenseMemo: "good",
-  },
-];
+let newRowData = [];
 
-function rowKeyGetter(row) {
-  return row.id;
-}
-
-let num = dataRow.length;
+let num = newRowData.length;
 export default function Inout() {
   const [rows, setRows] = useState([]); // 나중에 빈배열로 처리
   const [selectedRows, setSelectedRows] = useState(() => new Set());
   const loc = useLocation();
+  const queryClient = useQueryClient();
 
-  async function getData(path) {
+  async function getData() {
+    let path = loc.pathname;
+    let newData = [];
     if (path === "/inout/income") {
-      const res = await axios.get("http://localhost:5000/income");
-      console.log(res.data.income);
+      const res = await axios.get(INCOME_API_URL, {
+        headers: { "Content-Type": "application/json" },
+      });
+      // console.log(res.data.income);
       const incomeData = res.data.income;
-      const newData = incomeData.map((item) => {
-        return {
-          ...item,
-          date: item.incomeDate,
-          category: item.incomeCategoryName,
-        };
-      });
-      setRows(newData);
+      newData = incomeData;
+      // ? incomeData.map((item) => {
+      //     return {
+      //       ...item,
+      //       date: item.incomeDate,
+      //       category: item.incomeCategoryName,
+      //     };
+      //   })
+      // : [];
     } else if (path === "/inout/expense") {
-      const res = await axios.get("http://localhost:5000/expense");
-      console.log(res.data.expense);
-      const expenseData = res.data.expense;
-      console.log(expenseData);
-      // setRows(expenseData);
-      const newData = expenseData.map((item) => {
-        return {
-          ...item,
-          date: item.expenseDate,
-          category: item.expenseCategoryName,
-        };
+      const res = await axios.get(EXPENSE_API_URL, {
+        headers: { "Content-Type": "application/json" },
       });
-      setRows(newData);
+      // console.log(res.data.expense);
+      const expenseData = res.data.expense;
+      // console.log(expenseData);
+      // setRows(expenseData);
+      newData = expenseData;
+      // ? expenseData.map((item) => {
+      //     return {
+      //       ...item,
+      //       date: item.expenseDate,
+      //       category: item.expenseCategoryName,
+      //     };
+      //   })
+      // : [];
+
       // setRows(...rows, [0].expenseData
     }
-    console.log("getdata");
+    setRows(newData);
+    return newData;
   }
 
-  useEffect(() => {
-    // 데이터 불러오기
-    getData(loc.pathname); // dataRow에 받은 데이터 저장한 후 저장 할때 dataRow를 서버에 보내면 될듯
-  }, [loc]);
+  function rowKeyGetter(row) {
+    const id = loc.pathname === "/inout/income" ? row.incomeId : row.expenseId;
+    return id;
+  }
+  // useEffect(() => {
+  //   // 데이터 불러오기
+  //   getData(); // newRowData에 받은 데이터 저장한 후 저장 할때 newRowData를 서버에 보내면 될듯
+  // }, [loc]);
 
   function createNewRow() {
     const newIncomeData = {
-      id: num++,
-      date: "",
-      history: "",
-      cash: "",
-      card: "",
-      category: "",
-      memo: "",
+      incomeId: rows[rows.length]?.imcomeId,
+      incomeDate: "",
+      incomeItem: "",
+      incomeAmount: "",
+      incomeCategoryName: "",
+      incomeMemo: "",
     };
 
     const newExpenseData = {
-      id: num++,
-      date: "",
-      history: "",
-      cash: "",
-      card: "",
-      category: "",
-      memo: "",
+      expenseId: rows[rows.length]?.expenseId,
+      expenseDate: "",
+      expenseItem: "",
+      expenseCash: "",
+      expenseCard: "",
+      expenseCategoryName: "",
+      expenseMemo: "",
     };
-    setRows([...rows, newIncomeData]);
-    console.log(selectedRows);
-    dataRow.push(newIncomeData); // 요렇게 하면 다른 화면 이동 후에도 저장가능한듯?
-    // console.log(rows);
+
+    let newData =
+      loc.pathname === "/inout/income" ? newIncomeData : newExpenseData;
+
+    setRows([...rows, newData]);
+    // newRowData.push(newData);
+    console.log("data", newRowData);
   }
 
-  function saveData() {
-    alert("saved");
+  const saveDataMutation = useMutation(
+    async (rowData) => {
+      const data =
+        loc.pathname === "/inout/income"
+          ? { income: rowData }
+          : { expense: rowData };
+      const api =
+        loc.pathname === "/inout/income" ? INCOME_API_URL : EXPENSE_API_URL;
+      try {
+        const res = await axios.post(api, data, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("getInoutData");
+      },
+    }
+  );
+
+  const deleteDataMutation = useMutation(
+    async (rowData) => {
+      const api =
+        loc.pathname === "/inout/income" ? INCOME_API_URL : EXPENSE_API_URL;
+      try {
+        const res = await axios.delete(api, rowData, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("getInoutData");
+      },
+    }
+  );
+
+  const { data, isLoading, refetch } = useQuery(
+    ["getInoutData", loc],
+    getData,
+    {
+      staleTime: Infinity,
+    }
+  );
+
+  function onSaveData() {
+    console.log("saved");
+    console.log("saved", rows);
+    saveDataMutation.mutate(rows);
   }
-  function deleteData() {
-    // console.log(rows);
+  function onDeleteData() {
+    console.log("deleted");
+
     // console.log([...selectedRows]);
+    deleteDataMutation.mutate(selectedRows);
     const newRows = rows.slice();
-    const filteredRow = newRows.filter((row, idx) => !selectedRows.has(row.id));
-    setRows(filteredRow);
-    dataRow = filteredRow;
+    const filteredRow = newRows.filter((row, idx) => {
+      const id =
+        loc.pathname === "/inout/income" ? row.incomeId : row.expenseId;
+      return !selectedRows.has(id);
+    });
+    console.log("filtered", filteredRow);
+    // setRows(filteredRow);
+    // newRowData = filteredRow;
   }
 
+  if (isLoading) return <PacmanLoader color="#36d7b7" />;
+  console.log(isLoading, data);
+  // setRows(data);
   return (
     <div>
       <NavLinkContainer>
@@ -263,8 +327,8 @@ export default function Inout() {
             onSelectedRowsChange={setSelectedRows}
           />
           <button onClick={createNewRow}>Add</button>
-          <button onClick={saveData}>저장</button>
-          <button onClick={deleteData}>삭제</button>
+          <button onClick={onSaveData}>저장</button>
+          <button onClick={onDeleteData}>삭제</button>
         </div>
       }
     </div>

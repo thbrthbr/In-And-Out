@@ -13,6 +13,9 @@ import { addMonths, subMonths, addYears, subYears } from "date-fns";
 
 import axios from "axios";
 
+import { useQuery } from "react-query";
+import PacmanLoader from "react-spinners/PacmanLoader";
+
 import {
   doughnutOption,
   barOption,
@@ -51,6 +54,8 @@ Chart.register(
   PointElement,
   LineElement
 );
+
+const API_URL = "http://localhost:5000/report";
 const SideButton = styled.div`
   width: 180px;
   height: 50px;
@@ -170,7 +175,7 @@ export default function Report() {
   const loc = useLocation();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date());
-  const [data, setData] = useState([]);
+  const [month, setMonthData] = useState([]);
   const [label, setLabel] = useState([]);
 
   const prevMonth = () => {
@@ -230,7 +235,7 @@ export default function Report() {
     }
   };
 
-  const setMonthlyData = (fetchedData) => {
+  const getMonthlyData = (fetchedData) => {
     const newData = [];
     const newLabel = [];
     fetchedData.map((element, idx) => {
@@ -240,13 +245,14 @@ export default function Report() {
 
     return [newData, newLabel];
   };
-  const getData = async (path) => {
+  const getData = async () => {
+    const path = loc.pathname;
     if (path === "/report/monthly") {
       try {
-        const res = await axios({ url: "http://localhost:5000/report" });
+        const res = await axios({ url: API_URL });
 
         const fetchedData = res.data[costOption.option];
-        const [newData, newLabel] = setMonthlyData(fetchedData);
+        const [newData, newLabel] = getMonthlyData(fetchedData);
 
         doughnutConfig.data.labels = newLabel;
         doughnutConfig.data.datasets[0].data = newData;
@@ -255,7 +261,7 @@ export default function Report() {
         lineConfig.data.labels = newLabel;
         lineConfig.data.datasets[0].data = newData;
         // charId.update();
-        setData(newData);
+        setMonthData(newData);
         setLabel(newLabel);
       } catch (err) {
         console.log(err);
@@ -264,12 +270,12 @@ export default function Report() {
     }
   };
 
-  useEffect(() => {
-    getData(loc.pathname);
+  // useEffect(() => {
+  //   getData(loc.pathname);
 
-    addRows(rowData);
-    //console.log(rows);
-  }, []);
+  //   addRows(rowData);
+  //   //console.log(rows);
+  // }, []);
 
   useEffect(() => {
     console.log(data, label);
@@ -289,9 +295,16 @@ export default function Report() {
     };
   });
 
-  useEffect(() => {
-    getData(loc.pathname);
-  }, [costOption]);
+  // useEffect(() => {
+  //   getData(loc.pathname);
+  // }, [costOption]);
+
+  const { data, isLoading, refetch } = useQuery(
+    ["getReportData", costOption],
+    getData
+  );
+
+  if (isLoading) return <PacmanLoader color="#36d7b7" />;
 
   return (
     <div>
