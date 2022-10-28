@@ -9,7 +9,16 @@ import "react-data-grid/lib/styles.css";
 import DataGrid from "react-data-grid";
 import DateHeader from "../common/DateHeader";
 
-import { addMonths, subMonths, addYears, subYears } from "date-fns";
+import {
+  addMonths,
+  subMonths,
+  addYears,
+  subYears,
+  startOfMonth,
+  endOfMonth,
+  startOfYear,
+  endOfYear,
+} from "date-fns";
 
 import axios from "axios";
 
@@ -99,15 +108,15 @@ const columns = [
 // let labels = [];
 const rows = [];
 
-const rowData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-const addRows = (rowData) => {
-  const obj = {};
-  Object.entries(columns).forEach((column) => {
-    obj[column[1].key] = rowData[column[0]];
-  });
-  // console.log(obj);
-  rows.push(obj);
-};
+// const rowData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+// const addRows = (rowData) => {
+//   const obj = {};
+//   Object.entries(columns).forEach((column) => {
+//     obj[column[1].key] = rowData[column[0]];
+//   });
+//   // console.log(obj);
+//   rows.push(obj);
+// };
 
 const doughnutConfig = {
   type: "doughnut",
@@ -170,26 +179,62 @@ const lineConfig = {
   options: lineOption,
 };
 
+let currentMonth = new Date();
+let currentYear = new Date();
+let params = {};
 export default function Report() {
   const canvasRef = useRef(null);
   const loc = useLocation();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [currentYear, setCurrentYear] = useState(new Date());
-  const [month, setMonthData] = useState([]);
-  const [label, setLabel] = useState([]);
+  const params =
+    loc.pathname === "/report/month"
+      ? {
+          start_dt: startOfMonth(currentMonth),
+          end_dt: endOfMonth(currentMonth),
+        }
+      : {
+          start_dt: startOfYear(currentMonth),
+          end_dt: endOfYear(currentMonth),
+        };
+  // const [currentMonth, setCurrentMonth] = useState(new Date());
+  // const [currentYear, setCurrentYear] = useState(new Date());
+  // const [month, setMonthData] = useState([]);
+  // const [label, setLabel] = useState([]);
 
+  const setParam = () => {
+    const path = loc.pathname;
+    if (path === "/report/month") {
+      params.start_dt = startOfMonth(currentMonth);
+      params.end_dt = endOfMonth(currentMonth);
+    } else {
+      params.start_dt = startOfYear(currentYear);
+      params.end_dt = endOfYear(currentYear);
+    }
+  };
+
+  const setParamAndRefetch = () => {
+    setParam();
+    refetch();
+  };
   const prevMonth = () => {
-    setCurrentMonth(subMonths(currentMonth, 1));
+    // setCurrentMonth(subMonths(currentMonth, 1));
+    currentMonth = subMonths(currentMonth, 1);
+    setParamAndRefetch();
   };
   const nextMonth = () => {
-    setCurrentMonth(addMonths(currentMonth, 1));
+    // setCurrentMonth(addMonths(currentMonth, 1));
+    currentMonth = addMonths(currentMonth, 1);
+    setParamAndRefetch();
   };
 
   const prevYear = () => {
-    setCurrentYear(subYears(currentYear, 1));
+    // setCurrentYear(subYears(currentYear, 1));
+    currentYear = subYears(currentYear, 1);
+    setParamAndRefetch();
   };
   const nextYear = () => {
-    setCurrentYear(addYears(currentYear, 1));
+    // setCurrentYear(addYears(currentYear, 1));
+    currentYear = addYears(currentYear, 1);
+    setParamAndRefetch();
   };
 
   const [graphTypeChecked, setGraphTypeChecked] = useState({
@@ -249,9 +294,9 @@ export default function Report() {
     const path = loc.pathname;
     if (path === "/report/monthly") {
       try {
-        const res = await axios({ url: API_URL });
-
-        const fetchedData = res.data[costOption.option];
+        const res = await axios(`${API_URL}`, { params: params });
+        console.log("data", res.data);
+        const fetchedData = res.data[costOption.option]; // API문서보면 expense income URL이 따로 있는듯
         const [newData, newLabel] = getMonthlyData(fetchedData);
 
         doughnutConfig.data.labels = newLabel;
@@ -261,8 +306,8 @@ export default function Report() {
         lineConfig.data.labels = newLabel;
         lineConfig.data.datasets[0].data = newData;
         // charId.update();
-        setMonthData(newData);
-        setLabel(newLabel);
+        // setMonthData(newData);
+        // setLabel(newLabel);
       } catch (err) {
         console.log(err);
       }
@@ -278,7 +323,7 @@ export default function Report() {
   // }, []);
 
   useEffect(() => {
-    console.log(data, label);
+    // console.log(data, label);
     let charId;
     if (canvasRef.current) {
       charId = drawChart(
@@ -289,6 +334,26 @@ export default function Report() {
             : doughnutConfig
           : lineConfig
       );
+
+      canvasRef.current.onclick = function (evt) {
+        const points = charId.getElementsAtEventForMode(
+          evt,
+          "nearest",
+          { intersect: true },
+          true
+        );
+
+        if (points.length) {
+          const firstPoint = points[0];
+          const label = charId.data.labels[firstPoint.index];
+          const slabel = charId.data.datasets[firstPoint.datasetIndex].label;
+          const value =
+            charId.data.datasets[firstPoint.datasetIndex].data[
+              firstPoint.index
+            ];
+          console.log(label, slabel, value);
+        }
+      };
     }
     return () => {
       charId && charId.destroy();
