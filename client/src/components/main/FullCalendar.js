@@ -100,7 +100,7 @@ const RenderCells = ({
           >
             {diaryData.map((data) => {
               // console.log(day.format("MM/dd/yy"), data.date);
-              if (formattedDataForDiary === data.date)
+              if (formattedDataForDiary === data.date) {
                 return (
                   <Icon
                     icon="arcticons:diary"
@@ -111,16 +111,31 @@ const RenderCells = ({
                     }}
                   ></Icon>
                 );
+              } else {
+                return <></>;
+              }
             })}
-
-            <Icon
-              icon="cil:magnifying-glass"
-              id={formattedDataForDiary}
-              onClick={(e) => {
-                console.log(e.target.id);
-                setDetailDate(e.target.id);
-              }}
-            ></Icon>
+            {diaryData.map((data) => {
+              // console.log(day.format("MM/dd/yy"), data.date);
+              if (
+                formattedDataForDiary === data.date &&
+                (data.dailyExpenseList.length || data.dailyIncomeList.length)
+              ) {
+                console.log(data.dailyExpenseList);
+                return (
+                  <Icon
+                    icon="cil:magnifying-glass"
+                    id={formattedDataForDiary}
+                    onClick={(e) => {
+                      // onDiaryClick(!showWrittenDiary);
+                      setDiaryDate(e.target.id);
+                    }}
+                  ></Icon>
+                );
+              } else {
+                return <></>;
+              }
+            })}
           </div>
         </div>
       );

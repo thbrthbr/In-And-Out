@@ -60,6 +60,7 @@ export default function DateEditor({ row, onRowChange }) {
       // value={startDate.toLocaleDateString()}
       onChange={(date) => {
         // setStartDate(date);
+
         onRowChange({ ...row, date: date.format("MM/dd/yy") }, true);
         setStartDate(date.toLocaleDateString("en-US"));
       }}

@@ -14,48 +14,6 @@ import PacmanLoader from "react-spinners/PacmanLoader";
 
 const DIARY_API_URL = "http://localhost:5000/calendar";
 
-Date.prototype.format = function (f) {
-  if (!this.valueOf()) return " ";
-  var weekName = [
-    "일요일",
-    "월요일",
-    "화요일",
-    "수요일",
-    "목요일",
-    "금요일",
-    "토요일",
-  ];
-  var d = this;
-  return f.replace(/(yyyy|yy|MM|dd|E|hh|mm|ss|a\/p)/gi, function ($1) {
-    switch ($1) {
-      case "yyyy":
-        return d.getFullYear();
-      case "yy":
-        return (d.getFullYear() % 1000).zf(2);
-      case "MM":
-        return (d.getMonth() + 1).zf(2);
-      case "dd":
-        return d.getDate().zf(2);
-      default:
-        return $1;
-    }
-  });
-};
-String.prototype.string = function (len) {
-  var s = "",
-    i = 0;
-  while (i++ < len) {
-    s += this;
-  }
-  return s;
-};
-String.prototype.zf = function (len) {
-  return "0".string(len - this.length) + this;
-};
-Number.prototype.zf = function (len) {
-  return this.toString().zf(len);
-};
-
 const Container = styled.div`
   flex: 0.75;
   display: flex;
@@ -75,18 +33,81 @@ export default function Calendar() {
       const res = await axios.get(DIARY_API_URL, {
         headers: { "Content-Type": "application/json" },
       });
+      console.log(res.data);
       return res.data;
     } catch (err) {
       console.log(err);
     }
   };
 
+  const saveDataMutation = useMutation(
+    async (data) => {
+      try {
+        const editted = await getData();
+        console.log(editted);
+        for (let i = 0; i < editted.length; i++) {
+          if (editted[i].date === data.date) {
+            alert("해당 날짜에는 이미 다이어리가 등록되어 있습니다.");
+            return;
+          }
+        }
+        const res = await axios.post(DIARY_API_URL, data, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("getCalendarData");
+      },
+    }
+  );
+
+  const saveEditDataMutation = useMutation(
+    async (data) => {
+      try {
+        const res = await axios.put(`${DIARY_API_URL}/${data[1]}`, data[0], {
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("getCalendarData");
+      },
+    }
+  );
+
+  const deleteDataMutation = useMutation(
+    async (data) => {
+      try {
+        const res = await axios.delete(`${DIARY_API_URL}/${data[1]}`, data[0], {
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("getCalendarData");
+      },
+    }
+  );
+
   const { data, isLoading, refetch } = useQuery(["getCalendarData"], getData, {
     staleTime: Infinity,
   });
 
   if (isLoading) return <PacmanLoader color="#36d7b7" />;
-
+  console.log("data", data);
   return (
     <Container>
       <FullCalendar
@@ -108,6 +129,8 @@ export default function Calendar() {
             newDiary={showNewDiary}
             writtenDiary={showWrittenDiary}
             diaryDate={diaryDate}
+            saveDataMutation={saveDataMutation}
+            closeModal={() => setShowNewDiary(!showNewDiary)}
           ></Diary>
         </DiaryModal>
       )}
@@ -118,6 +141,10 @@ export default function Calendar() {
             writtenDiary={showWrittenDiary}
             diaryDate={diaryDate}
             calendarData={data}
+            saveDataMutation={saveDataMutation}
+            saveEditDataMutation={saveEditDataMutation}
+            deleteDataMutation={deleteDataMutation}
+            closeModal={() => setShowWrittenDiary(!showWrittenDiary)}
           ></Diary>
         </DiaryModal>
       )}
