@@ -44,6 +44,7 @@ const RenderCells = ({
   showWrittenDiary,
   setDiaryDate,
   setDetailDate,
+  diaryData,
 }) => {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -59,6 +60,7 @@ const RenderCells = ({
     for (let i = 0; i < 7; i++) {
       formattedDate = format(day, "d");
       const cloneDay = day;
+      const formattedDataForDiary = day.format("MM/dd/yy");
       days.push(
         <div
           className={`col cell ${
@@ -96,17 +98,24 @@ const RenderCells = ({
               justifyContent: "space-between",
             }}
           >
-            <Icon
-              icon="arcticons:diary"
-              id={day.toLocaleDateString()}
-              onClick={(e) => {
-                onDiaryClick(!showWrittenDiary);
-                setDiaryDate(e.target.id);
-              }}
-            ></Icon>
+            {diaryData.map((data) => {
+              // console.log(day.format("MM/dd/yy"), data.date);
+              if (formattedDataForDiary === data.date)
+                return (
+                  <Icon
+                    icon="arcticons:diary"
+                    id={formattedDataForDiary}
+                    onClick={(e) => {
+                      onDiaryClick(!showWrittenDiary);
+                      setDiaryDate(e.target.id);
+                    }}
+                  ></Icon>
+                );
+            })}
+
             <Icon
               icon="cil:magnifying-glass"
-              id={day.toLocaleDateString()}
+              id={formattedDataForDiary}
               onClick={(e) => {
                 console.log(e.target.id);
                 setDetailDate(e.target.id);
@@ -132,6 +141,7 @@ export const FullCalendar = ({
   writtenDiary,
   setDiaryDate,
   setDetailDate,
+  calendarData,
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -162,6 +172,7 @@ export const FullCalendar = ({
         showWrittenDiary={writtenDiary}
         setDiaryDate={setDiaryDate}
         setDetailDate={setDetailDate}
+        diaryData={calendarData}
       />
     </div>
   );

@@ -19,41 +19,125 @@ const Container = styled.div`
   }
 `;
 
-export default function Diary({ newDiary, writtenDiary, diaryDate }) {
+export default function Diary({
+  newDiary,
+  writtenDiary,
+  diaryDate,
+  calendarData,
+}) {
   const [textValue, setTextValue] = useState("");
   const [startDate, setStartDate] = useState(new Date());
+  const [edit, setEdit] = useState(false);
 
   const handleSetValue = (e) => {
     setTextValue(e.target.value);
   };
 
-  // diaryDate가지고 데이터 요청
+  const onEdit = () => {
+    setEdit(!edit);
+    setTextValue(diaryData.diary.text);
+  };
 
+  // diaryDate가지고 데이터 요청
+  const diaryData =
+    writtenDiary && calendarData.filter((data) => data.date === diaryDate)[0];
+  // console.log(diaryData);
   return (
     <div>
-      {writtenDiary && (
+      {writtenDiary && !edit && (
         <Container>
           <div>
-            <textarea value={"12312312312312"} disabled></textarea>
+            <div style={{ height: "300px" }}>
+              <div>수입</div>
+              {diaryData.dailyIncomeList.map((income) => {
+                return (
+                  <div>
+                    <span>{income.income_item}</span>
+                    <span>{income.income_amount}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ height: "300px" }}>
+              <div>지출</div>
+              {diaryData.dailyExpenseList.map((expense) => {
+                return (
+                  <div>
+                    <span>{expense.expense_item}</span>
+                    <span>{expense.expense_amount}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <div>
-            <div>{diaryDate}</div>
+            <div>{diaryData.date}</div>
             <div>
               <img
                 style={{ width: "80%", height: "300px", marginTop: "15px" }}
-                src="https://t2.daumcdn.net/thumb/R720x0/?fname=http://t1.daumcdn.net/brunch/service/user/TRE/image/jSbbIDabdmD5S54u1gX-1W64ok0"
+                src={diaryData.diary.diary_photo_url}
+                alt="이미지"
+              />
+            </div>
+            <div>
+              <div>{diaryData.diary.text}</div>
+            </div>
+            <div>
+              <button onClick={onEdit}>수정하기</button>
+            </div>
+          </div>
+        </Container>
+      )}
+
+      {writtenDiary && edit && (
+        <Container>
+          <div>
+            <div style={{ height: "300px" }}>
+              <div>수입</div>
+              {diaryData.dailyIncomeList.map((income) => {
+                return (
+                  <div>
+                    <span>{income.income_item}</span>
+                    <span>{income.income_amount}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ height: "300px" }}>
+              <div>지출</div>
+              {diaryData.dailyExpenseList.map((expense) => {
+                return (
+                  <div>
+                    <span>{expense.expense_item}</span>
+                    <span>{expense.expense_amount}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              disabled
+            />
+            <div>
+              <img
+                style={{ width: "80%", height: "300px", marginTop: "15px" }}
+                src={diaryData.diary.diary_photo_url}
                 alt="이미지"
               />
             </div>
             <div>
               <textarea
-                placeholder="여기에 입력하세요"
+                // placeholder="여기에 입력하세요"
                 value={textValue}
                 onChange={(e) => handleSetValue(e)}
               ></textarea>
             </div>
             <div>
-              <button>수정하기</button>
+              <button>이미지 등록</button>
+              <button>완료</button>
             </div>
           </div>
         </Container>

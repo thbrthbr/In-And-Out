@@ -295,7 +295,7 @@ export default function Report() {
     if (path === "/report/monthly") {
       try {
         const res = await axios(`${API_URL}`, { params: params });
-        console.log("data", res.data);
+        // console.log("data", res.data);
         const fetchedData = res.data[costOption.option]; // API문서보면 expense income URL이 따로 있는듯
         const [newData, newLabel] = getMonthlyData(fetchedData);
 
