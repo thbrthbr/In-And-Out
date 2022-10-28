@@ -72,7 +72,7 @@ const RenderCells = ({
               ? "not-valid"
               : "valid"
           }`}
-          key={day}
+          key={formattedDataForDiary}
           // onClick={() => onDateClick(parse(cloneDay, "YYYYMMDD", new Date()))}
           style={{
             display: "flex",
@@ -105,6 +105,7 @@ const RenderCells = ({
                   <Icon
                     icon="arcticons:diary"
                     id={formattedDataForDiary}
+                    key={data.date}
                     onClick={(e) => {
                       onDiaryClick(!showWrittenDiary);
                       setDiaryDate(e.target.id);
@@ -112,7 +113,7 @@ const RenderCells = ({
                   ></Icon>
                 );
               } else {
-                return <></>;
+                return <div style={{ display: "none" }} key={data.date}></div>;
               }
             })}
             {diaryData.map((data) => {
@@ -121,19 +122,20 @@ const RenderCells = ({
                 formattedDataForDiary === data.date &&
                 (data.dailyExpenseList.length || data.dailyIncomeList.length)
               ) {
-                console.log(data.dailyExpenseList);
+                // console.log(data.dailyExpenseList);
                 return (
                   <Icon
                     icon="cil:magnifying-glass"
                     id={formattedDataForDiary}
+                    key={data.date}
                     onClick={(e) => {
                       // onDiaryClick(!showWrittenDiary);
-                      setDiaryDate(e.target.id);
+                      setDetailDate(e.target.id);
                     }}
                   ></Icon>
                 );
               } else {
-                return <></>;
+                return <div style={{ display: "none" }} key={data.date}></div>;
               }
             })}
           </div>

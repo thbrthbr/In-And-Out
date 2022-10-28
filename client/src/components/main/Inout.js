@@ -119,7 +119,6 @@ const expenseColumns = [
 
 let newRowData = [];
 
-let num = newRowData.length;
 export default function Inout() {
   const [rows, setRows] = useState([]); // 나중에 빈배열로 처리
   const [selectedRows, setSelectedRows] = useState(() => new Set());
@@ -179,7 +178,7 @@ export default function Inout() {
 
   function createNewRow() {
     const newIncomeData = {
-      incomeId: rows[rows.length]?.imcomeId,
+      incomeId: rows[rows.length - 1].incomeId + 1,
       incomeDate: "",
       incomeItem: "",
       incomeAmount: "",
@@ -188,7 +187,7 @@ export default function Inout() {
     };
 
     const newExpenseData = {
-      expenseId: rows[rows.length]?.expenseId,
+      expenseId: rows[rows.length - 1].expenseId + 1,
       expenseDate: "",
       expenseItem: "",
       expenseCash: "",
@@ -196,9 +195,9 @@ export default function Inout() {
       expenseCategoryName: "",
       expenseMemo: "",
     };
-
     let newData =
       loc.pathname === "/inout/income" ? newIncomeData : newExpenseData;
+    console.log(rows[rows.length - 1].incomeId);
 
     setRows([...rows, newData]);
     // newRowData.push(newData);
@@ -258,7 +257,6 @@ export default function Inout() {
   );
 
   function onSaveData() {
-    console.log("saved");
     console.log("saved", rows);
     saveDataMutation.mutate(rows);
   }
