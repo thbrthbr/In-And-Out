@@ -37,7 +37,7 @@ export default function Sidebar({ menu }) {
   const mainMenus = [
     { name: "달력", path: ["/calendar"] },
     { name: "수입/지출", path: ["/inout/income", "/inout/expense"] },
-    { name: "보고서", path: ["/report/monthly", "/report/yearly"] },
+    { name: "보고서", path: ["/report"] },
   ];
 
   const settingMenus = [

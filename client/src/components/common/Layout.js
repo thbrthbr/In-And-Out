@@ -1,64 +1,61 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-// import Screen from "./Screen";
 import styled from "styled-components";
+
+import { Drawer } from "@mui/material";
+import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
+import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 
 const Container = styled.div`
   display: flex;
-  height: 90vh;
-`;
-
-const LoginContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 auto;
-  margin-top: 25px;
-  width: 35%;
-  height: 95%;
-  background-color: #d9d9d9;
+  height: 88vh;
 `;
 
 export default function Layout() {
   const loc = useLocation();
-  const loginRouterURL = [
-    "/",
-    "/initiate",
-    "/signin",
-    "/identify_email",
-    "/identify_phone",
+  const navigate = useNavigate();
+
+  const sideBarMenuItems = [
+    { text: "달력", icon: <CalendarMonthOutlinedIcon />, path: "/calendar" },
+    { text: "수입/지출", icon: <PaidOutlinedIcon />, path: "/inout/income" },
+    { text: "보고서", icon: <AssessmentOutlinedIcon />, path: "/report" },
   ];
-  const mainRouterURL = [
-    "/calendar",
-    "/inout/income",
-    "/inout/expense",
-    "/report/monthly",
-    "/report/yearly",
-  ];
-  const settingRouterURL = ["/profile_change", "/password_change", "/signout"];
 
   return (
     <div>
       <Header />
-      <main>
-        <Container>
-          {mainRouterURL.includes(loc.pathname) && (
-            <Sidebar menu={"main"}></Sidebar>
-          )}
-          {settingRouterURL.includes(loc.pathname) && (
-            <Sidebar menu={"setting"}></Sidebar>
-          )}
 
-          {loginRouterURL.includes(loc.pathname) ? (
-            <LoginContainer>
-              <Outlet />
-            </LoginContainer>
-          ) : (
-            <Outlet />
-          )}
-        </Container>
-      </main>
+      <Container>
+        <Drawer
+          variant="permanent"
+          PaperProps={{
+            sx: {
+              position: "static",
+              width: "180px",
+            },
+          }}
+        >
+          <List>
+            {sideBarMenuItems.map((item) => (
+              <ListItem
+                button
+                key={item.text}
+                onClick={() => {
+                  navigate(item.path);
+                }}
+                selected={loc.pathname === item.path}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text}></ListItemText>
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+        <Outlet />
+      </Container>
     </div>
   );
 }

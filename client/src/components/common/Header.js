@@ -23,6 +23,7 @@ export default function Header() {
       style={{
         background: "lightgray",
         height: "100px",
+        width: "100%",
         paddingLeft: 16,
       }}
     >

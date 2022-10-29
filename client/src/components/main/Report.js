@@ -9,6 +9,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Unstable_Grid2/Grid2";
 
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
@@ -361,57 +362,60 @@ export default function Report() {
   setData();
 
   return (
-    <div>
-      <Box sx={{ width: "100%" }}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            aria-label="periodic report"
-          >
-            <Tab label="월간 보고서" {...a11yProps(0)} />
-            <Tab label="연간 보고서" {...a11yProps(1)} />
-          </Tabs>
+    <Grid container spacing={0}>
+      <Grid xs={12}>
+        <Box sx={{ width: "100%" }}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              aria-label="periodic report"
+            >
+              <Tab label="월간 보고서" {...a11yProps(0)} />
+              <Tab label="연간 보고서" {...a11yProps(1)} />
+            </Tabs>
+          </Box>
         </Box>
-      </Box>
+      </Grid>
 
       <TabPanel value={tabValue} index={0}>
-        <FormControl component="fieldset">
-          <FormLabel component="legend">차트</FormLabel>
-          <RadioGroup aria-label="position">
-            {graphTypeOptions.map((option, idx) => (
-              <FormControlLabel
-                key={idx}
-                checked={graphTypeOption === option.graph}
-                value={option.graph}
-                control={<Radio />}
-                label={option.label}
-                name="monthly"
-                labelPlacement="end"
-                onChange={handleCheckboxChange}
-              />
-            ))}
-          </RadioGroup>
-        </FormControl>
+        <Grid display="flex" justifyContent="flex-end" sx={{ mb: 5, mt: -10 }}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">차트</FormLabel>
+            <RadioGroup aria-label="position">
+              {graphTypeOptions.map((option, idx) => (
+                <FormControlLabel
+                  key={idx}
+                  checked={graphTypeOption === option.graph}
+                  value={option.graph}
+                  control={<Radio />}
+                  label={option.label}
+                  name="monthly"
+                  labelPlacement="end"
+                  onChange={handleCheckboxChange}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
 
-        <FormControl component="fieldset">
-          <FormLabel component="legend">항목</FormLabel>
-          <RadioGroup aria-label="position">
-            {costOptions.map((option, idx) => (
-              <FormControlLabel
-                key={idx}
-                checked={costOption === option.category}
-                value={option.category}
-                control={<Radio />}
-                label={option.label}
-                name="cost"
-                labelPlacement="end"
-                onChange={handleCheckboxChange}
-              />
-            ))}
-          </RadioGroup>
-        </FormControl>
-
+          <FormControl component="fieldset">
+            <FormLabel component="legend">항목</FormLabel>
+            <RadioGroup aria-label="position">
+              {costOptions.map((option, idx) => (
+                <FormControlLabel
+                  key={idx}
+                  checked={costOption === option.category}
+                  value={option.category}
+                  control={<Radio />}
+                  label={option.label}
+                  name="cost"
+                  labelPlacement="end"
+                  onChange={handleCheckboxChange}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </Grid>
         <DateHeader
           type={"month"}
           currentTime={currentMonth}
@@ -422,28 +426,35 @@ export default function Report() {
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        <FormControl component="fieldset">
-          <FormLabel component="legend">형식</FormLabel>
-          <RadioGroup aria-label="position">
-            {yearlyOptions.map((option, idx) => (
-              <FormControlLabel
-                key={idx}
-                checked={yearlyOption === option.form}
-                value={option.form}
-                control={<Radio />}
-                label={option.label}
-                name="yearly"
-                labelPlacement="end"
-                onChange={handleCheckboxChange}
-              />
-            ))}
-          </RadioGroup>
-        </FormControl>
+        <Grid
+          display="flex"
+          justifyContent="flex-end"
+          sx={{ mb: 5, mt: -10 }}
+          alignItems="baseline"
+        >
+          <FormControl component="fieldset">
+            <FormLabel component="legend">형식</FormLabel>
+            <RadioGroup aria-label="position">
+              {yearlyOptions.map((option, idx) => (
+                <FormControlLabel
+                  key={idx}
+                  checked={yearlyOption === option.form}
+                  value={option.form}
+                  control={<Radio />}
+                  label={option.label}
+                  name="yearly"
+                  labelPlacement="end"
+                  onChange={handleCheckboxChange}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </Grid>
 
         <DateHeader currentTime={currentYear} prev={prevYear} next={nextYear} />
         {yearlyOption === "table" && (
           <div>
-            <DataGrid columns={columns} rows={rows} />
+            <DataGrid columns={columns} rows={rows} height={500} />
           </div>
         )}
         {yearlyOption === "chart" && (
@@ -452,6 +463,6 @@ export default function Report() {
           </div>
         )}
       </TabPanel>
-    </div>
+    </Grid>
   );
 }
