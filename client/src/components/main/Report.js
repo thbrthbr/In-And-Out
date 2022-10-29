@@ -1,13 +1,20 @@
-import { Link, NavLink, useLocation } from "react-router-dom";
-
-import { useRef, useState, useEffect, useCallback } from "react";
-import styled from "styled-components";
-import Checkbox from "./Checkbox";
+import { useRef, useState, useEffect } from "react";
 import ChartCanvas from "./ChartCanvas";
 
 import "react-data-grid/lib/styles.css";
 import DataGrid from "react-data-grid";
 import DateHeader from "../common/DateHeader";
+
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 
 import {
   addMonths,
@@ -64,28 +71,22 @@ Chart.register(
   LineElement
 );
 
-const API_URL = "http://localhost:5000/report";
-const SideButton = styled.div`
-  width: 180px;
-  height: 50px;
-  margin-top: 20px;
-  background-color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const NavLinkContainer = styled.div`
-  display: flex;
-`;
-
 const drawChart = (ctx, config) => {
   return new Chart(ctx, config);
 };
 
-const graphTypes = ["bar", "doughnut"];
-const yearlyOptions = ["table", "chart"];
-const costOptions = ["income", "expense"];
+const graphTypeOptions = [
+  { graph: "bar", label: "막대형" },
+  { graph: "doughnut", label: "파이형" },
+];
+const yearlyOptions = [
+  { form: "table", label: "표" },
+  { form: "chart", label: "그래프" },
+];
+const costOptions = [
+  { category: "income", label: "수입" },
+  { category: "expense", label: "지출" },
+];
 
 const columns = [
   { key: "date", name: "기간" },
@@ -103,20 +104,6 @@ const columns = [
   { key: "dec", name: "12월" },
   { key: "sum", name: "합계" },
 ];
-
-// let data = []; //useState로 관리? -> getData -> setData로 처리해 rerendering
-// let labels = [];
-const rows = [];
-
-// const rowData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-// const addRows = (rowData) => {
-//   const obj = {};
-//   Object.entries(columns).forEach((column) => {
-//     obj[column[1].key] = rowData[column[0]];
-//   });
-//   // console.log(obj);
-//   rows.push(obj);
-// };
 
 const doughnutConfig = {
   type: "doughnut",
@@ -179,88 +166,82 @@ const lineConfig = {
   options: lineOption,
 };
 
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography component="div">{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+const TabSelected = Object.freeze({
+  MONTH: 0,
+  YEAR: 1,
+});
+
 let currentMonth = new Date();
 let currentYear = new Date();
-let params = {};
+const rows = [];
+
 export default function Report() {
   const canvasRef = useRef(null);
-  const loc = useLocation();
-  const params =
-    loc.pathname === "/report/month"
-      ? {
-          start_dt: startOfMonth(currentMonth),
-          end_dt: endOfMonth(currentMonth),
-        }
-      : {
-          start_dt: startOfYear(currentMonth),
-          end_dt: endOfYear(currentMonth),
-        };
-  // const [currentMonth, setCurrentMonth] = useState(new Date());
-  // const [currentYear, setCurrentYear] = useState(new Date());
-  // const [month, setMonthData] = useState([]);
-  // const [label, setLabel] = useState([]);
 
-  const setParam = () => {
-    const path = loc.pathname;
-    if (path === "/report/month") {
-      params.start_dt = startOfMonth(currentMonth);
-      params.end_dt = endOfMonth(currentMonth);
-    } else {
-      params.start_dt = startOfYear(currentYear);
-      params.end_dt = endOfYear(currentYear);
-    }
-  };
+  const [graphTypeOption, setgraphTypeOption] = useState("bar");
+  const [yearlyOption, setYearlyOption] = useState("chart");
+  const [costOption, setCostOption] = useState("income");
+  const [tabValue, setTabValue] = useState(0);
 
   const setParamAndRefetch = () => {
     setParam();
     refetch();
   };
+
   const prevMonth = () => {
-    // setCurrentMonth(subMonths(currentMonth, 1));
     currentMonth = subMonths(currentMonth, 1);
     setParamAndRefetch();
   };
   const nextMonth = () => {
-    // setCurrentMonth(addMonths(currentMonth, 1));
     currentMonth = addMonths(currentMonth, 1);
     setParamAndRefetch();
   };
 
   const prevYear = () => {
-    // setCurrentYear(subYears(currentYear, 1));
     currentYear = subYears(currentYear, 1);
     setParamAndRefetch();
   };
   const nextYear = () => {
-    // setCurrentYear(addYears(currentYear, 1));
     currentYear = addYears(currentYear, 1);
     setParamAndRefetch();
   };
 
-  const [graphTypeChecked, setGraphTypeChecked] = useState({
-    option: "bar",
-    checked: true,
-  });
-
-  const [yearlyOption, setYearlyOption] = useState({
-    option: "chart",
-    checked: true,
-  });
-
-  const [costOption, setCostOption] = useState({
-    option: "income",
-    checked: true,
-  });
-
   const checkboxMap = {
     monthly(e) {
-      setGraphTypeChecked({ option: e.target.value, checked: true });
+      setgraphTypeOption(e.target.value);
     },
     yearly(e) {
-      setYearlyOption({ option: e.target.value, checked: true });
+      setYearlyOption(e.target.value);
     },
     cost(e) {
-      setCostOption({ option: e.target.value, checked: true });
+      setCostOption(e.target.value);
     },
   };
 
@@ -268,68 +249,75 @@ export default function Report() {
     checkboxMap[checkboxType](e);
   };
 
-  const handleOnChange = (e) => {
+  const handleCheckboxChange = (e) => {
     if (e.target.checked) {
-      if (e.target.name === "monthly") {
-        handleCheckbox("monthly", e);
-      } else if (e.target.name === "yearly") {
-        handleCheckbox("yearly", e);
-      } else if (e.target.name === "cost") {
-        handleCheckbox("cost", e);
-      }
+      handleCheckbox(e.target.name, e);
     }
   };
 
   const getMonthlyData = (fetchedData) => {
     const newData = [];
     const newLabel = [];
-    fetchedData.map((element, idx) => {
+    fetchedData.forEach((element, idx) => {
       newData[idx] = element.category_ratio * 100;
       newLabel[idx] = `${element.category} - ${element.category_sum}`;
     });
 
     return [newData, newLabel];
   };
-  const getData = async () => {
-    const path = loc.pathname;
-    if (path === "/report/monthly") {
-      try {
-        const res = await axios(`${API_URL}`, { params: params });
-        // console.log("data", res.data);
-        const fetchedData = res.data[costOption.option]; // API문서보면 expense income URL이 따로 있는듯
-        const [newData, newLabel] = getMonthlyData(fetchedData);
 
+  const setParam = () => {
+    switch (tabValue) {
+      case TabSelected.MONTH:
+        params.start_dt = startOfMonth(currentMonth);
+        params.end_dt = endOfMonth(currentMonth);
+        break;
+      case TabSelected.YEAR:
+        params.start_dt = startOfYear(currentYear);
+        params.end_dt = endOfYear(currentYear);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const getData = async (url, params) => {
+    try {
+      const res = await axios(url, { params: params });
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const setData = () => {
+    switch (tabValue) {
+      case TabSelected.MONTH:
+        const [newData, newLabel] = getMonthlyData(data[costOption]);
         doughnutConfig.data.labels = newLabel;
         doughnutConfig.data.datasets[0].data = newData;
         barConfig.data.labels = newLabel;
         barConfig.data.datasets[0].data = newData;
         lineConfig.data.labels = newLabel;
         lineConfig.data.datasets[0].data = newData;
-        // charId.update();
-        // setMonthData(newData);
-        // setLabel(newLabel);
-      } catch (err) {
-        console.log(err);
-      }
-    } else if (path === "/report/yearly") {
+        break;
+
+      default:
+        break;
     }
   };
 
-  // useEffect(() => {
-  //   getData(loc.pathname);
-
-  //   addRows(rowData);
-  //   //console.log(rows);
-  // }, []);
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
   useEffect(() => {
-    // console.log(data, label);
     let charId;
     if (canvasRef.current) {
       charId = drawChart(
         canvasRef.current,
-        loc.pathname === "/report/monthly"
-          ? graphTypeChecked.option === "bar"
+        tabValue === TabSelected.MONTH
+          ? graphTypeOption === "bar"
             ? barConfig
             : doughnutConfig
           : lineConfig
@@ -360,129 +348,110 @@ export default function Report() {
     };
   });
 
-  // useEffect(() => {
-  //   getData(loc.pathname);
-  // }, [costOption]);
+  const API_URL = "http://localhost:5000/report";
+  const params = {};
+  setParam();
 
   const { data, isLoading, refetch } = useQuery(
     ["getReportData", costOption],
-    getData
+    () => getData(API_URL, params)
   );
 
   if (isLoading) return <PacmanLoader color="#36d7b7" />;
+  setData();
 
   return (
     <div>
-      <NavLinkContainer>
-        <NavLink
-          style={({ isActive }) =>
-            isActive
-              ? {
-                  textDecoration: "none",
-                  borderBottom: "1px solid red",
-                }
-              : { color: "black", textDecoration: "none" }
-          }
-          to={"/report/monthly"}
-        >
-          <SideButton>{"월간 보고서"}</SideButton>
-        </NavLink>
-        <NavLink
-          style={({ isActive }) =>
-            isActive
-              ? { textDecoration: "none", borderBottom: "1px solid red" }
-              : { color: "black", textDecoration: "none" }
-          }
-          to={"/report/yearly"}
-        >
-          <SideButton>{"연간 보고서"}</SideButton>
-        </NavLink>
-      </NavLinkContainer>
+      <Box sx={{ width: "100%" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="periodic report"
+          >
+            <Tab label="월간 보고서" {...a11yProps(0)} />
+            <Tab label="연간 보고서" {...a11yProps(1)} />
+          </Tabs>
+        </Box>
+      </Box>
 
-      {loc.pathname === "/report/monthly" && (
-        <div>
-          <div>
-            <ul>
-              {graphTypes.map((type, idx) => {
-                return (
-                  <li key={idx}>
-                    <Checkbox
-                      type={type}
-                      name={"monthly"}
-                      checked={graphTypeChecked.option === type ? true : false}
-                      handleOnChange={handleOnChange}
-                    />
-                    {type === "bar" && "막대형"}
-                    {type === "doughnut" && "파이형"}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          <div>
-            <ul>
-              {costOptions.map((type, idx) => {
-                return (
-                  <li key={idx}>
-                    <Checkbox
-                      type={type}
-                      name={"cost"}
-                      checked={costOption.option === type ? true : false}
-                      handleOnChange={handleOnChange}
-                    />
-                    {type === "income" && "수입"}
-                    {type === "expense" && "지출"}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <DateHeader
-            type={"month"}
-            currentTime={currentMonth}
-            prev={prevMonth}
-            next={nextMonth}
-          />
-          <ChartCanvas width={1000} height={500} ref={canvasRef} />
-        </div>
-      )}
-
-      {loc.pathname === "/report/yearly" && (
-        <div>
-          <ul>
-            {yearlyOptions.map((type, idx) => {
-              return (
-                <li key={idx}>
-                  <Checkbox
-                    type={type}
-                    name={"yearly"}
-                    checked={yearlyOption.option === type ? true : false}
-                    handleOnChange={handleOnChange}
-                  />
-                  {type === "table" && "표"}
-                  {type === "chart" && "그래프"}
-                </li>
-              );
-            })}
-          </ul>
-          {yearlyOption.option === "table" && (
-            <div>
-              <DataGrid columns={columns} rows={rows} />
-            </div>
-          )}
-          {yearlyOption.option === "chart" && (
-            <div>
-              <DateHeader
-                currentTime={currentYear}
-                prev={prevYear}
-                next={nextYear}
+      <TabPanel value={tabValue} index={0}>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">차트</FormLabel>
+          <RadioGroup aria-label="position">
+            {graphTypeOptions.map((option, idx) => (
+              <FormControlLabel
+                key={idx}
+                checked={graphTypeOption === option.graph}
+                value={option.graph}
+                control={<Radio />}
+                label={option.label}
+                name="monthly"
+                labelPlacement="end"
+                onChange={handleCheckboxChange}
               />
-              <ChartCanvas width={1000} height={500} ref={canvasRef} />
-            </div>
-          )}
-        </div>
-      )}
+            ))}
+          </RadioGroup>
+        </FormControl>
+
+        <FormControl component="fieldset">
+          <FormLabel component="legend">항목</FormLabel>
+          <RadioGroup aria-label="position">
+            {costOptions.map((option, idx) => (
+              <FormControlLabel
+                key={idx}
+                checked={costOption === option.category}
+                value={option.category}
+                control={<Radio />}
+                label={option.label}
+                name="cost"
+                labelPlacement="end"
+                onChange={handleCheckboxChange}
+              />
+            ))}
+          </RadioGroup>
+        </FormControl>
+
+        <DateHeader
+          type={"month"}
+          currentTime={currentMonth}
+          prev={prevMonth}
+          next={nextMonth}
+        />
+        <ChartCanvas width={1000} height={500} ref={canvasRef} />
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={1}>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">형식</FormLabel>
+          <RadioGroup aria-label="position">
+            {yearlyOptions.map((option, idx) => (
+              <FormControlLabel
+                key={idx}
+                checked={yearlyOption === option.form}
+                value={option.form}
+                control={<Radio />}
+                label={option.label}
+                name="yearly"
+                labelPlacement="end"
+                onChange={handleCheckboxChange}
+              />
+            ))}
+          </RadioGroup>
+        </FormControl>
+
+        <DateHeader currentTime={currentYear} prev={prevYear} next={nextYear} />
+        {yearlyOption === "table" && (
+          <div>
+            <DataGrid columns={columns} rows={rows} />
+          </div>
+        )}
+        {yearlyOption === "chart" && (
+          <div>
+            <ChartCanvas width={1000} height={500} ref={canvasRef} />
+          </div>
+        )}
+      </TabPanel>
     </div>
   );
 }
