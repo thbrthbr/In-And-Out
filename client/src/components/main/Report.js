@@ -1,6 +1,6 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import Checkbox from "./Checkbox";
 import ChartCanvas from "./ChartCanvas";
@@ -9,9 +9,21 @@ import "react-data-grid/lib/styles.css";
 import DataGrid from "react-data-grid";
 import DateHeader from "../common/DateHeader";
 
-import { addMonths, subMonths, addYears, subYears } from "date-fns";
+import {
+  addMonths,
+  subMonths,
+  addYears,
+  subYears,
+  startOfMonth,
+  endOfMonth,
+  startOfYear,
+  endOfYear,
+} from "date-fns";
 
 import axios from "axios";
+
+import { useQuery } from "react-query";
+import PacmanLoader from "react-spinners/PacmanLoader";
 
 import {
   doughnutOption,
@@ -51,6 +63,8 @@ Chart.register(
   PointElement,
   LineElement
 );
+
+const API_URL = "http://localhost:5000/report";
 const SideButton = styled.div`
   width: 180px;
   height: 50px;
@@ -90,19 +104,19 @@ const columns = [
   { key: "sum", name: "합계" },
 ];
 
-let data = []; //useState로 관리? -> getData -> setData로 처리해 rerendering
-let labels = [];
+// let data = []; //useState로 관리? -> getData -> setData로 처리해 rerendering
+// let labels = [];
 const rows = [];
 
-const rowData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-const addRows = (rowData) => {
-  const obj = {};
-  Object.entries(columns).forEach((column) => {
-    obj[column[1].key] = rowData[column[0]];
-  });
-  // console.log(obj);
-  rows.push(obj);
-};
+// const rowData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+// const addRows = (rowData) => {
+//   const obj = {};
+//   Object.entries(columns).forEach((column) => {
+//     obj[column[1].key] = rowData[column[0]];
+//   });
+//   // console.log(obj);
+//   rows.push(obj);
+// };
 
 const doughnutConfig = {
   type: "doughnut",
@@ -165,26 +179,62 @@ const lineConfig = {
   options: lineOption,
 };
 
-function getData() {}
-
+let currentMonth = new Date();
+let currentYear = new Date();
+let params = {};
 export default function Report() {
   const canvasRef = useRef(null);
   const loc = useLocation();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [currentYear, setCurrentYear] = useState(new Date());
+  const params =
+    loc.pathname === "/report/month"
+      ? {
+          start_dt: startOfMonth(currentMonth),
+          end_dt: endOfMonth(currentMonth),
+        }
+      : {
+          start_dt: startOfYear(currentMonth),
+          end_dt: endOfYear(currentMonth),
+        };
+  // const [currentMonth, setCurrentMonth] = useState(new Date());
+  // const [currentYear, setCurrentYear] = useState(new Date());
+  // const [month, setMonthData] = useState([]);
+  // const [label, setLabel] = useState([]);
 
+  const setParam = () => {
+    const path = loc.pathname;
+    if (path === "/report/month") {
+      params.start_dt = startOfMonth(currentMonth);
+      params.end_dt = endOfMonth(currentMonth);
+    } else {
+      params.start_dt = startOfYear(currentYear);
+      params.end_dt = endOfYear(currentYear);
+    }
+  };
+
+  const setParamAndRefetch = () => {
+    setParam();
+    refetch();
+  };
   const prevMonth = () => {
-    setCurrentMonth(subMonths(currentMonth, 1));
+    // setCurrentMonth(subMonths(currentMonth, 1));
+    currentMonth = subMonths(currentMonth, 1);
+    setParamAndRefetch();
   };
   const nextMonth = () => {
-    setCurrentMonth(addMonths(currentMonth, 1));
+    // setCurrentMonth(addMonths(currentMonth, 1));
+    currentMonth = addMonths(currentMonth, 1);
+    setParamAndRefetch();
   };
 
   const prevYear = () => {
-    setCurrentYear(subYears(currentYear, 1));
+    // setCurrentYear(subYears(currentYear, 1));
+    currentYear = subYears(currentYear, 1);
+    setParamAndRefetch();
   };
   const nextYear = () => {
-    setCurrentYear(addYears(currentYear, 1));
+    // setCurrentYear(addYears(currentYear, 1));
+    currentYear = addYears(currentYear, 1);
+    setParamAndRefetch();
   };
 
   const [graphTypeChecked, setGraphTypeChecked] = useState({
@@ -230,38 +280,51 @@ export default function Report() {
     }
   };
 
-  useEffect(() => {
-    let charId;
-    if (loc.pathname === "/report/monthly") {
-      getData();
-      data = [10, 20, 15, 5, 50];
-      labels = [
-        "주거 - 10% 100,000",
-        "주거 - 10% 100,000",
-        "주거 - 10% 100,000",
-        "주거 - 10% 100,000",
-        "주거 - 10% 100,000",
-      ];
-    } else if (loc.pathname === "/report/yearly") {
-      getData();
-      data = [20, 30, 10, 30, 10];
-      labels = [
-        "주거 - 20% 200,000",
-        "주거 - 20% 200,000",
-        "주거 - 20% 200,000",
-        "주거 - 20% 200,000",
-        "주거 - 20% 200,000",
-      ];
-    }
-    doughnutConfig.data.labels = labels;
-    doughnutConfig.data.datasets[0].data = data;
-    barConfig.data.labels = labels;
-    barConfig.data.datasets[0].data = data;
-    lineConfig.data.labels = labels;
-    lineConfig.data.datasets[0].data = data;
-    addRows(rowData);
-    console.log(rows);
+  const getMonthlyData = (fetchedData) => {
+    const newData = [];
+    const newLabel = [];
+    fetchedData.map((element, idx) => {
+      newData[idx] = element.category_ratio * 100;
+      newLabel[idx] = `${element.category} - ${element.category_sum}`;
+    });
 
+    return [newData, newLabel];
+  };
+  const getData = async () => {
+    const path = loc.pathname;
+    if (path === "/report/monthly") {
+      try {
+        const res = await axios(`${API_URL}`, { params: params });
+        // console.log("data", res.data);
+        const fetchedData = res.data[costOption.option]; // API문서보면 expense income URL이 따로 있는듯
+        const [newData, newLabel] = getMonthlyData(fetchedData);
+
+        doughnutConfig.data.labels = newLabel;
+        doughnutConfig.data.datasets[0].data = newData;
+        barConfig.data.labels = newLabel;
+        barConfig.data.datasets[0].data = newData;
+        lineConfig.data.labels = newLabel;
+        lineConfig.data.datasets[0].data = newData;
+        // charId.update();
+        // setMonthData(newData);
+        // setLabel(newLabel);
+      } catch (err) {
+        console.log(err);
+      }
+    } else if (path === "/report/yearly") {
+    }
+  };
+
+  // useEffect(() => {
+  //   getData(loc.pathname);
+
+  //   addRows(rowData);
+  //   //console.log(rows);
+  // }, []);
+
+  useEffect(() => {
+    // console.log(data, label);
+    let charId;
     if (canvasRef.current) {
       charId = drawChart(
         canvasRef.current,
@@ -271,11 +334,42 @@ export default function Report() {
             : doughnutConfig
           : lineConfig
       );
+
+      canvasRef.current.onclick = function (evt) {
+        const points = charId.getElementsAtEventForMode(
+          evt,
+          "nearest",
+          { intersect: true },
+          true
+        );
+
+        if (points.length) {
+          const firstPoint = points[0];
+          const label = charId.data.labels[firstPoint.index];
+          const slabel = charId.data.datasets[firstPoint.datasetIndex].label;
+          const value =
+            charId.data.datasets[firstPoint.datasetIndex].data[
+              firstPoint.index
+            ];
+          console.log(label, slabel, value);
+        }
+      };
     }
     return () => {
       charId && charId.destroy();
     };
   });
+
+  // useEffect(() => {
+  //   getData(loc.pathname);
+  // }, [costOption]);
+
+  const { data, isLoading, refetch } = useQuery(
+    ["getReportData", costOption],
+    getData
+  );
+
+  if (isLoading) return <PacmanLoader color="#36d7b7" />;
 
   return (
     <div>

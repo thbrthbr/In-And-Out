@@ -7,8 +7,14 @@ import DateEditor from "../../editor/DateEditor";
 
 import { NavLink, useLocation } from "react-router-dom";
 
-import axios from "axios";
 import styled from "styled-components";
+import axios from "axios";
+
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import PacmanLoader from "react-spinners/PacmanLoader";
+
+const INCOME_API_URL = "http://localhost:5000/income";
+const EXPENSE_API_URL = "http://localhost:5000/expense";
 
 const SideButton = styled.div`
   width: 180px;
@@ -24,10 +30,10 @@ const NavLinkContainer = styled.div`
   display: flex;
 `;
 
-const columns = [
+const incomeColumns = [
   SelectColumn,
   {
-    key: "date",
+    key: "incomeDate",
     name: "날짜",
     width: 200,
     formatter(props) {
@@ -36,22 +42,17 @@ const columns = [
     editor: DateEditor,
   },
   {
-    key: "history",
+    key: "incomeItem",
     name: "사용내역",
     editor: textEditor,
   },
   {
-    key: "cash",
-    name: "현금",
+    key: "incomeAmount",
+    name: "금액",
     editor: textEditor,
   },
   {
-    key: "card",
-    name: "카드",
-    editor: textEditor,
-  },
-  {
-    key: "category",
+    key: "incomeCategoryName",
     name: "분류",
     formatter(props) {
       return <>{props.row.category}</>;
@@ -63,72 +64,221 @@ const columns = [
     },
   },
   {
-    key: "memo",
+    key: "incomeMemo",
     name: "메모",
     width: 500,
     editor: textEditor,
   },
 ];
 
-let dataRow = [
+const expenseColumns = [
+  SelectColumn,
   {
-    id: 1,
-    date: "10/6/2022",
-    history: "Lasagne",
-    cash: "4000",
-    card: "32000",
-    category: "식비",
-    memo: "good",
+    key: "expenseDate",
+    name: "날짜",
+    width: 200,
+    formatter(props) {
+      return <>{props.row.date}</>;
+    },
+    editor: DateEditor,
+  },
+  {
+    key: "expenseItem",
+    name: "사용내역",
+    editor: textEditor,
+  },
+  {
+    key: "expenseCash",
+    name: "현금",
+    editor: textEditor,
+  },
+  {
+    key: "expenseCard",
+    name: "카드",
+    editor: textEditor,
+  },
+  {
+    key: "expenseCategoryName",
+    name: "분류",
+    formatter(props) {
+      return <>{props.row.category}</>;
+    },
+    resizable: true,
+    editor: dropDownEditor,
+    editorOptions: {
+      editOnClick: true,
+    },
+  },
+  {
+    key: "expenseMemo",
+    name: "메모",
+    width: 500,
+    editor: textEditor,
   },
 ];
 
-function rowKeyGetter(row) {
-  return row.id;
-}
+let newRowData = [];
 
-function getData() {
-  console.log("getdata");
-}
-
-let num = dataRow.length;
 export default function Inout() {
-  const [rows, setRows] = useState(dataRow); // 나중에 빈배열로 처리
+  const [rows, setRows] = useState([]); // 나중에 빈배열로 처리
   const [selectedRows, setSelectedRows] = useState(() => new Set());
   const loc = useLocation();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    // 데이터 불러오기
-    getData(); // dataRow에 받은 데이터 저장한 후 저장 할때 dataRow를 서버에 보내면 될듯
-  }, [loc.pathname]);
+  async function getData() {
+    let path = loc.pathname;
+    let newData = [];
+    if (path === "/inout/income") {
+      const res = await axios.get(INCOME_API_URL, {
+        headers: { "Content-Type": "application/json" },
+      });
+      // console.log(res.data.income);
+      const incomeData = res.data.income;
+      newData = incomeData;
+      // ? incomeData.map((item) => {
+      //     return {
+      //       ...item,
+      //       date: item.incomeDate,
+      //       category: item.incomeCategoryName,
+      //     };
+      //   })
+      // : [];
+    } else if (path === "/inout/expense") {
+      const res = await axios.get(EXPENSE_API_URL, {
+        headers: { "Content-Type": "application/json" },
+      });
+      // console.log(res.data.expense);
+      const expenseData = res.data.expense;
+      // console.log(expenseData);
+      // setRows(expenseData);
+      newData = expenseData;
+      // ? expenseData.map((item) => {
+      //     return {
+      //       ...item,
+      //       date: item.expenseDate,
+      //       category: item.expenseCategoryName,
+      //     };
+      //   })
+      // : [];
+
+      // setRows(...rows, [0].expenseData
+    }
+    setRows(newData);
+    return newData;
+  }
+
+  function rowKeyGetter(row) {
+    const id = loc.pathname === "/inout/income" ? row.incomeId : row.expenseId;
+    return id;
+  }
+  // useEffect(() => {
+  //   // 데이터 불러오기
+  //   getData(); // newRowData에 받은 데이터 저장한 후 저장 할때 newRowData를 서버에 보내면 될듯
+  // }, [loc]);
 
   function createNewRow() {
-    const newData = {
-      id: num++,
-      date: "",
-      history: "",
-      cash: "",
-      card: "",
-      category: "",
-      memo: "",
+    const newIncomeData = {
+      incomeId: rows[rows.length - 1].incomeId + 1,
+      incomeDate: "",
+      incomeItem: "",
+      incomeAmount: "",
+      incomeCategoryName: "",
+      incomeMemo: "",
     };
+
+    const newExpenseData = {
+      expenseId: rows[rows.length - 1].expenseId + 1,
+      expenseDate: "",
+      expenseItem: "",
+      expenseCash: "",
+      expenseCard: "",
+      expenseCategoryName: "",
+      expenseMemo: "",
+    };
+    let newData =
+      loc.pathname === "/inout/income" ? newIncomeData : newExpenseData;
+    console.log(rows[rows.length - 1].incomeId);
+
     setRows([...rows, newData]);
-    console.log(selectedRows);
-    dataRow.push(newData); // 요렇게 하면 다른 화면 이동 후에도 저장가능한듯?
-    // console.log(rows);
+    // newRowData.push(newData);
+    console.log("data", newRowData);
   }
 
-  function saveData() {
-    alert("saved");
+  const saveDataMutation = useMutation(
+    async (rowData) => {
+      const data =
+        loc.pathname === "/inout/income"
+          ? { income: rowData }
+          : { expense: rowData };
+      const api =
+        loc.pathname === "/inout/income" ? INCOME_API_URL : EXPENSE_API_URL;
+      try {
+        const res = await axios.post(api, data, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("getInoutData");
+      },
+    }
+  );
+
+  const deleteDataMutation = useMutation(
+    async (rowData) => {
+      const api =
+        loc.pathname === "/inout/income" ? INCOME_API_URL : EXPENSE_API_URL;
+      try {
+        const res = await axios.delete(api, rowData, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("getInoutData");
+      },
+    }
+  );
+
+  const { data, isLoading, refetch } = useQuery(
+    ["getInoutData", loc],
+    getData,
+    {
+      staleTime: Infinity,
+    }
+  );
+
+  function onSaveData() {
+    console.log("saved", rows);
+    saveDataMutation.mutate(rows);
   }
-  function deleteData() {
-    // console.log(rows);
+  function onDeleteData() {
+    console.log("deleted");
+
     // console.log([...selectedRows]);
+    deleteDataMutation.mutate(selectedRows);
     const newRows = rows.slice();
-    const filteredRow = newRows.filter((row, idx) => !selectedRows.has(row.id));
-    setRows(filteredRow);
-    dataRow = filteredRow;
+    const filteredRow = newRows.filter((row, idx) => {
+      const id =
+        loc.pathname === "/inout/income" ? row.incomeId : row.expenseId;
+      return !selectedRows.has(id);
+    });
+    console.log("filtered", filteredRow);
+    // setRows(filteredRow);
+    // newRowData = filteredRow;
   }
 
+  if (isLoading) return <PacmanLoader color="#36d7b7" />;
+  console.log(isLoading, data);
+  // setRows(data);
   return (
     <div>
       <NavLinkContainer>
@@ -160,7 +310,9 @@ export default function Inout() {
       {
         <div>
           <DataGrid
-            columns={columns}
+            columns={
+              loc.pathname === "/inout/income" ? incomeColumns : expenseColumns
+            }
             rows={rows}
             rowGetter={(i) => rows[i]}
             rowKeyGetter={rowKeyGetter}
@@ -173,8 +325,8 @@ export default function Inout() {
             onSelectedRowsChange={setSelectedRows}
           />
           <button onClick={createNewRow}>Add</button>
-          <button onClick={saveData}>저장</button>
-          <button onClick={deleteData}>삭제</button>
+          <button onClick={onSaveData}>저장</button>
+          <button onClick={onDeleteData}>삭제</button>
         </div>
       }
     </div>

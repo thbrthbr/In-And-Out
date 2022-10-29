@@ -66,6 +66,10 @@ const barOption = {
         },
       },
     },
+    onClick: (evt, item) => {
+      this.check("source", this.state.data.datasets[0].data[item[0]._index]);
+      console.log("test");
+    },
   },
 };
 

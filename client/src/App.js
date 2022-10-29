@@ -22,6 +22,8 @@ import Error from "./components/Error";
 import Layout from "./components/common/Layout";
 
 import Screen from "./components/common/Screen";
+
+import { QueryClientProvider, QueryClient } from "react-query";
 // import { createStore } from "redux";
 
 // import { Provider, useSelector, useDispatch, connect } from "react-redux";
@@ -36,29 +38,32 @@ import Screen from "./components/common/Screen";
 // }
 
 // const store = createStore(reducer);
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Login />}></Route>
-          <Route path="/signin" element={<Signin />}></Route>
-          <Route path="/identify_email" element={<IdentifyEmail />}></Route>
-          <Route path="/identify_phone" element={<IdentifyPhone />}></Route>
-          <Route path="/initiate" element={<RecoverInitiate />}></Route>
-          <Route path="/calendar" element={<Calendar />}></Route>
-          <Route path="/report/monthly" element={<Report />}></Route>
-          <Route path="/report/yearly" element={<Report />}></Route>
-          <Route path="/inout/income" element={<Inout />}></Route>
-          <Route path="/inout/expense" element={<Inout />}></Route>
-          <Route path="/profile_change" element={<Screen />}></Route>
-          <Route path="/password_change" element={<Screen />}></Route>
-          <Route path="/signout" element={<Screen />}></Route>
-          <Route path="*" element={<Error />}></Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Login />}></Route>
+            <Route path="/signin" element={<Signin />}></Route>
+            <Route path="/identify_email" element={<IdentifyEmail />}></Route>
+            <Route path="/identify_phone" element={<IdentifyPhone />}></Route>
+            <Route path="/initiate" element={<RecoverInitiate />}></Route>
+            <Route path="/calendar" element={<Calendar />}></Route>
+            <Route path="/report/monthly" element={<Report />}></Route>
+            <Route path="/report/yearly" element={<Report />}></Route>
+            <Route path="/inout/income" element={<Inout />}></Route>
+            <Route path="/inout/expense" element={<Inout />}></Route>
+            <Route path="/profile_change" element={<Screen />}></Route>
+            <Route path="/password_change" element={<Screen />}></Route>
+            <Route path="/signout" element={<Screen />}></Route>
+            <Route path="*" element={<Error />}></Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
