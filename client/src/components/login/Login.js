@@ -49,7 +49,6 @@ export default function Login() {
       setResidence(result.residence);
       setGender(result.gender);
       setLogState(true);
-      // alert("반갑습니다");
     }
   };
 
@@ -67,13 +66,12 @@ export default function Login() {
     setResidence("");
     setGender("");
     console.log(id);
-    // console.log(localStorage.getItem("login-stuff"));
   }
 
   return (
     <div>
       {logState ? (
-        <div> Logged in : {id} </div>
+        <div> Logged in : {nickname} </div>
       ) : (
         <>
           <div>Login Page</div>

@@ -44,20 +44,20 @@ export default function Signout() {
       const user = users.find((user) => user.id === id);
       if (user.password !== e["pw"]) {
         alert("비밀번호가 맞지 않습니다.");
-        throw new Error("아이디 또는 비밀번호가 일치하지 않습니다.");
+        throw new Error("비밀번호가 맞지 않습니다.");
       }
     } else {
       throw new Error("서버 통신이 원할하지 않습니다.");
     }
     await signout();
     setLogState(false);
-    setId("X");
-    setNickname("X");
-    setPhoneNumber("X");
-    setBirthdate("X");
-    setResidence("X");
-    setGender("X");
-    setPassword("X");
+    setId("");
+    setNickname("");
+    setPhoneNumber("");
+    setBirthdate("");
+    setResidence("");
+    setGender("");
+    setPassword("");
     sessionStorage.clear();
     navigate("/");
   };
