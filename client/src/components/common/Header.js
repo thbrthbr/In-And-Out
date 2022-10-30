@@ -1,14 +1,25 @@
+import { useState } from "react";
 import logo from "../../img/logo.png";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
 import { useStore, useStore2 } from "../../store/store.js";
 import defaultUser from "../../img/default-user.jpg";
 
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Menu from "@mui/material/Menu";
+import Container from "@mui/material/Container";
+import Avatar from "@mui/material/Avatar";
+import Tooltip from "@mui/material/Tooltip";
+import MenuItem from "@mui/material/MenuItem";
+
+const settings = ["Setting", "Logout"];
+
 export default function Header() {
   const { profileImage } = useStore();
-
   const navigate = useNavigate();
-
   const { logState, setLogState } = useStore2();
 
   function loginHandler() {
@@ -18,68 +29,78 @@ export default function Header() {
     setLogState(false);
   }
 
-  return (
-    <HeaderLayout
-      style={{
-        background: "lightgray",
-        height: "100px",
-        paddingLeft: 16,
-      }}
-    >
-      <img
-        alt="로고"
-        onClick={() => navigate("/")}
-        style={{ width: "200px", cursor: "pointer" }}
-        src={logo}
-      />
-      {logState && (
-        <ProfImg>
-          <img
-            alt="프로필사진"
-            onClick={() => navigate("/profile_change")}
-            src={profileImage ? profileImage : defaultUser}
-            style={{ width: "100px", height: "100px", objectFit: "cover" }}
-          />
-        </ProfImg>
-      )}
-      {logState ? (
-        <button onClick={logoutHandler}>logoutState</button>
-      ) : (
-        <button onClick={loginHandler}>loginState</button>
-      )}
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
-      {/* <Temp>
-        <div>로그아웃</div>
-        <div>설정</div>
-      </Temp> */}
-    </HeaderLayout>
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = (e) => {
+    console.log(e.target.innerText);
+    setAnchorElUser(null);
+    switch (e.target.innerText) {
+      case "Setting":
+        navigate("/profile_change");
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  return (
+    <>
+      <AppBar position="static" style={{ background: "gray" }}>
+        <Container maxWidth="100%">
+          <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
+            <img
+              alt="로고"
+              onClick={() => navigate("/")}
+              style={{ width: "200px", cursor: "pointer" }}
+              src={logo}
+            />
+            {logState ? (
+              <button onClick={logoutHandler}>logoutState</button>
+            ) : (
+              <button onClick={loginHandler}>loginState</button>
+            )}
+            {logState && (
+              <Box sx={{ flexDirection: "row" }}>
+                <Tooltip title="Open">
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar
+                      alt="profileImage"
+                      src={profileImage ? profileImage : defaultUser}
+                    />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  {settings.map((setting) => (
+                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                      <Typography textAlign="center">{setting}</Typography>
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Box>
+            )}
+          </Toolbar>
+        </Container>
+      </AppBar>
+    </>
   );
 }
-
-// const Temp = styled.div`
-//   width: 48px;
-//   text-align: center;
-//   height: 20px;
-//   font-size: 10px;
-//   right: 10%;
-//   top: 0%;
-//   position: absolute;
-// `;
-
-const ProfImg = styled.div`
-  width: 100px;
-  height: 100px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  position: absolute;
-  right: 5%;
-  cursor: pointer;
-`;
-
-const HeaderLayout = styled.header`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  position: relative;
-`;

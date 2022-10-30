@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react";
 import styled from "styled-components";
 
 const Header = styled.div`
-  width: 20%;
+  width: 200px;
   height: 7%;
   display: flex;
   flex-direction: row;
