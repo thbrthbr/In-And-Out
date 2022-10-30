@@ -27,7 +27,7 @@ export default function Layout() {
 
   const mainSideBarMenuItems = [
     { text: "달력", icon: <CalendarMonthOutlinedIcon />, path: "/calendar" },
-    { text: "수입/지출", icon: <PaidOutlinedIcon />, path: "/inout/income" },
+    { text: "수입/지출", icon: <PaidOutlinedIcon />, path: "/inout" },
     { text: "보고서", icon: <AssessmentOutlinedIcon />, path: "/report" },
   ];
 
