@@ -1,59 +1,63 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Header from "./Header";
-import Sidebar from "./Sidebar";
 import styled from "styled-components";
 
-import { Drawer } from "@mui/material";
-import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import HttpsOutlinedIcon from "@mui/icons-material/HttpsOutlined";
+import ExitToAppOutlinedIcon from "@mui/icons-material/ExitToAppOutlined";
+import { useStore2 } from "../../store/store";
+import { LeftSidebar } from "./LeftSidebar";
+import { useLocation } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
   height: 88vh;
 `;
 
-export default function Layout() {
-  const loc = useLocation();
-  const navigate = useNavigate();
+const settingUrl = ["/profile_change", "/password_change", "/signout"];
 
-  const sideBarMenuItems = [
+let width = "240px";
+
+export default function Layout() {
+  const { logState } = useStore2();
+  const loc = useLocation();
+
+  const mainSideBarMenuItems = [
     { text: "달력", icon: <CalendarMonthOutlinedIcon />, path: "/calendar" },
     { text: "수입/지출", icon: <PaidOutlinedIcon />, path: "/inout/income" },
     { text: "보고서", icon: <AssessmentOutlinedIcon />, path: "/report" },
   ];
 
-  return (
-    <div>
-      <Header />
+  const settingSideBarMenuItems = [
+    {
+      text: "프로필 변경",
+      icon: <AccountCircleOutlinedIcon />,
+      path: "/profile_change",
+    },
+    {
+      text: "비밀번호 변경",
+      icon: <HttpsOutlinedIcon />,
+      path: "/password_change",
+    },
+    { text: "회원탈퇴", icon: <ExitToAppOutlinedIcon />, path: "/signout" },
+  ];
 
+  return (
+    <div style={{ overflow: "hidden" }}>
+      <Header />
       <Container>
-        <Drawer
-          variant="permanent"
-          PaperProps={{
-            sx: {
-              position: "static",
-              width: "180px",
-            },
-          }}
-        >
-          <List>
-            {sideBarMenuItems.map((item) => (
-              <ListItem
-                button
-                key={item.text}
-                onClick={() => {
-                  navigate(item.path);
-                }}
-                selected={loc.pathname === item.path}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text}></ListItemText>
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
+        {logState && !settingUrl.includes(loc.pathname) && (
+          <LeftSidebar width={width} sideBarMenuItems={mainSideBarMenuItems} />
+        )}
+        {logState && settingUrl.includes(loc.pathname) && (
+          <LeftSidebar
+            width={width}
+            sideBarMenuItems={settingSideBarMenuItems}
+          />
+        )}
         <Outlet />
       </Container>
     </div>

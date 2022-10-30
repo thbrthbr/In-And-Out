@@ -17,6 +17,8 @@ import FormLabel from "@mui/material/FormLabel";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 
+import RadioButton from "./RadioButton";
+
 import {
   addMonths,
   subMonths,
@@ -77,16 +79,16 @@ const drawChart = (ctx, config) => {
 };
 
 const graphTypeOptions = [
-  { graph: "bar", label: "막대형" },
-  { graph: "doughnut", label: "파이형" },
+  { value: "bar", label: "막대형" },
+  { value: "doughnut", label: "파이형" },
 ];
 const yearlyOptions = [
-  { form: "table", label: "표" },
-  { form: "chart", label: "그래프" },
+  { value: "table", label: "표" },
+  { value: "chart", label: "그래프" },
 ];
 const costOptions = [
-  { category: "income", label: "수입" },
-  { category: "expense", label: "지출" },
+  { value: "income", label: "수입" },
+  { value: "expense", label: "지출" },
 ];
 
 const columns = [
@@ -380,41 +382,23 @@ export default function Report() {
 
       <TabPanel value={tabValue} index={0}>
         <Grid display="flex" justifyContent="flex-end" sx={{ mb: 5, mt: -10 }}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend">차트</FormLabel>
-            <RadioGroup aria-label="position">
-              {graphTypeOptions.map((option, idx) => (
-                <FormControlLabel
-                  key={idx}
-                  checked={graphTypeOption === option.graph}
-                  value={option.graph}
-                  control={<Radio />}
-                  label={option.label}
-                  name="monthly"
-                  labelPlacement="end"
-                  onChange={handleCheckboxChange}
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
+          <RadioButton
+            legend={"차트"}
+            buttonOptions={graphTypeOptions}
+            checkedOption={graphTypeOption}
+            buttonName={"monthly"}
+            labelPlacement={"end"}
+            handleChange={handleCheckboxChange}
+          />
 
-          <FormControl component="fieldset">
-            <FormLabel component="legend">항목</FormLabel>
-            <RadioGroup aria-label="position">
-              {costOptions.map((option, idx) => (
-                <FormControlLabel
-                  key={idx}
-                  checked={costOption === option.category}
-                  value={option.category}
-                  control={<Radio />}
-                  label={option.label}
-                  name="cost"
-                  labelPlacement="end"
-                  onChange={handleCheckboxChange}
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
+          <RadioButton
+            legend={"항목"}
+            buttonOptions={costOptions}
+            checkedOption={costOption}
+            buttonName={"cost"}
+            labelPlacement={"end"}
+            handleChange={handleCheckboxChange}
+          />
         </Grid>
         <DateHeader
           type={"month"}
@@ -432,23 +416,14 @@ export default function Report() {
           sx={{ mb: 5, mt: -10 }}
           alignItems="baseline"
         >
-          <FormControl component="fieldset">
-            <FormLabel component="legend">형식</FormLabel>
-            <RadioGroup aria-label="position">
-              {yearlyOptions.map((option, idx) => (
-                <FormControlLabel
-                  key={idx}
-                  checked={yearlyOption === option.form}
-                  value={option.form}
-                  control={<Radio />}
-                  label={option.label}
-                  name="yearly"
-                  labelPlacement="end"
-                  onChange={handleCheckboxChange}
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
+          <RadioButton
+            legend={"형식"}
+            buttonOptions={yearlyOptions}
+            checkedOption={yearlyOption}
+            buttonName={"yearly"}
+            labelPlacement={"end"}
+            handleChange={handleCheckboxChange}
+          />
         </Grid>
 
         <DateHeader currentTime={currentYear} prev={prevYear} next={nextYear} />
