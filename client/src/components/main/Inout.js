@@ -132,36 +132,17 @@ export default function Inout() {
       const res = await axios.get(INCOME_API_URL, {
         headers: { "Content-Type": "application/json" },
       });
-      // console.log(res.data.income);
+
       const incomeData = res.data.income;
       newData = incomeData;
-      // ? incomeData.map((item) => {
-      //     return {
-      //       ...item,
-      //       date: item.incomeDate,
-      //       category: item.incomeCategoryName,
-      //     };
-      //   })
-      // : [];
     } else if (path === "/inout/expense") {
       const res = await axios.get(EXPENSE_API_URL, {
         headers: { "Content-Type": "application/json" },
       });
-      // console.log(res.data.expense);
-      const expenseData = res.data.expense;
-      // console.log(expenseData);
-      // setRows(expenseData);
-      newData = expenseData;
-      // ? expenseData.map((item) => {
-      //     return {
-      //       ...item,
-      //       date: item.expenseDate,
-      //       category: item.expenseCategoryName,
-      //     };
-      //   })
-      // : [];
 
-      // setRows(...rows, [0].expenseData
+      const expenseData = res.data.expense;
+
+      newData = expenseData;
     }
     setRows(newData);
     return newData;
@@ -171,10 +152,6 @@ export default function Inout() {
     const id = loc.pathname === "/inout/income" ? row.incomeId : row.expenseId;
     return id;
   }
-  // useEffect(() => {
-  //   // 데이터 불러오기
-  //   getData(); // newRowData에 받은 데이터 저장한 후 저장 할때 newRowData를 서버에 보내면 될듯
-  // }, [loc]);
 
   function createNewRow() {
     const newIncomeData = {
