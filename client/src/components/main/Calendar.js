@@ -15,9 +15,10 @@ import PacmanLoader from "react-spinners/PacmanLoader";
 const DIARY_API_URL = "http://localhost:5000/calendar";
 
 const Container = styled.div`
-  flex: 0.75;
+  flex: 1.75;
   display: flex;
-  flex-direction: column;
+
+  justify-content: center;
 `;
 
 export default function Calendar() {
@@ -119,7 +120,16 @@ export default function Calendar() {
       />
       <Icon
         icon="heroicons:pencil-square"
-        style={{ width: "5rem", height: "5rem", cursor: "pointer" }}
+        style={{
+          position: "fixed",
+          width: "3rem",
+          height: "3rem",
+          cursor: "pointer",
+          bottom: "70px",
+          right: "200px",
+          backgroundColor: "lightgray",
+          borderRadius: "50%",
+        }}
         onClick={() => setShowNewDiary(!showNewDiary)}
       ></Icon>
 
