@@ -1,34 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import "react-data-grid/lib/styles.css";
 import DataGrid, { SelectColumn, textEditor } from "react-data-grid";
 import dropDownEditor from "../../editor/dropDownEditor";
 import DateEditor from "../../editor/DateEditor";
 
-import { NavLink, useLocation } from "react-router-dom";
-
-import styled from "styled-components";
 import axios from "axios";
+
+import { startOfMonth, endOfMonth, addMonths, subMonths } from "date-fns";
+
+import DateHeader from "../common/DateHeader";
+
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Unstable_Grid2/Grid2";
+
+import TabPanel from "./TabPanel";
 
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
 const INCOME_API_URL = "http://localhost:5000/income";
 const EXPENSE_API_URL = "http://localhost:5000/expense";
-
-const SideButton = styled.div`
-  width: 180px;
-  height: 50px;
-  margin-top: 20px;
-  background-color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const NavLinkContainer = styled.div`
-  display: flex;
-`;
 
 const incomeColumns = [
   SelectColumn,
@@ -117,39 +114,74 @@ const expenseColumns = [
   },
 ];
 
-let newRowData = [];
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
+const TabSelected = Object.freeze({
+  INCOME: 0,
+  EXPENSE: 1,
+});
+
+let currentMonth = new Date();
 
 export default function Inout() {
   const [rows, setRows] = useState([]); // 나중에 빈배열로 처리
   const [selectedRows, setSelectedRows] = useState(() => new Set());
-  const loc = useLocation();
   const queryClient = useQueryClient();
+  const [tabValue, setTabValue] = useState(0);
 
-  async function getData() {
-    let path = loc.pathname;
-    let newData = [];
-    if (path === "/inout/income") {
-      const res = await axios.get(INCOME_API_URL, {
-        headers: { "Content-Type": "application/json" },
-      });
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
-      const incomeData = res.data.income;
-      newData = incomeData;
-    } else if (path === "/inout/expense") {
-      const res = await axios.get(EXPENSE_API_URL, {
-        headers: { "Content-Type": "application/json" },
-      });
+  const setParam = () => {
+    params.start_dt = startOfMonth(currentMonth);
+    params.end_dt = endOfMonth(currentMonth);
+  };
 
-      const expenseData = res.data.expense;
+  const setParamAndRefetch = () => {
+    setParam();
+    refetch();
+  };
 
-      newData = expenseData;
+  const prevMonth = () => {
+    currentMonth = subMonths(currentMonth, 1);
+    setParamAndRefetch();
+  };
+  const nextMonth = () => {
+    currentMonth = addMonths(currentMonth, 1);
+    setParamAndRefetch();
+  };
+
+  async function getInoutDataFrom(url, params) {
+    try {
+      const res = await axios(url, { params: params });
+
+      return res.data;
+    } catch (err) {
+      console.log(err);
     }
-    setRows(newData);
-    return newData;
   }
 
+  const setInoutDataWith = (data) => {
+    switch (tabValue) {
+      case TabSelected.INCOME:
+        setRows(data.income);
+        break;
+      case TabSelected.EXPENSE:
+        setRows(data.expense);
+        break;
+      default:
+        break;
+    }
+  };
+
   function rowKeyGetter(row) {
-    const id = loc.pathname === "/inout/income" ? row.incomeId : row.expenseId;
+    const id = tabValue === TabSelected.INCOME ? row.incomeId : row.expenseId;
     return id;
   }
 
@@ -173,22 +205,19 @@ export default function Inout() {
       expenseMemo: "",
     };
     let newData =
-      loc.pathname === "/inout/income" ? newIncomeData : newExpenseData;
-    console.log(rows[rows.length - 1].incomeId);
+      tabValue === TabSelected.INCOME ? newIncomeData : newExpenseData;
 
     setRows([...rows, newData]);
-    // newRowData.push(newData);
-    console.log("data", newRowData);
   }
 
   const saveDataMutation = useMutation(
     async (rowData) => {
       const data =
-        loc.pathname === "/inout/income"
+        tabValue === TabSelected.INCOME
           ? { income: rowData }
           : { expense: rowData };
       const api =
-        loc.pathname === "/inout/income" ? INCOME_API_URL : EXPENSE_API_URL;
+        tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL;
       try {
         const res = await axios.post(api, data, {
           headers: { "Content-Type": "application/json" },
@@ -208,7 +237,7 @@ export default function Inout() {
   const deleteDataMutation = useMutation(
     async (rowData) => {
       const api =
-        loc.pathname === "/inout/income" ? INCOME_API_URL : EXPENSE_API_URL;
+        tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL;
       try {
         const res = await axios.delete(api, rowData, {
           headers: { "Content-Type": "application/json" },
@@ -225,33 +254,35 @@ export default function Inout() {
     }
   );
 
-  const { data, isLoading, refetch } = useQuery(
-    ["getInoutData", loc],
-    getData,
-    {
-      staleTime: Infinity,
-    }
-  );
-
   function onSaveData() {
-    console.log("saved", rows);
     saveDataMutation.mutate(rows);
   }
+
   function onDeleteData() {
     console.log("deleted");
 
-    // console.log([...selectedRows]);
     deleteDataMutation.mutate(selectedRows);
     const newRows = rows.slice();
     const filteredRow = newRows.filter((row, idx) => {
-      const id =
-        loc.pathname === "/inout/income" ? row.incomeId : row.expenseId;
+      const id = tabValue === TabSelected.INCOME ? row.incomeId : row.expenseId;
       return !selectedRows.has(id);
     });
     console.log("filtered", filteredRow);
-    // setRows(filteredRow);
-    // newRowData = filteredRow;
   }
+
+  const handleInoutData = async (url, params) => {
+    const fetchedData = await getInoutDataFrom(url, params);
+    setInoutDataWith(fetchedData);
+  };
+
+  const params = {};
+  setParam();
+  const { isLoading, refetch } = useQuery(["getInoutData", tabValue], () => {
+    handleInoutData(
+      tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL,
+      params
+    );
+  });
 
   if (isLoading)
     return (
@@ -266,58 +297,85 @@ export default function Inout() {
         size={50}
       />
     );
-  console.log(isLoading, data);
-  // setRows(data);
+
   return (
     <div>
-      <NavLinkContainer>
-        <NavLink
-          style={({ isActive }) =>
-            isActive
-              ? {
-                  textDecoration: "none",
-                  borderBottom: "1px solid red",
-                }
-              : { color: "black", textDecoration: "none" }
-          }
-          to={"/inout/income"}
-        >
-          <SideButton>{"수입"}</SideButton>
-        </NavLink>
-        <NavLink
-          style={({ isActive }) =>
-            isActive
-              ? { textDecoration: "none", borderBottom: "1px solid red" }
-              : { color: "black", textDecoration: "none" }
-          }
-          to={"/inout/expense"}
-        >
-          <SideButton>{"지출"}</SideButton>
-        </NavLink>
-      </NavLinkContainer>
+      <Grid container spacing={0}>
+        <Grid xs={12}>
+          <Box sx={{ width: "100%" }}>
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                aria-label="periodic report"
+              >
+                <Tab label="수입" {...a11yProps(0)} />
+                <Tab label="지출" {...a11yProps(1)} />
+              </Tabs>
+            </Box>
+          </Box>
+        </Grid>
+      </Grid>
 
-      {
-        <div>
-          <DataGrid
-            columns={
-              loc.pathname === "/inout/income" ? incomeColumns : expenseColumns
-            }
-            rows={rows}
-            rowGetter={(i) => rows[i]}
-            rowKeyGetter={rowKeyGetter}
-            rowsCount={rows.length}
-            onRowsChange={setRows}
-            onRowClick={(data) => {
-              console.log(data);
-            }}
-            selectedRows={selectedRows}
-            onSelectedRowsChange={setSelectedRows}
-          />
-          <button onClick={createNewRow}>Add</button>
-          <button onClick={onSaveData}>저장</button>
-          <button onClick={onDeleteData}>삭제</button>
-        </div>
-      }
+      <TabPanel value={tabValue} index={0}>
+        <DateHeader
+          type={"month"}
+          currentTime={currentMonth}
+          prev={prevMonth}
+          next={nextMonth}
+        />
+        <DataGrid
+          columns={incomeColumns}
+          rows={rows}
+          rowGetter={(i) => rows[i]}
+          rowKeyGetter={rowKeyGetter}
+          rowsCount={rows.length}
+          onRowsChange={setRows}
+          onRowClick={(data) => {
+            console.log(data);
+          }}
+          selectedRows={selectedRows}
+          onSelectedRowsChange={setSelectedRows}
+        />
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={1}>
+        <DateHeader
+          type={"month"}
+          currentTime={currentMonth}
+          prev={prevMonth}
+          next={nextMonth}
+        />
+        <DataGrid
+          columns={expenseColumns}
+          rows={rows}
+          rowGetter={(i) => rows[i]}
+          rowKeyGetter={rowKeyGetter}
+          rowsCount={rows.length}
+          onRowsChange={setRows}
+          onRowClick={(data) => {
+            console.log(data);
+          }}
+          selectedRows={selectedRows}
+          onSelectedRowsChange={setSelectedRows}
+        />
+      </TabPanel>
+      <Button variant="text" size="large" onClick={createNewRow}>
+        +
+      </Button>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
+        <Button variant="contained" onClick={onSaveData}>
+          저장
+        </Button>
+        <Button variant="outlined" onClick={onDeleteData}>
+          삭제
+        </Button>
+      </Box>
     </div>
   );
 }

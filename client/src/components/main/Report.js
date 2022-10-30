@@ -7,10 +7,10 @@ import DateHeader from "../common/DateHeader";
 
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 
+import TabPanel from "./TabPanel";
 import RadioButton from "./RadioButton";
 
 import {
@@ -129,7 +129,7 @@ const barConfig = {
     datasets: [
       {
         axis: "y",
-        label: "My First Dataset",
+        label: "Dataset",
         data: [],
         fill: false,
         backgroundColor: [
@@ -168,26 +168,6 @@ function a11yProps(index) {
     id: `simple-tab-${index}`,
     "aria-controls": `simple-tabpanel-${index}`,
   };
-}
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography component="div">{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
 }
 
 const TabSelected = Object.freeze({
@@ -278,7 +258,7 @@ export default function Report() {
     }
   };
 
-  const getData = async (url, params) => {
+  const getReportDataFrom = async (url, params) => {
     try {
       const res = await axios(url, { params: params });
       return res.data;
@@ -287,7 +267,7 @@ export default function Report() {
     }
   };
 
-  const setData = () => {
+  const setReportDataWith = (data) => {
     switch (tabValue) {
       case TabSelected.MONTH:
         const [newData, newLabel] = getMonthlyData(data[costOption]);
@@ -349,9 +329,14 @@ export default function Report() {
   const params = {};
   setParam();
 
+  const handleReportData = async (url, params) => {
+    const fetchedData = await getReportDataFrom(url, params);
+    setReportDataWith(fetchedData);
+  };
+
   const { data, isLoading, refetch } = useQuery(
-    ["getReportData", costOption],
-    () => getData(API_URL, params)
+    ["getReportData", costOption, tabValue],
+    () => handleReportData(API_URL, params)
   );
 
   if (isLoading)
@@ -367,7 +352,6 @@ export default function Report() {
         size={50}
       />
     );
-  setData();
 
   return (
     <Grid container spacing={0}>

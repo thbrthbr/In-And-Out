@@ -66,7 +66,7 @@ export default function Header() {
             )}
             {logState && (
               <Box sx={{ flexDirection: "row" }}>
-                <Tooltip title="Open settings">
+                <Tooltip title="Open">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                     <Avatar
                       alt="profileImage"
