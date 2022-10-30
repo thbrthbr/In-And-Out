@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 const useStore = create(
   persist((set) => ({
     profileImage: null,
-    setprofileImage: (input) => set({ profileImage: input }),
+    setProfileImage: (input) => set({ profileImage: input }),
   }))
 );
 
