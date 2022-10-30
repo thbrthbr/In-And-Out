@@ -14,7 +14,7 @@ import { useLocation } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
-  height: 88vh;
+  height: 93vh;
 `;
 
 const settingUrl = ["/profile_change", "/password_change", "/signout"];
