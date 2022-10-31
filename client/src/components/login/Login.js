@@ -156,16 +156,14 @@ export default function Login() {
             <Button
               type="submit"
               variant="contained"
-              sx={{ mt: 3, mb: 2, width: "20%", backgroundColor: "lightblue" }}
+              sx={{ mt: 3, mb: 2, width: "20%", backgroundColor: "lightgreen" }}
               size="large"
               onClick={() => navigate("/signin")}
             >
               회원가입
             </Button>
             <Button
-              type="submit"
-              variant="contained"
-              sx={{ mt: 3, mb: 2, width: "20%", backgroundColor: "lightgreen" }}
+              sx={{ mt: 3, mb: 2 }}
               size="large"
               onClick={() => navigate("/identify_email")}
             >

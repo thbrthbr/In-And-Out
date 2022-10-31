@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -7,6 +7,7 @@ import { profileChangeSchema } from "../../schema/form_validation";
 import styled from "styled-components";
 import defaultUser from "../../img/default-user.jpg";
 import { useStore, loginStore } from "../../store/store.js";
+import DaumPostcode from "react-daum-postcode";
 
 import {
   Button,
@@ -46,6 +47,8 @@ export default function ProfileChange() {
   } = loginStore();
 
   const fileInput = useRef();
+  const [openPostcode, setOpenPostcode] = useState(false);
+  const [address, setAddress] = useState("");
 
   const handleButtonClick = (e) => {
     fileInput.current.click();
@@ -118,6 +121,16 @@ export default function ProfileChange() {
 
   const onSubmit = async (e) => {
     put(e);
+  };
+
+  const handlePostButtonClick = () => {
+    setOpenPostcode(!openPostcode);
+  };
+
+  const handleAddressSelect = (data) => {
+    // console.log(data.address);
+    setAddress(data.address);
+    setOpenPostcode(false);
   };
 
   return (
@@ -219,10 +232,24 @@ export default function ProfileChange() {
                 name="residence"
                 label="거주지"
                 error={!!errors.residence}
+                value={address}
                 defaultValue={residence}
-                {...register("residence")}
+                {...register("residence", {
+                  onChange: (e) => {
+                    setAddress(e.target.value);
+                  },
+                })}
                 helperText={errors.residence?.message}
               />
+              <Button onClick={handlePostButtonClick}>주소 검색</Button>
+              {openPostcode && (
+                <DaumPostcode
+                  style={{ height: "130px" }}
+                  onComplete={handleAddressSelect} // 값을 선택할 경우 실행되는 이벤트
+                  autoClose={false} // 값을 선택할 경우 사용되는 DOM을 제거하여 자동 닫힘 설정
+                  defaultQuery="판교역로 235"
+                />
+              )}
             </Grid>
             <Grid item xs={7}>
               <RadioGroup
