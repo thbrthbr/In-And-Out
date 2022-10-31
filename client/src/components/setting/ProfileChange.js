@@ -8,7 +8,14 @@ import styled from "styled-components";
 import defaultUser from "../../img/default-user.jpg";
 import { useStore, loginStore } from "../../store/store.js";
 
-import { Button, TextField, FormControl, Grid, Box } from "@mui/material/";
+import {
+  Button,
+  TextField,
+  FormControl,
+  Grid,
+  Box,
+  Typography,
+} from "@mui/material/";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -114,12 +121,22 @@ export default function ProfileChange() {
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        marginTop: 8,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Typography component="h1" variant="h5">
+        프로필 변경
+      </Typography>
       <Box
         component="form"
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        sx={{ mt: 20, ml: 25, display: "flex", justifyContent: "center" }}
+        sx={{ mt: 3, display: "flex", justifyContent: "center" }}
       >
         <Photo>
           <img
@@ -244,7 +261,7 @@ export default function ProfileChange() {
           </Button>
         </FormControl>
       </Box>
-    </>
+    </Box>
   );
 }
 

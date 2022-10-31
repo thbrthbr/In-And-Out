@@ -3,7 +3,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { recoverInitiateSchema } from "../../schema/form_validation";
 import { loginStore } from "../../store/store.js";
 
-import { Button, TextField, FormControl, Grid, Box } from "@mui/material/";
+import {
+  Button,
+  TextField,
+  FormControl,
+  Grid,
+  Box,
+  Typography,
+} from "@mui/material/";
 
 export default function PasswordChange() {
   const { id, nickname, phoneNumber, birthdate, residence, gender } =
@@ -59,16 +66,26 @@ export default function PasswordChange() {
   };
 
   return (
-    <div>
+    <Box
+      sx={{
+        marginTop: 8,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Typography component="h1" variant="h5">
+        비밀번호 변경
+      </Typography>
       <Box
         component="form"
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        sx={{ mt: 20, ml: 25, display: "flex", justifyContent: "center" }}
+        sx={{ mt: 3 }}
       >
         <FormControl component="fieldset" variant="standard">
           <Grid container spacing={2}>
-            <Grid item xs={7}>
+            <Grid item xs={12}>
               <TextField
                 required
                 autoFocus
@@ -82,7 +99,7 @@ export default function PasswordChange() {
                 helperText={errors.oldPw?.message}
               />
             </Grid>
-            <Grid item xs={7}>
+            <Grid item xs={12}>
               <TextField
                 required
                 fullWidth
@@ -95,7 +112,7 @@ export default function PasswordChange() {
                 helperText={errors.pw?.message}
               />
             </Grid>
-            <Grid item xs={7}>
+            <Grid item xs={12}>
               <TextField
                 required
                 fullWidth
@@ -112,13 +129,13 @@ export default function PasswordChange() {
           <Button
             type="submit"
             variant="contained"
-            sx={{ mt: 3, mb: 2, width: "58%" }}
+            sx={{ mt: 3, mb: 2, width: "100%" }}
             size="large"
           >
             제출
           </Button>
         </FormControl>
       </Box>
-    </div>
+    </Box>
   );
 }

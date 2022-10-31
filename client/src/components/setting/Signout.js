@@ -4,7 +4,14 @@ import { recoverInitiateSchema } from "../../schema/form_validation";
 import { loginStore, useStore2 } from "../../store/store.js";
 import { useNavigate } from "react-router-dom";
 
-import { Button, TextField, FormControl, Grid, Box } from "@mui/material/";
+import {
+  Button,
+  TextField,
+  FormControl,
+  Grid,
+  Box,
+  Typography,
+} from "@mui/material/";
 
 export default function Signout() {
   const navigate = useNavigate();
@@ -63,16 +70,26 @@ export default function Signout() {
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        marginTop: 8,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Typography component="h1" variant="h5">
+        회원 탈퇴
+      </Typography>
       <Box
         component="form"
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        sx={{ mt: 20, ml: 15, display: "flex", justifyContent: "center" }}
+        sx={{ mt: 3, display: "flex", justifyContent: "center" }}
       >
         <FormControl component="fieldset" variant="standard">
           <Grid container spacing={2}>
-            <Grid item xs={7}>
+            <Grid item xs={12}>
               <TextField
                 required
                 fullWidth
@@ -85,7 +102,7 @@ export default function Signout() {
                 helperText={errors.pw?.message}
               />
             </Grid>
-            <Grid item xs={7}>
+            <Grid item xs={12}>
               <TextField
                 required
                 fullWidth
@@ -102,13 +119,13 @@ export default function Signout() {
           <Button
             type="submit"
             variant="contained"
-            sx={{ mt: 3, mb: 2, width: "58%" }}
+            sx={{ mt: 3, mb: 2, width: "100%" }}
             size="large"
           >
             탈퇴
           </Button>
         </FormControl>
       </Box>
-    </>
+    </Box>
   );
 }
