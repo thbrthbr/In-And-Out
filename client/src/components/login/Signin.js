@@ -21,6 +21,9 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function Signin() {
   const {
     id,
@@ -68,11 +71,17 @@ export default function Signin() {
     console.log(response);
 
     if (response.ok) {
-      alert("회원가입 성공");
-      setLogState(true);
-      navigate("/");
+      toast.success("회원가입 성공!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+      setTimeout(() => {
+        setLogState(true);
+        navigate("/");
+      }, 3000);
     } else {
-      alert("이미 존재하는 아이디입니다");
+      toast.warn("서버 연결에 문제가 있거나 이미 존재하는 아이디입니다!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   }
 
@@ -103,10 +112,6 @@ export default function Signin() {
     setGender(event.currentTarget.value);
   };
 
-  // useEffect(() => {
-  //   post();
-  // }, [id]);
-
   return (
     <Box
       sx={{
@@ -116,6 +121,7 @@ export default function Signin() {
         alignItems: "center",
       }}
     >
+      <ToastContainer />
       <Typography component="h1" variant="h5">
         in & out 회원가입
       </Typography>
@@ -201,7 +207,7 @@ export default function Signin() {
                 type="text"
                 id="birthday"
                 name="birthday"
-                label="생년월일"
+                label="생년월일(ex.2011-01-01)"
                 error={!!errors.birthday}
                 defaultValue={birthdate}
                 {...register("birthday", { onChange: onBirthdateHandler })}

@@ -154,66 +154,13 @@
     ]
   },
   "income": {
-    "income": [
-      {
-        "incomeId": 1,
-        "incomeDate": "12/12/22",
-        "incomeItem": "월급",
-        "incomeCategoryName": "월급",
-        "incomeAmount": 20000,
-        "incomeMemo": "good",
-        "date": "12/12/22",
-        "category": "월급"
-      },
-      {
-        "incomeId": 2,
-        "incomeDate": "12/12/22",
-        "incomeItem": "월급",
-        "incomeCategoryName": "월급",
-        "incomeAmount": 20000,
-        "incomeMemo": "good",
-        "date": "12/12/22",
-        "category": "월급"
-      },
-      {
-        "incomeId": 3,
-        "incomeDate": "12/12/22",
-        "incomeItem": "월급",
-        "incomeCategoryName": "월급",
-        "incomeAmount": "111",
-        "incomeMemo": "good",
-        "date": "12/12/22",
-        "category": "월급"
-      },
-      {
-        "incomeId": 5,
-        "incomeDate": "",
-        "incomeItem": "122",
-        "incomeCategoryName": "",
-        "incomeAmount": "111",
-        "incomeMemo": "111",
-        "date": "9/28/2022",
-        "category": "교통비"
-      },
-      {
-        "incomeId": 7,
-        "incomeDate": "",
-        "incomeCategoryName": "",
-        "incomeItem": "",
-        "incomeAmount": "222",
-        "incomeMemo": "",
-        "date": "9/27/2022",
-        "category": ""
-      },
-      {
-        "incomeId": 8,
-        "incomeDate": "",
-        "incomeItem": "",
-        "incomeAmount": "3333",
-        "incomeCategoryName": "",
-        "incomeMemo": ""
-      }
-    ]
+    "id": "1z3r091@gmail.com",
+    "password": "aaa111!!!",
+    "nickname": "asdf",
+    "phoneNumber": "123123123123123",
+    "birthdate": "1991-07-08",
+    "residence": "dadsfasdfasdfasdf",
+    "gender": "남자"
   },
   "expense": {
     "expense": [

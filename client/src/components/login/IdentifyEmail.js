@@ -3,6 +3,12 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { identifyEmailSchema } from "../../schema/form_validation";
 
+import axios from "axios";
+
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import {
   Button,
   TextField,
@@ -11,6 +17,8 @@ import {
   Box,
   Typography,
 } from "@mui/material/";
+
+const API_URL = "http://localhost:5000/income";
 
 export default function IdentifyEmail() {
   const {
@@ -22,25 +30,50 @@ export default function IdentifyEmail() {
   });
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const onSubmit = (data) => {
-    alert("submit");
+    // console.log(data.email);
+    emailDataMutation.mutate(data.email);
   };
+
+  const emailDataMutation = useMutation(
+    async (email) => {
+      const data = { email };
+
+      const res = await axios.post(API_URL, data, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      return res.data;
+    },
+    {
+      onSuccess: (e) => {
+        navigate("/identify_phone");
+      },
+      onError: (error) => {
+        toast.warn("서버와 연결이 문제가 있거나 등록되지 않은 이메일 입니다!", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      },
+    }
+  );
 
   return (
     <Box
       sx={{
-        marginTop: 8,
+        marginTop: 30,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
       }}
     >
+      <ToastContainer />
       <Typography component="h1" variant="h5">
         비밀번호 찾기 (이메일 인증)
       </Typography>
-      <Typography component="h7" variant="h7">
+      <Typography component="h6" variant="h6">
         비밀번호는 이메일과 전화번호를 통해 찾을 수 있습니다
       </Typography>
       <Box
@@ -71,7 +104,7 @@ export default function IdentifyEmail() {
             variant="contained"
             sx={{ mt: 3, mb: 2, width: "100%" }}
             size="large"
-            onClick={() => navigate("/identify_phone")}
+            // onClick={() => }
           >
             다음
           </Button>
