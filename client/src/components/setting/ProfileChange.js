@@ -8,6 +8,11 @@ import styled from "styled-components";
 import defaultUser from "../../img/default-user.jpg";
 import { useStore, useStore2, loginStore } from "../../store/store.js";
 
+import { Button, TextField, FormControl, Grid, Box } from "@mui/material/";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+
 export default function ProfileChange() {
   const {
     register,
@@ -110,7 +115,12 @@ export default function ProfileChange() {
 
   return (
     <>
-      <BigPage>
+      <Box
+        component="form"
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{ mt: 20, ml: 25, display: "flex", justifyContent: "center" }}
+      >
         <Photo>
           <img
             alt="프로필사진"
@@ -129,142 +139,114 @@ export default function ProfileChange() {
             onChange={handleChange}
           />
         </Photo>
-        <Page>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <TextInputs>
-              <Categories>이메일</Categories>
-              <Inputs
-                spellCheck={false}
+        <FormControl component="fieldset" variant="standard">
+          <Grid container spacing={2}>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="email"
+                name="email"
+                label="이메일"
                 defaultValue={id}
-                readOnly
+                inputProps={{ readOnly: true }}
+                error={!!errors.oldPw}
+                {...register("oldPw")}
+                helperText={errors.oldPw?.message}
               />
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>닉네임</Categories>
-              <Inputs
-                spellCheck={false}
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="name"
+                name="name"
+                label="닉네임"
+                error={!!errors.name}
                 defaultValue={nickname}
                 {...register("name")}
+                helperText={errors.name?.message}
               />
-              <Alert role="alert">{errors.name?.message}</Alert>
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>전화번호</Categories>
-              <Inputs
-                spellCheck={false}
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="phone"
+                name="phone"
+                label="전화번호"
+                error={!!errors.phone}
                 defaultValue={phoneNumber}
                 {...register("phone")}
+                helperText={errors.phone?.message}
               />
-              <Alert role="alert">{errors.phone?.message}</Alert>
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>생년월일</Categories>
-              <Inputs
-                spellCheck={false}
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="birthday"
+                name="birthday"
+                label="생년월일"
+                error={!!errors.birthday}
                 defaultValue={birthdate}
                 {...register("birthday")}
+                helperText={errors.birthday?.message}
               />
-              <Alert role="alert">{errors.birthday?.message}</Alert>
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>거주지</Categories>
-              <Inputs
-                spellCheck={false}
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="residence"
+                name="residence"
+                label="거주지"
+                error={!!errors.residence}
                 defaultValue={residence}
                 {...register("residence")}
+                helperText={errors.residence?.message}
               />
-              <Alert role="alert">{errors.residence?.message}</Alert>
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>성별</Categories>
-              <div
-                style={{
-                  width: "300px",
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
+            </Grid>
+            <Grid item xs={7}>
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
               >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <div
-                    style={{
-                      marginRight: "10px",
-                    }}
-                  >
-                    여자
-                  </div>
-                  <Radio
-                    type="radio"
-                    name="gender"
-                    value="female"
-                    defaultChecked={gender === "female" ? true : false}
-                    {...register("gender")}
-                  />
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <div
-                    style={{
-                      marginRight: "10px",
-                    }}
-                  >
-                    남자
-                  </div>
-                  <Radio
-                    type="radio"
-                    name="gender"
-                    value="male"
-                    defaultChecked={gender === "male" ? true : false}
-                    {...register("gender")}
-                  />
-                </div>
-              </div>
-              <Alert role="alert">{errors.gender?.message}</Alert>
-            </TextInputs>
-
-            <ButtonInputs>
-              <button
-                style={{
-                  fontSize: "20px",
-                  width: "300px",
-                  height: "30px",
-                  cursor: "pointer",
-                }}
-                type="submit"
-              >
-                제출
-              </button>
-            </ButtonInputs>
-          </form>
-        </Page>
-      </BigPage>
+                <FormControlLabel
+                  value="female"
+                  control={<Radio />}
+                  label="여자"
+                  defaultChecked={gender === "female" ? true : false}
+                  {...register("gender")}
+                  error={!!errors.gender}
+                  helperText={errors.gender?.message}
+                />
+                <FormControlLabel
+                  value="남자"
+                  control={<Radio />}
+                  label="남자"
+                  defaultChecked={gender === "male" ? true : false}
+                  {...register("gender")}
+                  error={!!errors.gender}
+                  helperText={errors.gender?.message}
+                />
+              </RadioGroup>
+            </Grid>
+          </Grid>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3, mb: 2, width: "58%" }}
+            size="large"
+          >
+            제출
+          </Button>
+        </FormControl>
+      </Box>
     </>
   );
 }
-
-const Radio = styled.input`
-  width: 30px;
-  height: 30px;
-`;
 
 const File = styled.button`
   font-size: 15px;

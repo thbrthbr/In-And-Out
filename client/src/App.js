@@ -39,7 +39,6 @@ import { QueryClientProvider, QueryClient } from "react-query";
 
 //   return newState;
 // }
-
 // const store = createStore(reducer);
 const queryClient = new QueryClient();
 

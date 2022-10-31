@@ -6,6 +6,8 @@ import { recoverInitiateSchema } from "../../schema/form_validation";
 import { loginStore, useStore2 } from "../../store/store.js";
 import { useNavigate } from "react-router-dom";
 
+import { Button, TextField, FormControl, Grid, Box } from "@mui/material/";
+
 export default function Signout() {
   const navigate = useNavigate();
   const {
@@ -64,54 +66,51 @@ export default function Signout() {
 
   return (
     <>
-      <Page>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <TextInput>
-            <input
-              placeholder="비밀번호"
-              style={{
-                padding: 0,
-                outline: "none",
-                fontSize: "20px",
-                width: "296px",
-                height: "30px",
-              }}
-              type="password"
-              {...register("pw")}
-            />
-            <Alert role="alert">{errors.pw?.message}</Alert>
-          </TextInput>
-
-          <TextInput>
-            <input
-              placeholder="비밀번호 확인"
-              style={{
-                padding: 0,
-                outline: "none",
-                fontSize: "20px",
-                width: "296px",
-                height: "30px",
-              }}
-              type="password"
-              {...register("passwordConfirm")}
-            />
-            <Alert role="alert">{errors.passwordConfirm?.message}</Alert>
-          </TextInput>
-          <ButtonInput>
-            <button
-              style={{
-                fontSize: "20px",
-                width: "300px",
-                height: "30px",
-                cursor: "pointer",
-              }}
-              type="submit"
-            >
-              탈퇴하기
-            </button>
-          </ButtonInput>
-        </form>
-      </Page>
+      <Box
+        component="form"
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{ mt: 20, ml: 15, display: "flex", justifyContent: "center" }}
+      >
+        <FormControl component="fieldset" variant="standard">
+          <Grid container spacing={2}>
+            <Grid item xs={7}>
+              <TextField
+                required
+                fullWidth
+                type="password"
+                id="password"
+                name="password"
+                label="비밀번호"
+                error={!!errors.pw}
+                {...register("pw")}
+                helperText={errors.pw?.message}
+              />
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                required
+                fullWidth
+                type="password"
+                id="rePassword"
+                name="rePassword"
+                label="비밀번호 확인"
+                error={!!errors.passwordConfirm}
+                {...register("passwordConfirm")}
+                helperText={errors.passwordConfirm?.message}
+              />
+            </Grid>
+          </Grid>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3, mb: 2, width: "58%" }}
+            size="large"
+          >
+            탈퇴
+          </Button>
+        </FormControl>
+      </Box>
     </>
   );
 }
