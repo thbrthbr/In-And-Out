@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -28,6 +28,8 @@ export default function Login() {
   } = useForm({
     resolver: yupResolver(loginSchema),
   });
+
+  const navigate = useNavigate();
 
   const { logState, setLogState } = useStore2();
   const { tempFunc } = useStore3();
@@ -82,72 +84,96 @@ export default function Login() {
       {logState ? (
         <div> Logged in : {nickname} </div>
       ) : (
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Typography component="h1" variant="h5">
-            In & out에 로그인
-          </Typography>
+        <>
           <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit(onSubmit)}
             sx={{
-              mt: 3,
+              marginTop: 8,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
-            <FormControl component="fieldset" variant="standard">
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    autoFocus
-                    fullWidth
-                    type="text"
-                    id="email"
-                    name="email"
-                    label="아이디 (이메일)"
-                    error={!!errors.email}
-                    {...register("email")}
-                    helperText={errors.email?.message}
-                  />
+            <Typography component="h1" variant="h5">
+              in&out에 로그인
+            </Typography>
+            <Box
+              component="form"
+              noValidate
+              onSubmit={handleSubmit(onSubmit)}
+              sx={{
+                mt: 3,
+              }}
+            >
+              <FormControl component="fieldset" variant="standard">
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      autoFocus
+                      fullWidth
+                      type="text"
+                      id="email"
+                      name="email"
+                      label="아이디 (이메일)"
+                      error={!!errors.email}
+                      {...register("email")}
+                      helperText={errors.email?.message}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      fullWidth
+                      type="password"
+                      id="password"
+                      name="password"
+                      label="비밀번호"
+                      error={!!errors.pw}
+                      {...register("pw")}
+                      helperText={errors.pw?.message}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    type="password"
-                    id="password"
-                    name="password"
-                    label="비밀번호"
-                    error={!!errors.pw}
-                    {...register("pw")}
-                    helperText={errors.pw?.message}
-                  />
-                </Grid>
-              </Grid>
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{ mt: 3, mb: 2, width: "100%" }}
-                size="large"
-              >
-                로그인
-              </Button>
-            </FormControl>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2, width: "100%" }}
+                  size="large"
+                >
+                  로그인
+                </Button>
+              </FormControl>
+            </Box>
           </Box>
-        </Box>
+          <Box
+            sx={{
+              marginTop: 8,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ mt: 3, mb: 2, width: "20%", backgroundColor: "lightblue" }}
+              size="large"
+              onClick={() => navigate("/signin")}
+            >
+              회원가입
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ mt: 3, mb: 2, width: "20%", backgroundColor: "lightgreen" }}
+              size="large"
+              onClick={() => navigate("/identify_email")}
+            >
+              비밀번호 찾기
+            </Button>
+          </Box>
+        </>
       )}
-
-      <Link to="/signin">Signin page( 임시)</Link>
-      <br />
-      <Link to="/identify_email">RecoverPassword page (임시)</Link>
-      <br />
 
       <div>로그인 상태 : {logState ? "로그인됨" : "로그아웃됨"}</div>
     </div>

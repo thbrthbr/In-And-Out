@@ -9,6 +9,18 @@ import { signInSchema } from "../../schema/form_validation";
 
 import { loginStore, useStore2 } from "../../store/store.js";
 
+import {
+  Button,
+  TextField,
+  FormControl,
+  Grid,
+  Box,
+  Typography,
+} from "@mui/material/";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+
 export default function Signin() {
   const {
     id,
@@ -96,101 +108,156 @@ export default function Signin() {
   // }, [id]);
 
   return (
-    <div>
-      <div>Signin Page</div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <input
-            type="text"
-            id="id"
-            placeholder="아이디(이메일)"
-            {...register("email", { onChange: onEmailHandler })}
-          />
-          <span role="alert">{errors.email?.message}</span>
-        </div>
-        <div>
-          <input
-            type="password"
-            id="pw"
-            placeholder="비밀번호"
-            {...register("pw", { onChange: onPasswordHandler })}
-          />
-          <span role="alert">{errors.pw?.message}</span>
-        </div>
-        <div>
-          <input
-            type="password"
-            id="pw_check"
-            placeholder="비밀번호(확인)"
-            {...register("passwordConfirm")}
-          />
-          <span role="alert">{errors.passwordConfirm?.message}</span>
-        </div>
-        <div>
-          <input
-            type="text"
-            id="nickname"
-            placeholder="닉네임"
-            {...register("name", { onChange: onNameHandler })}
-          />
-          <span role="alert">{errors.name?.message}</span>
-        </div>
-        <div>
-          <input
-            type="text"
-            id="phonenumber"
-            placeholder="전화번호"
-            {...register("phone", { onChange: onPhoneNumberHandler })}
-          />
-          <span role="alert">{errors.phone?.message}</span>
-        </div>
-        <div>
-          <input
-            type="text"
-            id="birthday"
-            placeholder="생년월일"
-            {...register("birthday", { onChange: onBirthdateHandler })}
-          />
-          <span role="alert">{errors.birthday?.message}</span>
-        </div>
-        <div>
-          <input
-            type="text"
-            id="residence"
-            placeholder="거주지 (시/군/구)"
-            {...register("residence", { onChange: onResidenceHandler })}
-          />
-          <span role="alert">{errors.residence?.message}</span>
-        </div>
-        <div>
-          <label>
-            <input
-              type="radio"
-              name="gender"
-              value="female"
-              onChange={onGenderHandler}
-              {...register("gender", { onChange: onGenderHandler })}
-            />
-            여자
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="gender"
-              value="male"
-              onChange={onGenderHandler}
-              {...register("gender", { onChange: onGenderHandler })}
-            />
-            남자
-          </label>
-          <span role="alert">{errors.gender?.message}</span>
-        </div>
-
-        <div className="button">
-          <button type="submit">가입하기</button>
-        </div>
-      </form>
-      <Link to="/">Login</Link>
-    </div>
+    <Box
+      sx={{
+        marginTop: 8,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Typography component="h1" variant="h5">
+        in & out 회원가입
+      </Typography>
+      <Box
+        component="form"
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{
+          mt: 3,
+          ml: 5,
+        }}
+      >
+        <FormControl component="fieldset" variant="standard">
+          <Grid container spacing={2} style={{ justifyContent: "center" }}>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
+                type="text"
+                id="email"
+                name="email"
+                label="아이디(이메일)"
+                defaultValue={id}
+                error={!!errors.email}
+                {...register("email", { onChange: onEmailHandler })}
+                helperText={errors.email?.message}
+              />
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                required
+                fullWidth
+                type="password"
+                id="password"
+                name="password"
+                label="비밀번호"
+                error={!!errors.pw}
+                {...register("pw", { onChange: onPasswordHandler })}
+                helperText={errors.pw?.message}
+              />
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                required
+                fullWidth
+                type="password"
+                id="rePassword"
+                name="rePassword"
+                label="비밀번호 확인"
+                error={!!errors.passwordConfirm}
+                {...register("passwordConfirm")}
+                helperText={errors.passwordConfirm?.message}
+              />
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
+                type="text"
+                id="name"
+                name="name"
+                label="닉네임"
+                error={!!errors.name}
+                defaultValue={nickname}
+                {...register("name", { onChange: onNameHandler })}
+                helperText={errors.name?.message}
+              />
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
+                type="text"
+                id="phone"
+                name="phone"
+                label="전화번호"
+                error={!!errors.phone}
+                defaultValue={phoneNumber}
+                {...register("phone", { onChange: onPhoneNumberHandler })}
+                helperText={errors.phone?.message}
+              />
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
+                type="text"
+                id="birthday"
+                name="birthday"
+                label="생년월일"
+                error={!!errors.birthday}
+                defaultValue={birthdate}
+                {...register("birthday", { onChange: onBirthdateHandler })}
+                helperText={errors.birthday?.message}
+              />
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
+                type="text"
+                id="residence"
+                name="residence"
+                label="거주지"
+                error={!!errors.residence}
+                defaultValue={residence}
+                {...register("residence", { onChange: onResidenceHandler })}
+                helperText={errors.residence?.message}
+              />
+            </Grid>
+            <Grid item xs={7}>
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
+              >
+                <FormControlLabel
+                  value="female"
+                  control={<Radio />}
+                  label="여자"
+                  defaultChecked={gender === "female" ? true : false}
+                  {...register("gender", { onChange: onGenderHandler })}
+                  error={!!errors.gender}
+                  helperText={errors.gender?.message}
+                />
+                <FormControlLabel
+                  value="남자"
+                  control={<Radio />}
+                  label="남자"
+                  defaultChecked={gender === "male" ? true : false}
+                  {...register("gender", { onChange: onGenderHandler })}
+                  error={!!errors.gender}
+                  helperText={errors.gender?.message}
+                />
+              </RadioGroup>
+            </Grid>
+          </Grid>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3, mb: 2, ml: 45, width: "58%" }}
+            size="large"
+          >
+            제출
+          </Button>
+        </FormControl>
+      </Box>
+    </Box>
   );
 }

@@ -136,7 +136,7 @@ export default function ProfileChange() {
         component="form"
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        sx={{ mt: 3, display: "flex", justifyContent: "center" }}
+        sx={{ mt: 3, ml: 5, display: "flex", justifyContent: "center" }}
       >
         <Photo>
           <img
@@ -167,9 +167,9 @@ export default function ProfileChange() {
                 label="이메일"
                 defaultValue={id}
                 inputProps={{ readOnly: true }}
-                error={!!errors.oldPw}
-                {...register("oldPw")}
-                helperText={errors.oldPw?.message}
+                error={!!errors.email}
+                {...register("email")}
+                helperText={errors.email?.message}
               />
             </Grid>
             <Grid item xs={7}>
