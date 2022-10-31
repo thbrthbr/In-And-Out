@@ -1,8 +1,17 @@
 import { Link } from "react-router-dom";
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schema/form_validation";
+
+import {
+  Button,
+  TextField,
+  FormControl,
+  Grid,
+  Box,
+  Typography,
+} from "@mui/material/";
 
 import {
   useStore2,
@@ -69,47 +78,78 @@ export default function Login() {
   }
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       {logState ? (
         <div> Logged in : {nickname} </div>
       ) : (
-        <>
-          <div>Login Page</div>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div>
-              <input
-                type="text"
-                name="id"
-                autoComplete="username"
-                placeholder="아이디(이메일)"
-                {...register("email")}
-              />
-              <span role="alert">{errors.email?.message}</span>
-            </div>
-            <div>
-              <input
-                type="password"
-                name="password"
-                autoComplete="current-password"
-                placeholder="비밀번호"
-                {...register("pw")}
-              />
-              <span role="alert">{errors.pw?.message}</span>
-            </div>
-            <button type="submit">로그인</button>
-          </form>
-        </>
+        <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography component="h1" variant="h5">
+            In & out에 로그인
+          </Typography>
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleSubmit(onSubmit)}
+            sx={{
+              mt: 3,
+            }}
+          >
+            <FormControl component="fieldset" variant="standard">
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    autoFocus
+                    fullWidth
+                    type="text"
+                    id="email"
+                    name="email"
+                    label="아이디 (이메일)"
+                    error={!!errors.email}
+                    {...register("email")}
+                    helperText={errors.email?.message}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    type="password"
+                    id="password"
+                    name="password"
+                    label="비밀번호"
+                    error={!!errors.pw}
+                    {...register("pw")}
+                    helperText={errors.pw?.message}
+                  />
+                </Grid>
+              </Grid>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ mt: 3, mb: 2, width: "100%" }}
+                size="large"
+              >
+                로그인
+              </Button>
+            </FormControl>
+          </Box>
+        </Box>
       )}
-      <Link to="/calendar">Login</Link>
+
+      <Link to="/signin">Signin page( 임시)</Link>
       <br />
-      <Link to="/signin">Signin</Link>
-      <br />
-      <Link to="/identify_email">RecoverPassword</Link>
+      <Link to="/identify_email">RecoverPassword page (임시)</Link>
       <br />
 
-      <div>{logState ? "로그인됨" : "로그아웃됨"}</div>
-      <button onClick={loginHandler}>로그인</button>
-      <button onClick={logoutHandler}>로그아웃</button>
+      <div>로그인 상태 : {logState ? "로그인됨" : "로그아웃됨"}</div>
     </div>
   );
 }
