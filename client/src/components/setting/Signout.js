@@ -1,5 +1,3 @@
-import styled from "styled-components";
-
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { recoverInitiateSchema } from "../../schema/form_validation";
@@ -114,30 +112,3 @@ export default function Signout() {
     </>
   );
 }
-
-const Alert = styled.span`
-  font-size: 15px;
-`;
-
-const Page = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const TextInput = styled.div`
-  margin-top: 30px;
-  width: 300px;
-  height: 50px;
-
-  display: flex;
-  flex-direction: column;
-`;
-
-const ButtonInput = styled.div`
-  margin-top: 30px;
-  width: 300px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-`;

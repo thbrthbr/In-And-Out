@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -6,7 +6,7 @@ import { profileChangeSchema } from "../../schema/form_validation";
 
 import styled from "styled-components";
 import defaultUser from "../../img/default-user.jpg";
-import { useStore, useStore2, loginStore } from "../../store/store.js";
+import { useStore, loginStore } from "../../store/store.js";
 
 import { Button, TextField, FormControl, Grid, Box } from "@mui/material/";
 import Radio from "@mui/material/Radio";
@@ -263,53 +263,8 @@ const File = styled.button`
   }
 `;
 
-const Categories = styled.h4`
-  margin: 0px;
-`;
-
-const Inputs = styled.input`
-  margin-top: 5px;
-  outline: none;
-  width: 296px;
-  padding: 0;
-  font-size: 20px;
-`;
-
-const Alert = styled.span`
-  font-size: 15px;
-`;
-
 const Photo = styled.div`
   margin: 120px;
   display: flex;
   flex-direction: column;
-`;
-
-const BigPage = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
-
-const Page = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const TextInputs = styled.div`
-  width: 500px;
-  height: 50px;
-  display: flex;
-  flex-direction: column;
-  font-size: 20px;
-  // align-items: center;
-  justify-content: center;
-  margin-top: 30px;
-`;
-
-const ButtonInputs = styled.div`
-  width: 500px;
-  height: 100px;
-  display: flex;
-  align-items: center;
 `;
