@@ -4,7 +4,11 @@ import { format, addMonths, subMonths } from "date-fns";
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek } from "date-fns";
 import { isSameMonth, isSameDay, addDays, parse } from "date-fns";
 
-const RenderHeader = ({ currentMonth, prevMonth, nextMonth }) => {
+import { calenderStore } from "../../store/store.js";
+
+const RenderHeader = () => {
+  const { currentMonth, prevMonth, nextMonth } = calenderStore();
+
   return (
     <div className="header row">
       <div className="col col-first">
@@ -36,16 +40,26 @@ const RenderDays = () => {
   return <div className="days row">{days}</div>;
 };
 
-const RenderCells = ({
-  currentMonth,
-  selectedDate,
-  onDateClick,
-  onDiaryClick,
-  showWrittenDiary,
-  setDiaryDate,
-  setDetailDate,
-  diaryData,
-}) => {
+const RenderCells = ({ diaryData }) => {
+  const {
+    showWrittenDiary,
+    setShowWrittenDiary,
+    setDiaryDate,
+    setDetailDate,
+    selectedDate,
+    setSelectedDate,
+    currentMonth,
+    setCurrentMonth,
+    showNewDiary,
+    setShowNewDiary,
+    setSpecificDate,
+  } = calenderStore();
+
+  const onDateClick = (day) => {
+    console.log(1, day);
+    setSelectedDate(day);
+  };
+
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart);
@@ -79,6 +93,29 @@ const RenderCells = ({
             flexDirection: "column",
             justifyContent: "space-between",
           }}
+          id={formattedDataForDiary}
+          onClick={(e) => {
+            setSpecificDate(formattedDataForDiary);
+            let check = 0;
+            {
+              diaryData.map((data) => {
+                // console.log(day.format("MM/dd/yy"), data.date);
+                if (formattedDataForDiary === data.date) {
+                  setShowWrittenDiary(!showWrittenDiary);
+                  setDiaryDate(e.target.id);
+                  check++;
+                  console.log(check);
+                  console.log(e.target.id);
+                }
+              });
+            }
+            if (check == 0) {
+              console.log(check);
+              console.log(e.target.id);
+              setDiaryDate(e.target.id);
+              setShowNewDiary(!showNewDiary);
+            }
+          }}
         >
           <span
             className={
@@ -106,10 +143,6 @@ const RenderCells = ({
                     icon="arcticons:diary"
                     id={formattedDataForDiary}
                     key={data.date}
-                    onClick={(e) => {
-                      onDiaryClick(!showWrittenDiary);
-                      setDiaryDate(e.target.id);
-                    }}
                   ></Icon>
                 );
               } else {
@@ -153,44 +186,12 @@ const RenderCells = ({
   return <div className="body">{rows}</div>;
 };
 
-export const FullCalendar = ({
-  onDiaryClick,
-  writtenDiary,
-  setDiaryDate,
-  setDetailDate,
-  calendarData,
-}) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  const prevMonth = () => {
-    setCurrentMonth(subMonths(currentMonth, 1));
-  };
-  const nextMonth = () => {
-    setCurrentMonth(addMonths(currentMonth, 1));
-  };
-  const onDateClick = (day) => {
-    console.log(1, day);
-    setSelectedDate(day);
-  };
+export const FullCalendar = ({ calendarData }) => {
   return (
     <div className="calendar">
-      <RenderHeader
-        currentMonth={currentMonth}
-        prevMonth={prevMonth}
-        nextMonth={nextMonth}
-      />
+      <RenderHeader />
       <RenderDays />
-      <RenderCells
-        currentMonth={currentMonth}
-        selectedDate={selectedDate}
-        onDateClick={onDateClick}
-        onDiaryClick={onDiaryClick}
-        showWrittenDiary={writtenDiary}
-        setDiaryDate={setDiaryDate}
-        setDetailDate={setDetailDate}
-        diaryData={calendarData}
-      />
+      <RenderCells diaryData={calendarData} />
     </div>
   );
 };

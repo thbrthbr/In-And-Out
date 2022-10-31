@@ -7,6 +7,8 @@ import { Icon } from "@iconify/react";
 import DiaryModal from "./WriteModal";
 import Diary from "./Diary";
 
+import { calenderStore } from "../../store/store.js";
+
 import axios from "axios";
 
 import { useQuery, useMutation, useQueryClient } from "react-query";
@@ -22,10 +24,16 @@ const Container = styled.div`
 `;
 
 export default function Calendar() {
-  const [showWrittenDiary, setShowWrittenDiary] = useState(false);
-  const [showNewDiary, setShowNewDiary] = useState(false);
-  const [diaryDate, setDiaryDate] = useState("");
-  const [detailDate, setDetailDate] = useState("");
+  const {
+    showWrittenDiary,
+    setShowWrittenDiary,
+    showNewDiary,
+    setShowNewDiary,
+    diaryDate,
+    setDiaryDate,
+    detailDate,
+    setDetailDate,
+  } = calenderStore();
 
   const queryClient = useQueryClient();
 
@@ -109,16 +117,11 @@ export default function Calendar() {
 
   if (isLoading) return <PacmanLoader color="#36d7b7" />;
   console.log("data", data);
+
   return (
     <Container>
-      <FullCalendar
-        onDiaryClick={setShowWrittenDiary}
-        writtenDiary={showWrittenDiary}
-        setDiaryDate={setDiaryDate}
-        setDetailDate={setDetailDate}
-        calendarData={data}
-      />
-      <Icon
+      <FullCalendar calendarData={data} />
+      {/* <Icon
         icon="heroicons:pencil-square"
         style={{
           position: "fixed",
@@ -131,14 +134,15 @@ export default function Calendar() {
           borderRadius: "50%",
         }}
         onClick={() => setShowNewDiary(!showNewDiary)}
-      ></Icon>
+      ></Icon> */}
 
       {showNewDiary && (
         <DiaryModal closeModal={() => setShowNewDiary(!showNewDiary)}>
           <Diary
-            newDiary={showNewDiary}
-            writtenDiary={showWrittenDiary}
-            diaryDate={diaryDate}
+            // newDiary={showNewDiary}
+            // writtenDiary={showWrittenDiary}
+            // diaryDate={diaryDate}
+            calendarData={data}
             saveDataMutation={saveDataMutation}
             closeModal={() => setShowNewDiary(!showNewDiary)}
           ></Diary>
@@ -147,9 +151,9 @@ export default function Calendar() {
       {showWrittenDiary && (
         <DiaryModal closeModal={() => setShowWrittenDiary(!showWrittenDiary)}>
           <Diary
-            newDiary={showNewDiary}
-            writtenDiary={showWrittenDiary}
-            diaryDate={diaryDate}
+            // newDiary={showNewDiary}
+            // writtenDiary={showWrittenDiary}
+            // diaryDate={diaryDate}
             calendarData={data}
             saveDataMutation={saveDataMutation}
             saveEditDataMutation={saveEditDataMutation}

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import DatePicker from "react-datepicker";
 
+import { calenderStore } from "../../store/store.js";
+
 import defaultUser from "../../img/default-user.jpg";
 
 Date.prototype.format = function (f) {
@@ -64,18 +66,30 @@ const Container = styled.div`
 `;
 
 export default function Diary({
-  newDiary,
-  writtenDiary,
-  diaryDate,
   calendarData,
   saveDataMutation,
   saveEditDataMutation,
   deleteDataMutation,
   closeModal,
 }) {
+  const {
+    showWrittenDiary,
+    setShowWrittenDiary,
+    showNewDiary,
+    setShowNewDiary,
+    diaryDate,
+    setDiaryDate,
+    detailDate,
+    setDetailDate,
+    edit,
+    setEdit,
+    specificDate,
+    setSpecificDate,
+  } = calenderStore();
+
   const [textValue, setTextValue] = useState("");
   const [startDate, setStartDate] = useState(new Date());
-  const [edit, setEdit] = useState(false);
+
   const [profileImage, setprofileImage] = useState();
 
   const handleSetValue = (e) => {
@@ -112,7 +126,7 @@ export default function Diary({
     const body = {
       id: num,
       diary_id: num,
-      date: startDate.format("MM/dd/yy"),
+      date: specificDate.format("MM/dd/yy"),
       dailyIncomeList: [],
       dailyExpenseList: [],
       diary: {
@@ -154,15 +168,16 @@ export default function Diary({
 
   // diaryDate가지고 데이터 요청
   const diaryData =
-    writtenDiary &&
+    showWrittenDiary &&
     calendarData &&
     calendarData.filter((data) => data.date === diaryDate)[0];
   // console.log(diaryData);
   return (
     <div>
-      {writtenDiary && !edit && (
+      {showWrittenDiary && !edit && (
         <Container>
           <div>
+            {/* 작성된 화면 */}
             <div style={{ height: "300px" }}>
               <div>수입</div>
               {diaryData.dailyIncomeList.length &&
@@ -189,7 +204,13 @@ export default function Diary({
             </div>
           </div>
           <div>
-            <div>{diaryData.date}</div>
+            <DatePicker
+              // selected={new Date(diaryData.date)}
+              // onChange={(date) => setStartDate(date)}
+              selected={new Date(specificDate)}
+              onChange={(date) => setSpecificDate(date)}
+              // 이 onchange 함수에서 렌더링하는 거 더 추가해야함
+            />
             <div>
               <img
                 style={{ width: "300px", height: "300px", marginTop: "15px" }}
@@ -208,9 +229,10 @@ export default function Diary({
         </Container>
       )}
 
-      {writtenDiary && edit && (
+      {showWrittenDiary && edit && (
         <Container>
           <div>
+            {/* 작성된 화면 수정 화면 */}
             <div style={{ height: "300px" }}>
               <div>수입</div>
               {diaryData.dailyIncomeList.length &&
@@ -275,11 +297,13 @@ export default function Diary({
         </Container>
       )}
 
-      {newDiary && (
+      {showNewDiary && (
         <Container>
           <div>
+            {/* 아직 작성되지 않은 화면 */}
             <div style={{ width: "300px", height: "300px" }}>
               <div>수입</div>
+
               {diaryData.dailyIncomeList &&
                 diaryData.dailyIncomeList.map((income) => {
                   return (
@@ -305,9 +329,11 @@ export default function Diary({
           </div>
           <form style={{ width: "100%" }}>
             <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              dateFormat="MM/dd/yy"
+              selected={new Date(specificDate)}
+              onChange={(date) => setSpecificDate(date)}
+              // dateFormat="MM/dd/yy"
+              // selected={new Date(diaryData.date)}
+              // onChange={(date) => setStartDate(date)}
             />
             <div>
               <img
