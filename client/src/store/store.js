@@ -1,5 +1,6 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
+import { format, addMonths, subMonths } from "date-fns";
 
 const useStore = create(
   persist((set) => ({
@@ -64,29 +65,34 @@ const loginStore = create(
   )
 );
 
-const backUpStore = create(
-  persist(
-    (set) => ({
-      BU_id: "",
-      setBU_Id: (input) => set({ BU_id: input }),
-      BU_password: "",
-      setBU_Password: (input) => set({ BU_password: input }),
-      BU_nickname: "",
-      setBU_Nickname: (input) => set({ BU_nickname: input }),
-      BU_phoneNumber: "",
-      setBU_PhoneNumber: (input) => set({ BU_phoneNumber: input }),
-      BU_birthdate: "",
-      setBU_Birthdate: (input) => set({ BU_birthdate: input }),
-      BU_residence: "",
-      setBU_Residence: (input) => set({ BU_residence: input }),
-      BU_gender: "",
-      setBU_Gender: (input) => set({ BU_gender: input }),
-    }),
-    {
-      name: "BU-login-stuff",
-      getStorage: () => sessionStorage,
-    }
-  )
-);
+const calenderStore = create((set, get) => ({
+  showWrittenDiary: false,
+  setShowWrittenDiary: (input) => set({ showWrittenDiary: input }),
 
-export { useStore, useStore2, useStore3, loginStore, backUpStore };
+  showNewDiary: false,
+  setShowNewDiary: (input) => set({ showNewDiary: input }),
+
+  diaryDate: "",
+  setDiaryDate: (input) => set({ diaryDate: input }),
+
+  detailDate: "",
+  setDetailDate: (input) => set({ detailDate: input }),
+
+  currentMonth: new Date(),
+  setcurrentMonth: (input) => set({ currentMonth: input }),
+
+  prevMonth: () => set({ currentMonth: subMonths(get().currentMonth, 1) }),
+
+  nextMonth: () => set({ currentMonth: addMonths(get().currentMonth, 1) }),
+
+  showselectedDate: new Date(),
+  setSelectedDate: (input) => set({ selectedDate: input }),
+
+  edit: false,
+  setEdit: (input) => set({ edit: input }),
+
+  specificDate: new Date(),
+  setSpecificDate: (input) => set({ specificDate: input }),
+}));
+
+export { useStore, useStore2, useStore3, loginStore, calenderStore };

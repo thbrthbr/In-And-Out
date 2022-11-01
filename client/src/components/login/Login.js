@@ -4,12 +4,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schema/form_validation";
 
-import {
-  useStore2,
-  useStore3,
-  loginStore,
-  backUpStore,
-} from "../../store/store.js";
+import { useStore2, useStore3, loginStore } from "../../store/store.js";
 
 export default function Login() {
   const {
@@ -33,7 +28,6 @@ export default function Login() {
     setResidence,
     setGender,
   } = loginStore();
-  const { BU_nickname, setBU_Nickname } = backUpStore();
 
   const onSubmit = async (e) => {
     // e.preventDefault();
@@ -43,7 +37,6 @@ export default function Login() {
       setId(e["email"]);
       setPassword(e["pw"]);
       setNickname(result.nickname);
-      setBU_Nickname(result.nickname);
       setPhoneNumber(result.phoneNumber);
       setBirthdate(result.birthdate);
       setResidence(result.residence);
