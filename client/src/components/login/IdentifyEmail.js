@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material/";
 
-const API_URL = "http://localhost:5000/income";
+const API_URL = "http://localhost:5000/password";
 
 export default function IdentifyEmail() {
   const {

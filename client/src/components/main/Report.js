@@ -30,9 +30,9 @@ import { useQuery } from "react-query";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
 import {
-  doughnutOption,
-  barOption,
-  lineOption,
+  doughnutConfig,
+  barConfig,
+  lineConfig,
 } from "../../option/graphOptions";
 
 import {
@@ -86,7 +86,7 @@ const costOptions = [
 ];
 
 const columns = [
-  { key: "date", name: "기간" },
+  { key: "category", name: "내용" },
   { key: "jan", name: "1월" },
   { key: "feb", name: "2월" },
   { key: "mar", name: "3월" },
@@ -102,65 +102,8 @@ const columns = [
   { key: "sum", name: "합계" },
 ];
 
-const doughnutConfig = {
-  type: "doughnut",
-  data: {
-    datasets: [
-      {
-        data: [],
-        backgroundColor: [
-          "rgb(255, 99, 132)",
-          "rgb(255, 159, 64)",
-          "rgb(255, 205, 86)",
-          "rgb(75, 192, 192)",
-          "rgb(54, 162, 235)",
-        ],
-      },
-    ],
-    labels: [],
-  },
-  options: doughnutOption,
-};
-
-const barConfig = {
-  type: "bar",
-  data: {
-    labels: [],
-    datasets: [
-      {
-        axis: "y",
-        label: "Dataset",
-        data: [],
-        fill: false,
-        backgroundColor: [
-          "rgb(255, 99, 132)",
-          "rgb(255, 159, 64)",
-          "rgb(255, 205, 86)",
-          "rgb(75, 192, 192)",
-          "rgb(54, 162, 235)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  },
-  options: barOption,
-};
-
-const lineConfig = {
-  type: "line",
-  data: {
-    labels: [],
-    datasets: [
-      {
-        label: "My First Dataset",
-        data: [],
-        fill: false,
-        borderColor: "rgb(75, 192, 192)",
-        tension: 0.1,
-      },
-    ],
-  },
-  options: lineOption,
+let categories = {
+  // 주수입: new Array(14).fill(0),
 };
 
 function a11yProps(index) {
@@ -177,7 +120,6 @@ const TabSelected = Object.freeze({
 
 let currentMonth = new Date();
 let currentYear = new Date();
-const rows = [];
 
 export default function Report() {
   const canvasRef = useRef(null);
@@ -187,6 +129,7 @@ export default function Report() {
   const [costOption, setCostOption] = useState("income");
   const [tabValue, setTabValue] = useState(0);
 
+  const [rows, setRows] = useState([]);
   const setParamAndRefetch = () => {
     setParam();
     refetch();
@@ -235,23 +178,30 @@ export default function Report() {
   const getMonthlyData = (fetchedData) => {
     const newData = [];
     const newLabel = [];
+
     fetchedData.forEach((element, idx) => {
-      newData[idx] = element.category_ratio * 100;
-      newLabel[idx] = `${element.category} - ${element.category_sum}`;
+      newData[idx] = Math.round(element.categoryRatio);
+      newLabel[idx] = `${element.category} - ${element.categorySum}`;
     });
 
     return [newData, newLabel];
   };
 
+  const formatDate = (date) => {
+    return `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+  };
+
   const setParam = () => {
     switch (tabValue) {
       case TabSelected.MONTH:
-        params.start_dt = startOfMonth(currentMonth);
-        params.end_dt = endOfMonth(currentMonth);
+        params.startDt = formatDate(startOfMonth(currentMonth));
+        params.endDt = formatDate(endOfMonth(currentMonth));
         break;
       case TabSelected.YEAR:
-        params.start_dt = startOfYear(currentYear);
-        params.end_dt = endOfYear(currentYear);
+        params.startDt = startOfYear(currentYear);
+        params.endDt = endOfYear(currentYear);
         break;
       default:
         break;
@@ -261,24 +211,84 @@ export default function Report() {
   const getReportDataFrom = async (url, params) => {
     try {
       const res = await axios(url, { params: params });
+      console.log(res);
       return res.data;
     } catch (err) {
       console.log(err);
     }
   };
 
+  const test = async () => {
+    const res = await axios.get("/api/report/month/income", {
+      params: { endDt: "2022-10-31", startDt: "2022-10-01" },
+    });
+    console.log(res);
+  };
+  // test();
   const setReportDataWith = (data) => {
     switch (tabValue) {
       case TabSelected.MONTH:
-        const [newData, newLabel] = getMonthlyData(data[costOption]);
+        const [newData, newLabel] = getMonthlyData(data);
+        console.log(newData, newLabel);
         doughnutConfig.data.labels = newLabel;
         doughnutConfig.data.datasets[0].data = newData;
         barConfig.data.labels = newLabel;
         barConfig.data.datasets[0].data = newData;
-        lineConfig.data.labels = newLabel;
-        lineConfig.data.datasets[0].data = newData;
+        // lineConfig.data.labels = newLabel;
+        // lineConfig.data.datasets[0].data = newData;
         break;
+      case TabSelected.YEAR:
+        // console.log(currentYear.getFullYear());
+        const yearLabel = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        lineConfig.data.labels = yearLabel;
 
+        const yearlyIncomeData = data.year.incomeReportList.filter(
+          (item) => item.year === currentYear.getFullYear()
+        );
+        const yearlyIncomeMonthSums = yearlyIncomeData.map(
+          (data) => data.monthlySum
+        );
+        lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
+        const yearlyIncomeReport = yearlyIncomeData.map((data) =>
+          data.incomeReport ? data.incomeReport : 0
+        );
+
+        yearlyIncomeReport.forEach((report, idx) => {
+          // console.log(report);
+          if (report.length !== 0) {
+            for (let i = 0; i < report.length; i++) {
+              //categories[report[i].category][idx + 1] = report[i].categorySum;
+              if (!categories[report[i].category])
+                categories[report[i].category] = new Array(14).fill(0);
+              categories[report[i].category][idx + 1] = report[i].categorySum;
+            }
+          }
+        });
+        console.log("categories", categories);
+
+        const tempRows = [];
+        for (let key in categories) {
+          let idx = 1;
+          let sum = 0;
+          const row = {};
+          for (let item of columns) {
+            if (item.key === "category") row[item.key] = key;
+            else if (item.key === "sum") row[item.key] = sum;
+            else {
+              row[item.key] = categories[key][idx++];
+              sum += row[item.key];
+            }
+          }
+          tempRows.push(row);
+        }
+
+        setRows(tempRows);
+
+        // console.log(yearlyIncomeReport);
+
+        // lineConfig.data.datasets[0].label = ""
+
+        break;
       default:
         break;
     }
@@ -325,17 +335,21 @@ export default function Report() {
     };
   });
 
-  const API_URL = "http://localhost:5000/report";
+  let API_URL =
+    tabValue === TabSelected.MONTH
+      ? `/api/report/month/${costOption}`
+      : "http://localhost:5000/report";
   const params = {};
   setParam();
 
   const handleReportData = async (url, params) => {
     const fetchedData = await getReportDataFrom(url, params);
+
     setReportDataWith(fetchedData);
   };
 
   const { data, isLoading, refetch } = useQuery(
-    ["getReportData", costOption, tabValue],
+    ["getMonthReportData", costOption, tabValue],
     () => handleReportData(API_URL, params)
   );
 

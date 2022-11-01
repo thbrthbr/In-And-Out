@@ -118,6 +118,184 @@
     }
   ],
   "report": {
+    "year": {
+      "incomeReportList": [
+        {
+          "year": 2021,
+          "month": 11,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2021,
+          "month": 12,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2022,
+          "month": 1,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2022,
+          "month": 2,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2022,
+          "month": 3,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2022,
+          "month": 4,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2022,
+          "month": 5,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2022,
+          "month": 6,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2022,
+          "month": 7,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2022,
+          "month": 8,
+          "monthlySum": 0,
+          "incomeReport": []
+        },
+        {
+          "year": 2022,
+          "month": 9,
+          "monthlySum": 127500,
+          "incomeReport": [
+            {
+              "category": "주수입",
+              "categorySum": 100000,
+              "categoryRatio": 78.43
+            },
+            {
+              "category": "부수입",
+              "categorySum": 27500,
+              "categoryRatio": 21.57
+            }
+          ]
+        },
+        {
+          "year": 2022,
+          "month": 10,
+          "monthlySum": 6250000,
+          "incomeReport": [
+            {
+              "category": "주수입",
+              "categorySum": 4250000,
+              "categoryRatio": 68
+            },
+            {
+              "category": "부수입",
+              "categorySum": 2000000,
+              "categoryRatio": 32
+            }
+          ]
+        }
+      ],
+      "expenseReportList": [
+        {
+          "year": 2021,
+          "month": 11,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2021,
+          "month": 12,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 1,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 2,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 3,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 4,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 5,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 6,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 7,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 8,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 9,
+          "monthlySum": 0,
+          "expenseReport": []
+        },
+        {
+          "year": 2022,
+          "month": 10,
+          "monthlySum": 41000,
+          "expenseReport": [
+            {
+              "category": "식비",
+              "categorySum": 41000,
+              "categoryRatio": 0
+            }
+          ]
+        }
+      ]
+    },
     "income": [
       {
         "category": "수입1",
@@ -154,13 +332,66 @@
     ]
   },
   "income": {
-    "id": "1z3r091@gmail.com",
-    "password": "aaa111!!!",
-    "nickname": "asdf",
-    "phoneNumber": "123123123123123",
-    "birthdate": "1991-07-08",
-    "residence": "dadsfasdfasdfasdf",
-    "gender": "남자"
+    "income": [
+      {
+        "incomeId": 1,
+        "incomeDate": "12/12/22",
+        "incomeItem": "월급",
+        "incomeCategoryName": "월급",
+        "incomeAmount": 20000,
+        "incomeMemo": "good",
+        "date": "12/12/22",
+        "category": "월급"
+      },
+      {
+        "incomeId": 2,
+        "incomeDate": "12/12/22",
+        "incomeItem": "월급",
+        "incomeCategoryName": "월급",
+        "incomeAmount": 20000,
+        "incomeMemo": "good",
+        "date": "12/12/22",
+        "category": "월급"
+      },
+      {
+        "incomeId": 3,
+        "incomeDate": "12/12/22",
+        "incomeItem": "월급",
+        "incomeCategoryName": "월급",
+        "incomeAmount": "111",
+        "incomeMemo": "good",
+        "date": "12/12/22",
+        "category": "월급"
+      },
+      {
+        "incomeId": 5,
+        "incomeDate": "",
+        "incomeItem": "122",
+        "incomeCategoryName": "",
+        "incomeAmount": "111",
+        "incomeMemo": "111",
+        "date": "9/28/2022",
+        "category": "교통비"
+      },
+      {
+        "incomeId": 7,
+        "incomeDate": "",
+        "incomeCategoryName": "",
+        "incomeItem": "",
+        "incomeAmount": "222",
+        "incomeMemo": "",
+        "date": "9/27/2022",
+        "category": ""
+      },
+      {
+        "incomeId": 8,
+        "incomeDate": "",
+        "incomeItem": "",
+        "incomeAmount": "3333",
+        "incomeCategoryName": "",
+        "incomeMemo": ""
+      }
+    ]
   },
   "expense": {
     "expense": [

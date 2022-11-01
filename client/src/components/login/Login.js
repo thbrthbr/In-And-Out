@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schema/form_validation";
 
+import axios from "axios";
+
 import {
   Button,
   TextField,
@@ -78,6 +80,15 @@ export default function Login() {
     setGender("");
     console.log(id);
   }
+
+  const test = async () => {
+    const res = await axios.post("/api/signin", {
+      email: "yellowghost@hanmail.com",
+      password: "yel123!@",
+    });
+    console.log(res);
+  };
+  test();
 
   return (
     <div style={{ width: "100%" }}>
