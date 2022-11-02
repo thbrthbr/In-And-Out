@@ -22,6 +22,9 @@ import {
   backUpStore,
 } from "../../store/store.js";
 
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function Login() {
   const {
     register,
@@ -50,18 +53,33 @@ export default function Login() {
 
   const onSubmit = async (e) => {
     // e.preventDefault();
-    const result = await tempFunc(e["email"], e["pw"]);
-    console.log(result);
-    if (result) {
-      setId(e["email"]);
-      setPassword(e["pw"]);
-      setNickname(result.nickname);
-      setBU_Nickname(result.nickname);
-      setPhoneNumber(result.phoneNumber);
-      setBirthdate(result.birthdate);
-      setResidence(result.residence);
-      setGender(result.gender);
+    // const result = await tempFunc(e["email"], e["pw"]);
+    // console.log(result);
+    // if (result) {
+    //   setId(e["email"]);
+    //   setPassword(e["pw"]);
+    //   setNickname(result.nickname);
+    //   setBU_Nickname(result.nickname);
+    //   setPhoneNumber(result.phoneNumber);
+    //   setBirthdate(result.birthdate);
+    //   setResidence(result.residence);
+    //   setGender(result.gender);
+    //   setLogState(true);
+    // }
+    try {
+      const res = await axios.post("/api/signin", {
+        email: e["email"],
+        password: e["pw"],
+      });
       setLogState(true);
+      setTimeout(() => {
+        navigate("/calendar");
+      }, 0);
+    } catch (err) {
+      console.log(err);
+      toast.warn("서버와 연결이 문제가 있거나 로그인 정보가 틀렸습니다!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   };
 
@@ -88,7 +106,7 @@ export default function Login() {
     });
     console.log(res);
   };
-  test();
+  // test();
 
   return (
     <div style={{ width: "100%" }}>
@@ -104,13 +122,14 @@ export default function Login() {
               alignItems: "center",
             }}
           >
+            <ToastContainer />
             <Typography component="h1" variant="h5">
               in&out에 로그인
             </Typography>
             <Box
               component="form"
               noValidate
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={() => handleSubmit(onSubmit)}
               sx={{
                 mt: 3,
               }}
