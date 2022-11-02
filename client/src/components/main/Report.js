@@ -86,7 +86,7 @@ const costOptions = [
 ];
 
 const columns = [
-  { key: "category", name: "내용" },
+  { key: "category", name: "내용", width: 200 },
   { key: "jan", name: "1월" },
   { key: "feb", name: "2월" },
   { key: "mar", name: "3월" },
@@ -101,10 +101,6 @@ const columns = [
   { key: "dec", name: "12월" },
   { key: "sum", name: "합계" },
 ];
-
-let categories = {
-  // 주수입: new Array(14).fill(0),
-};
 
 function a11yProps(index) {
   return {
@@ -200,8 +196,8 @@ export default function Report() {
         params.endDt = formatDate(endOfMonth(currentMonth));
         break;
       case TabSelected.YEAR:
-        params.startDt = startOfYear(currentYear);
-        params.endDt = endOfYear(currentYear);
+        params.startDt = formatDate(startOfYear(currentYear));
+        params.endDt = formatDate(endOfYear(currentYear));
         break;
       default:
         break;
@@ -224,6 +220,163 @@ export default function Report() {
     });
     console.log(res);
   };
+
+  const renderTotalYearReportOnGraph = (data) => {
+    const yearlyIncomeData = data.incomeReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+    const yearlyIncomeMonthSums = yearlyIncomeData.map(
+      (data) => data.monthlySum
+    );
+
+    const yearlyExpenseData = data.expenseReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+    const yearlyExpenseMonthSums = yearlyExpenseData.map(
+      (data) => data.monthlySum
+    );
+
+    const yearlyTotalMonthSums = yearlyIncomeMonthSums.map(
+      (x, y) => x - yearlyExpenseMonthSums[y]
+    );
+
+    lineConfig.data.datasets[0].data = yearlyTotalMonthSums;
+  };
+
+  const renderIncomeYearReportOnGraph = (data) => {
+    const yearlyIncomeData = data.incomeReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+    const yearlyIncomeMonthSums = yearlyIncomeData.map(
+      (data) => data.monthlySum
+    );
+    lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
+  };
+
+  const renderExpenseYearReportOnGraph = (data) => {
+    const yearlyExpenseData = data.expenseReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+    const yearlyExpenseMonthSums = yearlyExpenseData.map(
+      (data) => data.monthlySum
+    );
+    lineConfig.data.datasets[0].data = yearlyExpenseMonthSums;
+  };
+
+  const createMainRows = (categoryTitle) => {
+    let obj = {};
+    columns.forEach((column) => {
+      if (column.key === "category") obj[column.key] = categoryTitle;
+      else obj[column.key] = 0;
+    });
+
+    return obj;
+  };
+
+  const renderTotalYearReportOnTable = (data) => {
+    let incomeCategories = {
+      // 주수입: new Array(14).fill(0),
+    };
+    let expenseCategories = {
+      // 주수입: new Array(14).fill(0),
+    };
+    const tempRows = [];
+
+    tempRows.push(createMainRows("수입지출합계"));
+
+    tempRows.push(createMainRows("수입합계"));
+
+    const yearlyIncomeData = data.incomeReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+
+    const yearlyIncomeReport = yearlyIncomeData.map((data) =>
+      data.incomeReport ? data.incomeReport : 0
+    );
+
+    yearlyIncomeReport.forEach((report, idx) => {
+      // console.log(report);
+      if (report.length !== 0) {
+        for (let i = 0; i < report.length; i++) {
+          //categories[report[i].category][idx + 1] = report[i].categorySum;
+          if (!incomeCategories[report[i].category])
+            incomeCategories[report[i].category] = new Array(14).fill(0);
+          incomeCategories[report[i].category][idx + 1] = report[i].categorySum;
+        }
+      }
+    });
+
+    for (let key in incomeCategories) {
+      let idx = 1;
+      let sum = 0;
+      const row = {};
+      for (let item of columns) {
+        if (item.key === "category") row[item.key] = key;
+        else if (item.key === "sum") {
+          row[item.key] = sum;
+          tempRows[1][item.key] += row[item.key];
+        } else {
+          row[item.key] = incomeCategories[key][idx++];
+          tempRows[1][item.key] += row[item.key];
+          sum += row[item.key];
+        }
+      }
+      tempRows.push(row);
+    }
+
+    tempRows.push(createMainRows("지출합계"));
+    let expenseSumRowPos = tempRows.length - 1;
+
+    const yearlyExpenseData = data.expenseReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+
+    const yearlyExpenseReport = yearlyExpenseData.map((data) =>
+      data.expenseReport ? data.expenseReport : 0
+    );
+
+    yearlyExpenseReport.forEach((report, idx) => {
+      // console.log(report);
+      if (report.length !== 0) {
+        for (let i = 0; i < report.length; i++) {
+          //categories[report[i].category][idx + 1] = report[i].categorySum;
+          if (!expenseCategories[report[i].category])
+            expenseCategories[report[i].category] = new Array(14).fill(0);
+          expenseCategories[report[i].category][idx + 1] =
+            report[i].categorySum;
+        }
+      }
+    });
+
+    for (let key in expenseCategories) {
+      let idx = 1;
+      let sum = 0;
+      const row = {};
+      for (let item of columns) {
+        if (item.key === "category") row[item.key] = key;
+        else if (item.key === "sum") {
+          row[item.key] = sum;
+          tempRows[expenseSumRowPos][item.key] += row[item.key];
+        } else {
+          row[item.key] = expenseCategories[key][idx++];
+          tempRows[expenseSumRowPos][item.key] += row[item.key];
+          sum += row[item.key];
+        }
+      }
+      tempRows.push(row);
+    }
+
+    const obj = {};
+    for (const property in tempRows[1]) {
+      obj[property] =
+        tempRows[1][property] - tempRows[expenseSumRowPos][property];
+    }
+    obj.category = "수입지출합계";
+    tempRows[0] = obj;
+    // tempRows[1].map((row, idx) => console.log(row));
+    setRows(tempRows);
+  };
+
   // test();
   const setReportDataWith = (data) => {
     switch (tabValue) {
@@ -242,47 +395,55 @@ export default function Report() {
         const yearLabel = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
         lineConfig.data.labels = yearLabel;
 
-        const yearlyIncomeData = data.year.incomeReportList.filter(
+        let categories = {
+          // 주수입: new Array(14).fill(0),
+        };
+
+        const yearlyIncomeData = data.incomeReportList.filter(
           (item) => item.year === currentYear.getFullYear()
         );
         const yearlyIncomeMonthSums = yearlyIncomeData.map(
           (data) => data.monthlySum
         );
-        lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
-        const yearlyIncomeReport = yearlyIncomeData.map((data) =>
-          data.incomeReport ? data.incomeReport : 0
-        );
+        // lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
+        // renderIncomeYearReportOnGraph(data);
+        renderTotalYearReportOnGraph(data);
+        renderTotalYearReportOnTable(data);
 
-        yearlyIncomeReport.forEach((report, idx) => {
-          // console.log(report);
-          if (report.length !== 0) {
-            for (let i = 0; i < report.length; i++) {
-              //categories[report[i].category][idx + 1] = report[i].categorySum;
-              if (!categories[report[i].category])
-                categories[report[i].category] = new Array(14).fill(0);
-              categories[report[i].category][idx + 1] = report[i].categorySum;
-            }
-          }
-        });
-        console.log("categories", categories);
+        // const yearlyIncomeReport = yearlyIncomeData.map((data) =>
+        //   data.incomeReport ? data.incomeReport : 0
+        // );
 
-        const tempRows = [];
-        for (let key in categories) {
-          let idx = 1;
-          let sum = 0;
-          const row = {};
-          for (let item of columns) {
-            if (item.key === "category") row[item.key] = key;
-            else if (item.key === "sum") row[item.key] = sum;
-            else {
-              row[item.key] = categories[key][idx++];
-              sum += row[item.key];
-            }
-          }
-          tempRows.push(row);
-        }
+        // yearlyIncomeReport.forEach((report, idx) => {
+        //   // console.log(report);
+        //   if (report.length !== 0) {
+        //     for (let i = 0; i < report.length; i++) {
+        //       //categories[report[i].category][idx + 1] = report[i].categorySum;
+        //       if (!categories[report[i].category])
+        //         categories[report[i].category] = new Array(14).fill(0);
+        //       categories[report[i].category][idx + 1] = report[i].categorySum;
+        //     }
+        //   }
+        // });
+        // console.log("categories", categories);
 
-        setRows(tempRows);
+        // const tempRows = [];
+        // for (let key in categories) {
+        //   let idx = 1;
+        //   let sum = 0;
+        //   const row = {};
+        //   for (let item of columns) {
+        //     if (item.key === "category") row[item.key] = key;
+        //     else if (item.key === "sum") row[item.key] = sum;
+        //     else {
+        //       row[item.key] = categories[key][idx++];
+        //       sum += row[item.key];
+        //     }
+        //   }
+        //   tempRows.push(row);
+        // }
+
+        // setRows(tempRows);
 
         // console.log(yearlyIncomeReport);
 
@@ -338,7 +499,7 @@ export default function Report() {
   let API_URL =
     tabValue === TabSelected.MONTH
       ? `/api/report/month/${costOption}`
-      : "http://localhost:5000/report";
+      : `/api/report/year`;
   const params = {};
   setParam();
 
@@ -439,6 +600,7 @@ export default function Report() {
         {yearlyOption === "chart" && (
           <div>
             <ChartCanvas width={1000} height={500} ref={canvasRef} />
+            <span>Test</span>
           </div>
         )}
       </TabPanel>
