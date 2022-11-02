@@ -16,7 +16,6 @@
   "profile": {
     "name": "typicode"
   },
-
   "users": [
     {
       "id": "inandout1234@gmail.com",
@@ -35,6 +34,15 @@
       "birthdate": "1995-06-18",
       "residence": "일본",
       "gender": "남자"
+    },
+    {
+      "id": "zero@gmail.com",
+      "password": "@@zero12",
+      "nickname": "wpwp",
+      "phoneNumber": "010-0011-2222",
+      "birthdate": "1990-01-01",
+      "residence": "한국",
+      "gender": "male"
     }
   ]
 }

@@ -49,7 +49,6 @@ export default function Login() {
     setResidence,
     setGender,
   } = loginStore();
-  const { BU_nickname, setBU_Nickname } = backUpStore();
 
   const onSubmit = async (e) => {
     // e.preventDefault();
