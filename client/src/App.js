@@ -63,17 +63,17 @@ function App() {
               <Route
                 path="/signin"
                 element={
-                  <PrivateRoute>
+                  <PublicRoute>
                     <Signin />
-                  </PrivateRoute>
+                  </PublicRoute>
                 }
               ></Route>
               <Route
                 path="/identify_email"
                 element={
-                  <PrivateRoute>
+                  <PublicRoute>
                     <IdentifyEmail />
-                  </PrivateRoute>
+                  </PublicRoute>
                 }
               ></Route>
               <Route
