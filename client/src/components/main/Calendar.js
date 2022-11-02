@@ -33,6 +33,7 @@ export default function Calendar() {
     setDiaryDate,
     detailDate,
     setDetailDate,
+    setShowInstanceTable,
   } = calenderStore();
 
   const queryClient = useQueryClient();
@@ -119,7 +120,11 @@ export default function Calendar() {
   console.log("data", data);
 
   return (
-    <Container>
+    <Container
+      onClick={() => {
+        setShowInstanceTable(false);
+      }}
+    >
       <FullCalendar calendarData={data} />
       {/* <Icon
         icon="heroicons:pencil-square"
@@ -139,9 +144,6 @@ export default function Calendar() {
       {showNewDiary && (
         <DiaryModal closeModal={() => setShowNewDiary(!showNewDiary)}>
           <Diary
-            // newDiary={showNewDiary}
-            // writtenDiary={showWrittenDiary}
-            // diaryDate={diaryDate}
             calendarData={data}
             saveDataMutation={saveDataMutation}
             closeModal={() => setShowNewDiary(!showNewDiary)}
@@ -151,9 +153,6 @@ export default function Calendar() {
       {showWrittenDiary && (
         <DiaryModal closeModal={() => setShowWrittenDiary(!showWrittenDiary)}>
           <Diary
-            // newDiary={showNewDiary}
-            // writtenDiary={showWrittenDiary}
-            // diaryDate={diaryDate}
             calendarData={data}
             saveDataMutation={saveDataMutation}
             saveEditDataMutation={saveEditDataMutation}
