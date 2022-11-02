@@ -52,7 +52,6 @@ const Container = styled.div`
   display: flex;
   background-color: white;
   margin-top: 35px;
-
   > div:first-child {
     text-align: center;
     flex: 0.5;
@@ -64,6 +63,12 @@ const Container = styled.div`
     flex: 1;
   }
 `;
+
+const Pyo = styled.div`
+  height: 300px;
+`;
+
+const DiaryContext = styled.div``;
 
 export default function Diary({
   calendarData,
@@ -109,26 +114,38 @@ export default function Diary({
       id: diaryData.id,
       diary_id: diaryData.diary_id,
       date: diaryData.date,
-      dailyIncomeList: [],
-      dailyExpenseList: [],
+      dailyIncomeList: diaryData.dailyIncomeList
+        ? diaryData.dailyIncomeList
+        : [],
+      dailyExpenseList: diaryData.dailyExpenseList
+        ? diaryData.dailyExpenseList
+        : [],
       diary: {
         text: textValue,
         diary_photo_url: "",
       },
     };
     closeModal();
+    setEdit(!edit);
     saveEditDataMutation.mutate([body, diaryData.id]);
   };
 
+  //date: startDate.format("MM/dd/yy"),
+
   const onSave = (e) => {
     e.preventDefault();
+    console.log(startDate);
     let num = Math.floor(Math.random() * 100);
     const body = {
       id: num,
       diary_id: num,
-      date: specificDate.format("MM/dd/yy"),
-      dailyIncomeList: [],
-      dailyExpenseList: [],
+      date: specificDate,
+      dailyIncomeList: diaryData.dailyIncomeList
+        ? diaryData.dailyIncomeList
+        : [],
+      dailyExpenseList: diaryData.dailyExpenseList
+        ? diaryData.dailyExpenseList
+        : [],
       diary: {
         text: textValue,
         diary_photo_url: "",
@@ -172,198 +189,227 @@ export default function Diary({
     calendarData &&
     calendarData.filter((data) => data.date === diaryDate)[0];
   // console.log(diaryData);
+
   return (
     <div>
-      {showWrittenDiary && !edit && (
+      {(showWrittenDiary || showNewDiary) && (
         <Container>
-          <div>
-            {/* 작성된 화면 */}
-            <div style={{ height: "300px" }}>
-              <div>수입</div>
-              {diaryData.dailyIncomeList.length &&
-                diaryData.dailyIncomeList.map((income) => {
-                  return (
-                    <div>
-                      <span>{income.income_item}</span>
-                      <span>{income.income_amount}</span>
-                    </div>
-                  );
-                })}
-            </div>
-            <div style={{ height: "300px" }}>
-              <div>지출</div>
-              {diaryData.dailyExpenseList.length &&
-                diaryData.dailyExpenseList.map((expense) => {
-                  return (
-                    <div>
-                      <span>{expense.expense_item}</span>
-                      <span>{expense.expense_amount}</span>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-          <div>
-            <DatePicker
-              // selected={new Date(diaryData.date)}
-              // onChange={(date) => setStartDate(date)}
-              selected={new Date(specificDate)}
-              onChange={(date) => setSpecificDate(date)}
-              // 이 onchange 함수에서 렌더링하는 거 더 추가해야함
-            />
-            <div>
-              <img
-                style={{ width: "300px", height: "300px", marginTop: "15px" }}
-                src={diaryData.diary.diary_photo_url}
-                alt="이미지"
+          <Pyo>
+            {showWrittenDiary && !edit && (
+              <>
+                {/* 작성된 화면 */}
+                <div style={{ height: "300px" }}>
+                  <div>수입</div>
+                  {diaryData.dailyIncomeList.length &&
+                    diaryData.dailyIncomeList.map((income) => {
+                      return (
+                        <div>
+                          <span>{income.income_item}</span>
+                          <span>{income.income_amount}</span>
+                        </div>
+                      );
+                    })}
+                </div>
+                <div style={{ height: "300px" }}>
+                  <div>지출</div>
+                  {diaryData.dailyExpenseList.length &&
+                    diaryData.dailyExpenseList.map((expense) => {
+                      return (
+                        <div>
+                          <span>{expense.expense_item}</span>
+                          <span>{expense.expense_amount}</span>
+                        </div>
+                      );
+                    })}
+                </div>
+              </>
+            )}
+            {showWrittenDiary && edit && (
+              <>
+                {/* 작성된 화면 수정 화면 */}
+                <div style={{ height: "300px" }}>
+                  <div>수입</div>
+                  {diaryData.dailyIncomeList.length &&
+                    diaryData.dailyIncomeList.map((income) => {
+                      return (
+                        <div>
+                          <span>{income.income_item}</span>
+                          <span>{income.income_amount}</span>
+                        </div>
+                      );
+                    })}
+                </div>
+                <div style={{ height: "300px" }}>
+                  <div>지출</div>
+                  {diaryData.dailyExpenseList.length &&
+                    diaryData.dailyExpenseList.map((expense) => {
+                      return (
+                        <div>
+                          <span>{expense.expense_item}</span>
+                          <span>{expense.expense_amount}</span>
+                        </div>
+                      );
+                    })}
+                </div>
+              </>
+            )}
+            {showNewDiary && (
+              <>
+                {/* 아직 작성되지 않은 화면 */}
+                <div style={{ height: "300px" }}>
+                  <div>수입</div>
+                  {diaryData.dailyIncomeList &&
+                    diaryData.dailyIncomeList.map((income) => {
+                      return (
+                        <div>
+                          <span>{income.income_item}</span>
+                          <span>{income.income_amount}</span>
+                        </div>
+                      );
+                    })}
+                </div>
+                <div style={{ height: "300px" }}>
+                  <div>지출</div>
+                  {diaryData.dailyExpenseList &&
+                    diaryData.dailyExpenseList.map((expense) => {
+                      return (
+                        <div>
+                          <span>{expense.expense_item}</span>
+                          <span>{expense.expense_amount}</span>
+                        </div>
+                      );
+                    })}
+                </div>
+              </>
+            )}
+          </Pyo>
+          <DiaryContext>
+            {edit ? (
+              specificDate
+            ) : (
+              <DatePicker
+                selected={new Date(specificDate)}
+                onChange={(date) => {
+                  setSpecificDate(date.format("MM/dd/yy"));
+                  setDiaryDate(date.format("MM/dd/yy"));
+                  let checker = 0;
+                  calendarData.map((data) => {
+                    if (date.format("MM/dd/yy") === data.date) {
+                      checker++;
+                    }
+                  });
+                  if (checker == 0) {
+                    setShowWrittenDiary(false);
+                    setShowNewDiary(true);
+                  } else {
+                    setShowWrittenDiary(true);
+                    setShowNewDiary(false);
+                  }
+                }}
               />
-            </div>
-            <div>
-              <div>{diaryData.diary.text}</div>
-            </div>
-            <div>
-              <button onClick={onEdit}>수정하기</button>
-              <button onClick={onDelete}>삭제</button>
-            </div>
-          </div>
-        </Container>
-      )}
+            )}
 
-      {showWrittenDiary && edit && (
-        <Container>
-          <div>
-            {/* 작성된 화면 수정 화면 */}
-            <div style={{ height: "300px" }}>
-              <div>수입</div>
-              {diaryData.dailyIncomeList.length &&
-                diaryData.dailyIncomeList.map((income) => {
-                  return (
-                    <div>
-                      <span>{income.income_item}</span>
-                      <span>{income.income_amount}</span>
-                    </div>
-                  );
-                })}
-            </div>
-            <div style={{ height: "300px" }}>
-              <div>지출</div>
-              {diaryData.dailyExpenseList.length &&
-                diaryData.dailyExpenseList.map((expense) => {
-                  return (
-                    <div>
-                      <span>{expense.expense_item}</span>
-                      <span>{expense.expense_amount}</span>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-          <div>
-            <DatePicker
-              selected={new Date(diaryData.date)}
-              onChange={(date) => setStartDate(date)}
-            />
-            <div>
-              <img
-                style={{ width: "300px", height: "300px", marginTop: "15px" }}
-                src={
-                  profileImage ? profileImage : diaryData.diary.diary_photo_url
-                }
-                alt="이미지"
-                onClick={handleButtonClick}
-                htmlFor="input-file"
-              />
-              <input
-                type="file"
-                id="input-file"
-                accept="image/*"
-                ref={fileInput}
-                style={{ display: "none" }}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <textarea
-                // placeholder="여기에 입력하세요"
-                value={textValue}
-                onChange={(e) => handleSetValue(e)}
-              ></textarea>
-            </div>
-            <div>
-              <button onClick={onImageEdit}>이미지 등록</button>
-              <button onClick={onEditSave}>수정</button>
-            </div>
-          </div>
-        </Container>
-      )}
-
-      {showNewDiary && (
-        <Container>
-          <div>
-            {/* 아직 작성되지 않은 화면 */}
-            <div style={{ width: "300px", height: "300px" }}>
-              <div>수입</div>
-
-              {diaryData.dailyIncomeList &&
-                diaryData.dailyIncomeList.map((income) => {
-                  return (
-                    <div>
-                      <span>{income.income_item}</span>
-                      <span>{income.income_amount}</span>
-                    </div>
-                  );
-                })}
-            </div>
-            <div style={{ height: "300px" }}>
-              <div>지출</div>
-              {diaryData.dailyExpenseList &&
-                diaryData.dailyExpenseList.map((expense) => {
-                  return (
-                    <div>
-                      <span>{expense.expense_item}</span>
-                      <span>{expense.expense_amount}</span>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-          <form style={{ width: "100%" }}>
-            <DatePicker
-              selected={new Date(specificDate)}
-              onChange={(date) => setSpecificDate(date)}
-              // dateFormat="MM/dd/yy"
-              // selected={new Date(diaryData.date)}
-              // onChange={(date) => setStartDate(date)}
-            />
-            <div>
-              <img
-                style={{ width: "300px", height: "300px", marginTop: "15px" }}
-                src={profileImage ? profileImage : defaultUser}
-                alt="이미지"
-                onClick={handleButtonClick}
-                htmlFor="input-file"
-              />
-              <input
-                type="file"
-                id="input-file"
-                accept="image/*"
-                ref={fileInput}
-                style={{ display: "none" }}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <textarea
-                placeholder="여기에 입력하세요"
-                value={textValue}
-                onChange={(e) => handleSetValue(e)}
-              ></textarea>
-            </div>
-            <div>
-              <button onClick={onImageEdit}>이미지 등록</button>
-              <button onClick={onSave}>완료</button>
-            </div>
-          </form>
+            {showWrittenDiary && !edit && (
+              <>
+                <div>
+                  <img
+                    style={{
+                      width: "300px",
+                      height: "300px",
+                      marginTop: "15px",
+                    }}
+                    src={diaryData.diary.diary_photo_url}
+                    alt="이미지"
+                  />
+                </div>
+                <div>
+                  <div>{diaryData.diary.text}</div>
+                </div>
+                <div>
+                  <button onClick={onEdit}>수정하기</button>
+                  <button onClick={onDelete}>삭제</button>
+                </div>
+              </>
+            )}
+            {showWrittenDiary && edit && (
+              <>
+                <div>
+                  <img
+                    style={{
+                      width: "300px",
+                      height: "300px",
+                      marginTop: "15px",
+                    }}
+                    src={
+                      profileImage
+                        ? profileImage
+                        : diaryData.diary.diary_photo_url
+                    }
+                    alt="이미지"
+                    onClick={handleButtonClick}
+                    htmlFor="input-file"
+                  />
+                  <input
+                    type="file"
+                    id="input-file"
+                    accept="image/*"
+                    ref={fileInput}
+                    style={{ display: "none" }}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <textarea
+                    // placeholder="여기에 입력하세요"
+                    value={textValue}
+                    onChange={(e) => handleSetValue(e)}
+                  ></textarea>
+                </div>
+                <div>
+                  <button onClick={onImageEdit}>이미지 등록</button>
+                  <button onClick={onEditSave}>수정</button>
+                </div>
+              </>
+            )}
+            {showNewDiary && (
+              // <form style={{ width: "100%" }}>
+              <>
+                <div>
+                  <img
+                    style={{
+                      width: "300px",
+                      height: "300px",
+                      marginTop: "15px",
+                    }}
+                    src={profileImage ? profileImage : defaultUser}
+                    alt="이미지"
+                    onClick={handleButtonClick}
+                    htmlFor="input-file"
+                  />
+                  <input
+                    type="file"
+                    id="input-file"
+                    accept="image/*"
+                    ref={fileInput}
+                    style={{ display: "none" }}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <textarea
+                    placeholder="여기에 입력하세요"
+                    value={textValue}
+                    onChange={(e) => handleSetValue(e)}
+                  ></textarea>
+                </div>
+                <div>
+                  <button onClick={onImageEdit}>이미지 등록</button>
+                  <button onClick={onSave}>완료</button>
+                </div>
+              </>
+              // </form>
+            )}
+          </DiaryContext>
         </Container>
       )}
     </div>

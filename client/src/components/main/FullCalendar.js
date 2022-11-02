@@ -3,8 +3,40 @@ import { Icon } from "@iconify/react";
 import { format, addMonths, subMonths } from "date-fns";
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek } from "date-fns";
 import { isSameMonth, isSameDay, addDays, parse } from "date-fns";
+import styled from "styled-components";
 
 import { calenderStore } from "../../store/store.js";
+
+const InstanceTable = styled.div`
+  margin-top: 20px;
+  margin-left: 60px;
+  width: 100px;
+  height: 100px;
+  border: 1px solid black;
+  background-color: white;
+  position: absolute;
+  overflow: scroll;
+  cursor: default;
+`;
+
+const TableWrapper = styled.div`
+  position: relative;
+`;
+
+const CloseBtn = styled.div`
+  position: sticky;
+  top: 0;
+  margin-left: 5px;
+  height: 30px;
+  font-size: 25px;
+  cursor: pointer;
+`;
+
+// const IconWrapper = styled.div`
+//   weight: 100px;
+//   height: 20px;
+//   background-color: yellow;
+// `;
 
 const RenderHeader = () => {
   const { currentMonth, prevMonth, nextMonth } = calenderStore();
@@ -44,6 +76,7 @@ const RenderCells = ({ diaryData }) => {
   const {
     showWrittenDiary,
     setShowWrittenDiary,
+    diaryDate,
     setDiaryDate,
     setDetailDate,
     selectedDate,
@@ -53,12 +86,16 @@ const RenderCells = ({ diaryData }) => {
     showNewDiary,
     setShowNewDiary,
     setSpecificDate,
+    showInstanceTable,
+    setShowInstanceTable,
   } = calenderStore();
 
   const onDateClick = (day) => {
     console.log(1, day);
     setSelectedDate(day);
   };
+
+  const tempDiaryData = diaryData.filter((data) => data.date === diaryDate)[0];
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -92,6 +129,7 @@ const RenderCells = ({ diaryData }) => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
+            cursor: "pointer",
           }}
           id={formattedDataForDiary}
           onClick={(e) => {
@@ -99,19 +137,14 @@ const RenderCells = ({ diaryData }) => {
             let check = 0;
             {
               diaryData.map((data) => {
-                // console.log(day.format("MM/dd/yy"), data.date);
                 if (formattedDataForDiary === data.date) {
                   setShowWrittenDiary(!showWrittenDiary);
                   setDiaryDate(e.target.id);
                   check++;
-                  console.log(check);
-                  console.log(e.target.id);
                 }
               });
             }
             if (check == 0) {
-              console.log(check);
-              console.log(e.target.id);
               setDiaryDate(e.target.id);
               setShowNewDiary(!showNewDiary);
             }
@@ -134,9 +167,9 @@ const RenderCells = ({ diaryData }) => {
               display: "flex",
               justifyContent: "space-between",
             }}
+            id={formattedDataForDiary}
           >
             {diaryData.map((data) => {
-              // console.log(day.format("MM/dd/yy"), data.date);
               if (formattedDataForDiary === data.date) {
                 return (
                   <Icon
@@ -150,22 +183,67 @@ const RenderCells = ({ diaryData }) => {
               }
             })}
             {diaryData.map((data) => {
-              // console.log(day.format("MM/dd/yy"), data.date);
               if (
                 formattedDataForDiary === data.date &&
                 (data.dailyExpenseList.length || data.dailyIncomeList.length)
               ) {
-                // console.log(data.dailyExpenseList);
                 return (
-                  <Icon
-                    icon="cil:magnifying-glass"
-                    id={formattedDataForDiary}
-                    key={data.date}
-                    onClick={(e) => {
-                      // onDiaryClick(!showWrittenDiary);
-                      setDetailDate(e.target.id);
-                    }}
-                  ></Icon>
+                  <>
+                    <Icon
+                      icon="cil:magnifying-glass"
+                      id={formattedDataForDiary}
+                      key={data.date}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDetailDate(e.target.id);
+                        setShowInstanceTable(!showInstanceTable);
+                        setDiaryDate(formattedDataForDiary);
+                        console.log(showInstanceTable);
+                      }}
+                    ></Icon>
+                    {showInstanceTable && formattedDataForDiary === diaryDate && (
+                      <InstanceTable
+                        // key={data.date}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        <TableWrapper>
+                          <CloseBtn
+                            onClick={(e) => {
+                              setShowInstanceTable(!showInstanceTable);
+                            }}
+                          >
+                            &#215;
+                          </CloseBtn>
+                          <h3>수입</h3>
+                          <div>
+                            {tempDiaryData.dailyIncomeList.length &&
+                              tempDiaryData.dailyIncomeList.map((income) => {
+                                return (
+                                  <div>
+                                    <span>{income.income_item}</span>
+                                    <span>{income.income_amount}</span>
+                                  </div>
+                                );
+                              })}
+                          </div>
+                          <h3>지출</h3>
+                          <div>
+                            {tempDiaryData.dailyExpenseList.length &&
+                              tempDiaryData.dailyExpenseList.map((expense) => {
+                                return (
+                                  <div>
+                                    <span>{expense.expense_item}</span>
+                                    <span>{expense.expense_amount}</span>
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        </TableWrapper>
+                      </InstanceTable>
+                    )}
+                  </>
                 );
               } else {
                 return <div style={{ display: "none" }} key={data.date}></div>;

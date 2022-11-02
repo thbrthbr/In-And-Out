@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { calenderStore } from "../../store/store.js";
 
 const Modal = styled.div`
   position: fixed;
@@ -28,9 +29,8 @@ const ModalCloseBtn = styled.div`
   top: 15px;
   right: 15px;
   border: none;
-  color: rgba(0, 0, 0, 0.7);
-  background-color: transparent;
-  font-size: 20px;
+  color: white;
+  font-size: 50px;
 
   &:hover {
     cursor: pointer;
@@ -38,14 +38,19 @@ const ModalCloseBtn = styled.div`
 `;
 
 function DiaryModal(props) {
+  const { edit, setEdit } = calenderStore();
+
   function closeModal() {
+    if (edit === true) {
+      setEdit(!edit);
+    }
     props.closeModal();
   }
 
   return (
     <Modal onClick={closeModal}>
       <ModalBody onClick={(e) => e.stopPropagation()}>
-        <ModalCloseBtn onClick={closeModal}>✖</ModalCloseBtn>
+        <ModalCloseBtn onClick={closeModal}>&#215;</ModalCloseBtn>
         {props.children}
       </ModalBody>
     </Modal>

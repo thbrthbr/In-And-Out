@@ -93,6 +93,9 @@ const calenderStore = create((set, get) => ({
 
   specificDate: new Date(),
   setSpecificDate: (input) => set({ specificDate: input }),
+
+  showInstanceTable: false,
+  setShowInstanceTable: (input) => set({ showInstanceTable: input }),
 }));
 
 export { useStore, useStore2, useStore3, loginStore, calenderStore };
