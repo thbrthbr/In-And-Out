@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { identifyPhoneSchema } from "../../schema/form_validation";
@@ -18,7 +18,7 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_URL = "http://localhost:5000/password";
+const API_URL = "/api/password/email/phone";
 
 export default function IdentifyPhone() {
   const {
@@ -29,6 +29,7 @@ export default function IdentifyPhone() {
     resolver: yupResolver(identifyPhoneSchema),
   });
 
+  const { state } = useLocation();
   const onSubmit = (data) => {
     // console.log(data);
     phoneDataMutation.mutate(data.phone);
@@ -47,6 +48,9 @@ export default function IdentifyPhone() {
     {
       onSuccess: (e) => {
         // navigate("/identify_phone");
+        toast.success("이메일로 인증링크가 전송 되었습니다!", {
+          position: toast.POSITION.TOP_CENTER,
+        });
       },
       onError: (error) => {
         toast.warn(
@@ -84,6 +88,17 @@ export default function IdentifyPhone() {
       >
         <FormControl component="fieldset" variant="standard">
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                type="email"
+                id="email"
+                name="email"
+                label="이메일(아이디)"
+                value={state.email}
+                inputProps={{ readOnly: true }}
+              />
+            </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth

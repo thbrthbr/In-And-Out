@@ -54,7 +54,7 @@ const loginStore = create(
       setBirthdate: (input) => set({ birthdate: input }),
       residence: "",
       setResidence: (input) => set({ residence: input }),
-      gender: "",
+      gender: "female",
       setGender: (input) => set({ gender: input }),
     }),
     {

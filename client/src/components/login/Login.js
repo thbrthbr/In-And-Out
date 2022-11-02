@@ -129,7 +129,7 @@ export default function Login() {
             <Box
               component="form"
               noValidate
-              onSubmit={() => handleSubmit(onSubmit)}
+              onSubmit={handleSubmit(onSubmit)}
               sx={{
                 mt: 3,
               }}

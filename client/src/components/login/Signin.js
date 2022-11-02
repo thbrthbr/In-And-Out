@@ -66,8 +66,8 @@ export default function Signin() {
     setOpenPostcode(false);
   };
 
-  async function post() {
-    const response = await fetch("http://localhost:4000/users", {
+  async function sendUserDataToServer() {
+    const response = await fetch("/api/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -99,8 +99,8 @@ export default function Signin() {
   }
 
   const onSubmit = (data) => {
-    post();
-    console.log(id);
+    sendUserDataToServer();
+    // console.log(id);
   };
 
   const onEmailHandler = (event) => {
@@ -152,6 +152,7 @@ export default function Signin() {
             <Grid item xs={7}>
               <TextField
                 fullWidth
+                required
                 type="text"
                 id="email"
                 name="email"
@@ -191,6 +192,7 @@ export default function Signin() {
             <Grid item xs={7}>
               <TextField
                 fullWidth
+                required
                 type="text"
                 id="name"
                 name="name"
@@ -204,6 +206,7 @@ export default function Signin() {
             <Grid item xs={7}>
               <TextField
                 fullWidth
+                required
                 type="text"
                 id="phone"
                 name="phone"
@@ -217,6 +220,7 @@ export default function Signin() {
             <Grid item xs={7}>
               <TextField
                 fullWidth
+                required
                 type="text"
                 id="birthday"
                 name="birthday"
@@ -230,6 +234,7 @@ export default function Signin() {
             <Grid item xs={7}>
               <TextField
                 fullWidth
+                required
                 type="text"
                 id="residence"
                 name="residence"
@@ -240,6 +245,7 @@ export default function Signin() {
                 {...register("residence", {
                   onChange: (e) => {
                     setAddress(e.target.value);
+                    onResidenceHandler(e);
                   },
                 })}
                 helperText={errors.residence?.message}
@@ -264,31 +270,34 @@ export default function Signin() {
                   value="female"
                   control={<Radio />}
                   label="여자"
-                  defaultChecked={gender === "female" ? true : false}
+                  required
+                  checked={gender === "female" ? true : false}
                   {...register("gender", { onChange: onGenderHandler })}
                   error={!!errors.gender}
                   helperText={errors.gender?.message}
                 />
                 <FormControlLabel
-                  value="남자"
+                  value="male"
                   control={<Radio />}
                   label="남자"
-                  defaultChecked={gender === "male" ? true : false}
+                  checked={gender === "male" ? true : false}
                   {...register("gender", { onChange: onGenderHandler })}
                   error={!!errors.gender}
                   helperText={errors.gender?.message}
                 />
               </RadioGroup>
             </Grid>
+            <Grid item xs={7}>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ mt: 3, mb: 2, width: "100%" }}
+                size="large"
+              >
+                제출
+              </Button>
+            </Grid>
           </Grid>
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ mt: 3, mb: 2, ml: 45, width: "58%" }}
-            size="large"
-          >
-            제출
-          </Button>
         </FormControl>
       </Box>
     </Box>

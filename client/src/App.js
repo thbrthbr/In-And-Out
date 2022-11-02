@@ -79,9 +79,9 @@ function App() {
               <Route
                 path="/identify_phone"
                 element={
-                  <PrivateRoute>
+                  <PublicRoute>
                     <IdentifyPhone />
-                  </PrivateRoute>
+                  </PublicRoute>
                 }
               ></Route>
               <Route

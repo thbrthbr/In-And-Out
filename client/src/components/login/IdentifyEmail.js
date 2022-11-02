@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material/";
 
-const API_URL = "http://localhost:5000/password";
+const API_URL = "/api/password/email";
 
 export default function IdentifyEmail() {
   const {
@@ -39,17 +39,17 @@ export default function IdentifyEmail() {
 
   const emailDataMutation = useMutation(
     async (email) => {
-      const data = { email };
+      const data = { email: email };
 
       const res = await axios.post(API_URL, data, {
         headers: { "Content-Type": "application/json" },
       });
-
+      console.log(res);
       return res.data;
     },
     {
       onSuccess: (e) => {
-        navigate("/identify_phone");
+        navigate("/identify_phone", { state: { email: e } });
       },
       onError: (error) => {
         toast.warn("서버와 연결이 문제가 있거나 등록되지 않은 이메일 입니다!", {
