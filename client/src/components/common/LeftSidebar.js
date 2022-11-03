@@ -16,7 +16,7 @@ export function LeftSidebar({ width, sideBarMenuItems }) {
         },
       }}
     >
-      <List>
+      <List style={{ margin: 0, padding: 0 }}>
         {sideBarMenuItems.map((item) => (
           <ListItem
             button

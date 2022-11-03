@@ -6,7 +6,24 @@ import { profileChangeSchema } from "../../schema/form_validation";
 
 import styled from "styled-components";
 import defaultUser from "../../img/default-user.jpg";
-import { useStore, useStore2, loginStore } from "../../store/store.js";
+import { useStore, loginStore } from "../../store/store.js";
+import DaumPostcode from "react-daum-postcode";
+
+import {
+  Button,
+  TextField,
+  FormControl,
+  Grid,
+  Box,
+  Typography,
+} from "@mui/material/";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ProfileChange() {
   const {
@@ -34,6 +51,9 @@ export default function ProfileChange() {
   } = loginStore();
 
   const fileInput = useRef();
+  const [openPostcode, setOpenPostcode] = useState(false);
+  const [address, setAddress] = useState("");
+  const queryClient = useQueryClient();
 
   const handleButtonClick = (e) => {
     fileInput.current.click();
@@ -51,6 +71,23 @@ export default function ProfileChange() {
     };
   };
 
+  const onNameHandler = (event) => {
+    setNickname(event.currentTarget.value);
+  };
+
+  const onPhoneNumberHandler = (event) => {
+    setPhoneNumber(event.currentTarget.value);
+  };
+  const onBirthdateHandler = (event) => {
+    setBirthdate(event.currentTarget.value);
+  };
+  const onResidenceHandler = (event) => {
+    setResidence(event.currentTarget.value);
+  };
+  const onGenderHandler = (event) => {
+    setGender(event.currentTarget.value);
+  };
+
   async function ImagePut(e) {
     const response = await fetch(`http://localhost:4000/users/${id}`, {
       method: "PUT",
@@ -66,7 +103,7 @@ export default function ProfileChange() {
       }),
     });
 
-    console.log(response);
+    // console.log(response);
 
     if (response.ok) {
       alert("수정완료");
@@ -76,6 +113,7 @@ export default function ProfileChange() {
   }
 
   async function put(e) {
+    console.log(e);
     const response = await fetch(`http://localhost:4000/users/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -97,7 +135,7 @@ export default function ProfileChange() {
       setPhoneNumber(e["phone"]);
       setBirthdate(e["birthday"]);
       setResidence(e["residence"]);
-      setGender(e["gender"]);
+      setGender(e["gender"] === "남" ? "male" : "female");
       alert("수정완료");
     } else {
       alert("오류");
@@ -105,12 +143,97 @@ export default function ProfileChange() {
   }
 
   const onSubmit = async (e) => {
-    put(e);
+    // put(e);
+    e.address = e.residence;
+    e.birth = e.birthday;
+    e.nickname = e.name;
+    e.memberPhotoUrl = "";
+    delete e.email;
+    delete e.residence;
+    delete e.birthday;
+    delete e.name;
+    console.log("d", e);
+    saveDataMutation.mutate(e);
   };
 
+  const handlePostButtonClick = () => {
+    setOpenPostcode(!openPostcode);
+  };
+
+  const handleAddressSelect = (data) => {
+    // console.log(data.address);
+    setAddress(data.address);
+    setOpenPostcode(false);
+  };
+
+  const getUserData = async () => {
+    try {
+      const res = await axios.get("/api/member/info");
+      // console.log(res.data);
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const { data, isLoading } = useQuery(["getProfileData"], getUserData, {
+    onSuccess: (data) => {
+      setNickname(data["nickName"]);
+      setPhoneNumber(data["phone"]);
+      setBirthdate(data["birth"]);
+      setResidence(data["address"]);
+      setAddress(data["address"]);
+      setGender(data["gender"] === "남" ? "male" : "female");
+      setProfileImage(data["s3ImageUrl"]);
+    },
+  });
+
+  const saveDataMutation = useMutation(
+    async (userData) => {
+      // console.log("data", userData);
+      try {
+        const res = await axios.put("/api/member/info", userData, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      onSuccess: () => {
+        toast.success("프로필 변경이 성공적으로 처리됐습니다!", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        queryClient.invalidateQueries("getProfileData");
+      },
+      onError: () => {
+        toast.warn("프로필 변경이 성공적으로 처리되지 않았습니다.", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      },
+    }
+  );
+
   return (
-    <>
-      <BigPage>
+    <Box
+      sx={{
+        marginTop: 8,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <ToastContainer />
+      <Typography component="h1" variant="h5">
+        프로필 변경
+      </Typography>
+      <Box
+        component="form"
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{ mt: 3, ml: 5, display: "flex", justifyContent: "center" }}
+      >
         <Photo>
           <img
             alt="프로필사진"
@@ -129,142 +252,131 @@ export default function ProfileChange() {
             onChange={handleChange}
           />
         </Photo>
-        <Page>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <TextInputs>
-              <Categories>이메일</Categories>
-              <Inputs
-                spellCheck={false}
+        <FormControl component="fieldset" variant="standard">
+          <Grid container spacing={2}>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="email"
+                name="email"
+                label="이메일"
                 defaultValue={id}
-                readOnly
+                inputProps={{ readOnly: true }}
+                error={!!errors.email}
+                {...register("email")}
+                helperText={errors.email?.message}
               />
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>닉네임</Categories>
-              <Inputs
-                spellCheck={false}
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="name"
+                name="name"
+                label="닉네임"
+                error={!!errors.name}
                 defaultValue={nickname}
-                {...register("name")}
+                {...register("name", { onChange: onNameHandler })}
+                helperText={errors.name?.message}
               />
-              <Alert role="alert">{errors.name?.message}</Alert>
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>전화번호</Categories>
-              <Inputs
-                spellCheck={false}
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="phone"
+                name="phone"
+                label="전화번호"
+                error={!!errors.phone}
                 defaultValue={phoneNumber}
-                {...register("phone")}
+                {...register("phone", { onChange: onPhoneNumberHandler })}
+                helperText={errors.phone?.message}
               />
-              <Alert role="alert">{errors.phone?.message}</Alert>
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>생년월일</Categories>
-              <Inputs
-                spellCheck={false}
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="birthday"
+                name="birthday"
+                label="생년월일"
+                error={!!errors.birthday}
                 defaultValue={birthdate}
-                {...register("birthday")}
+                {...register("birthday", { onChange: onBirthdateHandler })}
+                helperText={errors.birthday?.message}
               />
-              <Alert role="alert">{errors.birthday?.message}</Alert>
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>거주지</Categories>
-              <Inputs
-                spellCheck={false}
+            </Grid>
+            <Grid item xs={7}>
+              <TextField
+                fullWidth
                 type="text"
+                id="residence"
+                name="residence"
+                label="거주지"
+                error={!!errors.residence}
+                value={address}
                 defaultValue={residence}
-                {...register("residence")}
+                {...register("residence", {
+                  onChange: (e) => {
+                    setAddress(e.target.value);
+                    onResidenceHandler(e);
+                  },
+                })}
+                helperText={errors.residence?.message}
               />
-              <Alert role="alert">{errors.residence?.message}</Alert>
-            </TextInputs>
-
-            <TextInputs>
-              <Categories>성별</Categories>
-              <div
-                style={{
-                  width: "300px",
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
+              <Button onClick={handlePostButtonClick}>주소 검색</Button>
+              {openPostcode && (
+                <DaumPostcode
+                  style={{ height: "130px" }}
+                  onComplete={handleAddressSelect} // 값을 선택할 경우 실행되는 이벤트
+                  autoClose={false} // 값을 선택할 경우 사용되는 DOM을 제거하여 자동 닫힘 설정
+                  defaultQuery="판교역로 235"
+                />
+              )}
+            </Grid>
+            <Grid item xs={7}>
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
               >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <div
-                    style={{
-                      marginRight: "10px",
-                    }}
-                  >
-                    여자
-                  </div>
-                  <Radio
-                    type="radio"
-                    name="gender"
-                    value="female"
-                    defaultChecked={gender === "female" ? true : false}
-                    {...register("gender")}
-                  />
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <div
-                    style={{
-                      marginRight: "10px",
-                    }}
-                  >
-                    남자
-                  </div>
-                  <Radio
-                    type="radio"
-                    name="gender"
-                    value="male"
-                    defaultChecked={gender === "male" ? true : false}
-                    {...register("gender")}
-                  />
-                </div>
-              </div>
-              <Alert role="alert">{errors.gender?.message}</Alert>
-            </TextInputs>
-
-            <ButtonInputs>
-              <button
-                style={{
-                  fontSize: "20px",
-                  width: "300px",
-                  height: "30px",
-                  cursor: "pointer",
-                }}
-                type="submit"
-              >
-                제출
-              </button>
-            </ButtonInputs>
-          </form>
-        </Page>
-      </BigPage>
-    </>
+                <FormControlLabel
+                  value="female"
+                  control={<Radio />}
+                  label="여자"
+                  defaultChecked={gender === "female" ? true : false}
+                  checked={gender === "female" ? true : false}
+                  {...register("gender", { onChange: onGenderHandler })}
+                  error={!!errors.gender}
+                  helperText={errors.gender?.message}
+                />
+                <FormControlLabel
+                  value="남자"
+                  control={<Radio />}
+                  label="남자"
+                  defaultChecked={gender === "male" ? true : false}
+                  checked={gender === "male" ? true : false}
+                  {...register("gender", { onChange: onGenderHandler })}
+                  error={!!errors.gender}
+                  helperText={errors.gender?.message}
+                />
+              </RadioGroup>
+            </Grid>
+          </Grid>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ mt: 3, mb: 2, width: "58%" }}
+            size="large"
+          >
+            제출
+          </Button>
+        </FormControl>
+      </Box>
+    </Box>
   );
 }
-
-const Radio = styled.input`
-  width: 30px;
-  height: 30px;
-`;
 
 const File = styled.button`
   font-size: 15px;
@@ -281,53 +393,8 @@ const File = styled.button`
   }
 `;
 
-const Categories = styled.h4`
-  margin: 0px;
-`;
-
-const Inputs = styled.input`
-  margin-top: 5px;
-  outline: none;
-  width: 296px;
-  padding: 0;
-  font-size: 20px;
-`;
-
-const Alert = styled.span`
-  font-size: 15px;
-`;
-
 const Photo = styled.div`
   margin: 120px;
   display: flex;
   flex-direction: column;
-`;
-
-const BigPage = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
-
-const Page = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const TextInputs = styled.div`
-  width: 500px;
-  height: 50px;
-  display: flex;
-  flex-direction: column;
-  font-size: 20px;
-  // align-items: center;
-  justify-content: center;
-  margin-top: 30px;
-`;
-
-const ButtonInputs = styled.div`
-  width: 500px;
-  height: 100px;
-  display: flex;
-  align-items: center;
 `;

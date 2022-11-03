@@ -1,4 +1,4 @@
-const titles = ["식비", "교통비", "전화비"];
+const titles = ["", "교통비", "전화비", "식비"];
 
 export default function dropDownEditor({ row, onRowChange }) {
   return (

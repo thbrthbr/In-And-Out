@@ -43,6 +43,13 @@ export default function Header() {
         navigate("/profile_change");
         break;
 
+      case "Logout":
+        setLogState(false);
+        setTimeout(() => {
+          navigate("/");
+        }, 0);
+        break;
+
       default:
         break;
     }

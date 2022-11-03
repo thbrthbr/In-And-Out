@@ -27,6 +27,9 @@ import Screen from "./components/common/Screen";
 
 import { QueryClientProvider, QueryClient } from "react-query";
 
+import PublicRoute from "./components/route/publicRoute";
+import PrivateRoute from "./components/route/privateRoute";
+
 // import { createStore } from "redux";
 
 // import { Provider, useSelector, useDispatch, connect } from "react-redux";
@@ -39,7 +42,6 @@ import { QueryClientProvider, QueryClient } from "react-query";
 
 //   return newState;
 // }
-
 // const store = createStore(reducer);
 const queryClient = new QueryClient();
 
@@ -50,19 +52,96 @@ function App() {
         <BrowserRouter basename={process.env.PUBLIC_URL}>
           <Routes>
             <Route path="/" element={<Layout />}>
-              <Route index element={<Login />}></Route>
-              <Route path="/signin" element={<Signin />}></Route>
-              <Route path="/identify_email" element={<IdentifyEmail />}></Route>
-              <Route path="/identify_phone" element={<IdentifyPhone />}></Route>
-              <Route path="/initiate" element={<RecoverInitiate />}></Route>
-              <Route path="/calendar" element={<Calendar />}></Route>
-              <Route path="/report" element={<Report />}></Route>
+              <Route
+                index
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
+              ></Route>
+              <Route
+                path="/signin"
+                element={
+                  <PublicRoute>
+                    <Signin />
+                  </PublicRoute>
+                }
+              ></Route>
+              <Route
+                path="/identify_email"
+                element={
+                  <PublicRoute>
+                    <IdentifyEmail />
+                  </PublicRoute>
+                }
+              ></Route>
+              <Route
+                path="/identify_phone"
+                element={
+                  <PublicRoute>
+                    <IdentifyPhone />
+                  </PublicRoute>
+                }
+              ></Route>
+              <Route
+                path="/initiate"
+                element={
+                  <PublicRoute>
+                    <RecoverInitiate />
+                  </PublicRoute>
+                }
+              ></Route>
+              <Route
+                path="/calendar"
+                element={
+                  <PrivateRoute>
+                    <Calendar />
+                  </PrivateRoute>
+                }
+              ></Route>
+              <Route
+                path="/report"
+                element={
+                  <PrivateRoute>
+                    <Report />
+                  </PrivateRoute>
+                }
+              ></Route>
               {/* <Route path="/report/yearly" element={<Report />}></Route> */}
-              <Route path="/inout" element={<Inout />}></Route>
+              <Route
+                path="/inout"
+                element={
+                  <PrivateRoute>
+                    <Inout />
+                  </PrivateRoute>
+                }
+              ></Route>
               {/* <Route path="/inout/expense" element={<Inout />}></Route> */}
-              <Route path="/profile_change" element={<Screen />}></Route>
-              <Route path="/password_change" element={<Screen />}></Route>
-              <Route path="/signout" element={<Screen />}></Route>
+              <Route
+                path="/profile_change"
+                element={
+                  <PrivateRoute>
+                    <Screen />
+                  </PrivateRoute>
+                }
+              ></Route>
+              <Route
+                path="/password_change"
+                element={
+                  <PrivateRoute>
+                    <Screen />
+                  </PrivateRoute>
+                }
+              ></Route>
+              <Route
+                path="/signout"
+                element={
+                  <PrivateRoute>
+                    <Screen />
+                  </PrivateRoute>
+                }
+              ></Route>
               <Route path="*" element={<Error />}></Route>
             </Route>
           </Routes>

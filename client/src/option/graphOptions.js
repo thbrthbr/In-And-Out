@@ -42,7 +42,7 @@ const barOption = {
   // In this case, we are setting the border of each horizontal bar to be 2px wide
   elements: {
     bar: {
-      borderWidth: 2,
+      borderWidth: 0,
     },
   },
   plugins: {
@@ -61,6 +61,8 @@ const barOption = {
           return chart.data.labels.map((label, index) => ({
             text: label,
             fillStyle: chart.data.datasets[0].backgroundColor[index],
+            lineWidth: 0,
+            borderColor: "#ffffff",
             hidden: false,
           }));
         },
@@ -81,4 +83,65 @@ const lineOption = {
   },
 };
 
-export { doughnutOption, barOption, lineOption };
+const doughnutConfig = {
+  type: "doughnut",
+  data: {
+    datasets: [
+      {
+        data: [],
+        backgroundColor: [
+          "rgb(255, 99, 132)",
+          "rgb(255, 159, 64)",
+          "rgb(255, 205, 86)",
+          "rgb(75, 192, 192)",
+          "rgb(54, 162, 235)",
+        ],
+      },
+    ],
+    labels: [],
+  },
+  options: doughnutOption,
+};
+
+const barConfig = {
+  type: "bar",
+  data: {
+    labels: [],
+    datasets: [
+      {
+        axis: "y",
+        label: "Dataset",
+        data: [],
+        fill: false,
+        backgroundColor: [
+          "rgb(255, 99, 132)",
+          "rgb(255, 159, 64)",
+          "rgb(255, 205, 86)",
+          "rgb(75, 192, 192)",
+          "rgb(54, 162, 235)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: barOption,
+};
+
+const lineConfig = {
+  type: "line",
+  data: {
+    labels: [],
+    datasets: [
+      {
+        label: "Dataset",
+        data: [],
+        fill: false,
+        borderColor: "rgb(75, 192, 192)",
+        tension: 0.1,
+      },
+    ],
+  },
+  options: lineOption,
+};
+
+export { doughnutConfig, barConfig, lineConfig };
