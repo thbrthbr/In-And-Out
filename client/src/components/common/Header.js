@@ -14,6 +14,7 @@ import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
+import axios from "axios";
 
 const settings = ["Setting", "Logout"];
 
@@ -35,6 +36,18 @@ export default function Header() {
     setAnchorElUser(event.currentTarget);
   };
 
+  const requestLogout = async () => {
+    try {
+      const res = await axios.post("/api/signout");
+      setLogState(false);
+      setTimeout(() => {
+        navigate("/");
+      }, 0);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleCloseUserMenu = (e) => {
     console.log(e.target.innerText);
     setAnchorElUser(null);
@@ -44,10 +57,8 @@ export default function Header() {
         break;
 
       case "Logout":
-        setLogState(false);
-        setTimeout(() => {
-          navigate("/");
-        }, 0);
+        requestLogout();
+
         break;
 
       default:
