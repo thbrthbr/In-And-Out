@@ -19,7 +19,7 @@ const Container = styled.div`
 
 const settingUrl = ["/profile_change", "/password_change", "/signout"];
 
-let width = "240px";
+let sideBarWidth = "240px";
 
 export default function Layout() {
   const { logState } = useStore2();
@@ -50,11 +50,14 @@ export default function Layout() {
       <Header />
       <Container>
         {logState && !settingUrl.includes(loc.pathname) && (
-          <LeftSidebar width={width} sideBarMenuItems={mainSideBarMenuItems} />
+          <LeftSidebar
+            width={sideBarWidth}
+            sideBarMenuItems={mainSideBarMenuItems}
+          />
         )}
         {logState && settingUrl.includes(loc.pathname) && (
           <LeftSidebar
-            width={width}
+            width={sideBarWidth}
             sideBarMenuItems={settingSideBarMenuItems}
           />
         )}

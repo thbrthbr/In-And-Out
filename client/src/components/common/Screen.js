@@ -7,7 +7,7 @@ import Signout from "../setting/Signout";
 export default function Screen() {
   const loc = useLocation();
   return (
-    <ScreenDefault>
+    <ScreenDefault style={{ margin: 0, padding: 0 }}>
       {loc.pathname === "/profile_change" && <ProfileChange />}
       {loc.pathname === "/password_change" && <PasswordChange />}
       {loc.pathname === "/signout" && <Signout />}
@@ -22,4 +22,5 @@ const ScreenDefault = styled.div`
 
   background-color: #d9d9d9;
   font-size: 100px;
+  position: relative;
 `;

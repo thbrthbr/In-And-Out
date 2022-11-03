@@ -9,6 +9,10 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 
 import TabPanel from "./TabPanel";
 import RadioButton from "./RadioButton";
@@ -30,9 +34,9 @@ import { useQuery } from "react-query";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
 import {
-  doughnutOption,
-  barOption,
-  lineOption,
+  doughnutConfig,
+  barConfig,
+  lineConfig,
 } from "../../option/graphOptions";
 
 import {
@@ -86,7 +90,7 @@ const costOptions = [
 ];
 
 const columns = [
-  { key: "date", name: "기간" },
+  { key: "category", name: "내용", width: 200 },
   { key: "jan", name: "1월" },
   { key: "feb", name: "2월" },
   { key: "mar", name: "3월" },
@@ -102,67 +106,6 @@ const columns = [
   { key: "sum", name: "합계" },
 ];
 
-const doughnutConfig = {
-  type: "doughnut",
-  data: {
-    datasets: [
-      {
-        data: [],
-        backgroundColor: [
-          "rgb(255, 99, 132)",
-          "rgb(255, 159, 64)",
-          "rgb(255, 205, 86)",
-          "rgb(75, 192, 192)",
-          "rgb(54, 162, 235)",
-        ],
-      },
-    ],
-    labels: [],
-  },
-  options: doughnutOption,
-};
-
-const barConfig = {
-  type: "bar",
-  data: {
-    labels: [],
-    datasets: [
-      {
-        axis: "y",
-        label: "Dataset",
-        data: [],
-        fill: false,
-        backgroundColor: [
-          "rgb(255, 99, 132)",
-          "rgb(255, 159, 64)",
-          "rgb(255, 205, 86)",
-          "rgb(75, 192, 192)",
-          "rgb(54, 162, 235)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  },
-  options: barOption,
-};
-
-const lineConfig = {
-  type: "line",
-  data: {
-    labels: [],
-    datasets: [
-      {
-        label: "My First Dataset",
-        data: [],
-        fill: false,
-        borderColor: "rgb(75, 192, 192)",
-        tension: 0.1,
-      },
-    ],
-  },
-  options: lineOption,
-};
-
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
@@ -177,7 +120,8 @@ const TabSelected = Object.freeze({
 
 let currentMonth = new Date();
 let currentYear = new Date();
-const rows = [];
+
+let categoryRows = [];
 
 export default function Report() {
   const canvasRef = useRef(null);
@@ -186,6 +130,22 @@ export default function Report() {
   const [yearlyOption, setYearlyOption] = useState("chart");
   const [costOption, setCostOption] = useState("income");
   const [tabValue, setTabValue] = useState(0);
+
+  const [rows, setRows] = useState([]);
+  const [category, setCategory] = useState("");
+
+  const handleCategoryChange = (event) => {
+    let data = [];
+    setCategory(event.target.value);
+    categoryRows.forEach((row) => {
+      if (row.category === event.target.value) {
+        data = Object.entries(row)
+          .slice(1, 13)
+          .map((entry) => entry[1]);
+        lineConfig.data.datasets[0].data = data;
+      }
+    });
+  };
 
   const setParamAndRefetch = () => {
     setParam();
@@ -235,23 +195,30 @@ export default function Report() {
   const getMonthlyData = (fetchedData) => {
     const newData = [];
     const newLabel = [];
+
     fetchedData.forEach((element, idx) => {
-      newData[idx] = element.category_ratio * 100;
-      newLabel[idx] = `${element.category} - ${element.category_sum}`;
+      newData[idx] = Math.round(element.categoryRatio);
+      newLabel[idx] = `${element.category} - ${element.categorySum}`;
     });
 
     return [newData, newLabel];
   };
 
+  const formatDate = (date) => {
+    return `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+  };
+
   const setParam = () => {
     switch (tabValue) {
       case TabSelected.MONTH:
-        params.start_dt = startOfMonth(currentMonth);
-        params.end_dt = endOfMonth(currentMonth);
+        params.startDt = formatDate(startOfMonth(currentMonth));
+        params.endDt = formatDate(endOfMonth(currentMonth));
         break;
       case TabSelected.YEAR:
-        params.start_dt = startOfYear(currentYear);
-        params.end_dt = endOfYear(currentYear);
+        params.startDt = formatDate(startOfYear(currentYear));
+        params.endDt = formatDate(endOfYear(currentYear));
         break;
       default:
         break;
@@ -261,24 +228,243 @@ export default function Report() {
   const getReportDataFrom = async (url, params) => {
     try {
       const res = await axios(url, { params: params });
+      console.log(res);
       return res.data;
     } catch (err) {
       console.log(err);
     }
   };
 
+  const renderTotalYearReportOnGraph = (data) => {
+    const yearlyIncomeData = data.incomeReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+    const yearlyIncomeMonthSums = yearlyIncomeData.map(
+      (data) => data.monthlySum
+    );
+
+    const yearlyExpenseData = data.expenseReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+    const yearlyExpenseMonthSums = yearlyExpenseData.map(
+      (data) => data.monthlySum
+    );
+
+    const yearlyTotalMonthSums = yearlyIncomeMonthSums.map(
+      (x, y) => x - yearlyExpenseMonthSums[y]
+    );
+
+    lineConfig.data.datasets[0].data = yearlyTotalMonthSums;
+  };
+
+  // const renderIncomeYearReportOnGraph = (data) => {
+  //   const yearlyIncomeData = data.incomeReportList.filter(
+  //     (item) => item.year === currentYear.getFullYear()
+  //   );
+  //   const yearlyIncomeMonthSums = yearlyIncomeData.map(
+  //     (data) => data.monthlySum
+  //   );
+  //   lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
+  // };
+
+  // const renderExpenseYearReportOnGraph = (data) => {
+  //   const yearlyExpenseData = data.expenseReportList.filter(
+  //     (item) => item.year === currentYear.getFullYear()
+  //   );
+  //   const yearlyExpenseMonthSums = yearlyExpenseData.map(
+  //     (data) => data.monthlySum
+  //   );
+  //   lineConfig.data.datasets[0].data = yearlyExpenseMonthSums;
+  // };
+
+  const createMainRows = (categoryTitle) => {
+    let obj = {};
+    columns.forEach((column) => {
+      if (column.key === "category") obj[column.key] = categoryTitle;
+      else obj[column.key] = 0;
+    });
+
+    return obj;
+  };
+
+  const renderTotalYearReportOnTable = (data) => {
+    let incomeCategories = {
+      // 주수입: new Array(14).fill(0),
+    };
+    let expenseCategories = {
+      // 주수입: new Array(14).fill(0),
+    };
+    const tempRows = [];
+
+    tempRows.push(createMainRows("수입지출합계"));
+
+    tempRows.push(createMainRows("수입합계"));
+
+    const yearlyIncomeData = data.incomeReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+
+    const yearlyIncomeReport = yearlyIncomeData.map((data) =>
+      data.incomeReport ? data.incomeReport : 0
+    );
+
+    yearlyIncomeReport.forEach((report, idx) => {
+      // console.log(report);
+      if (report.length !== 0) {
+        for (let i = 0; i < report.length; i++) {
+          //categories[report[i].category][idx + 1] = report[i].categorySum;
+          if (!incomeCategories[report[i].category])
+            incomeCategories[report[i].category] = new Array(14).fill(0);
+          incomeCategories[report[i].category][idx + 1] = report[i].categorySum;
+        }
+      }
+    });
+
+    for (let key in incomeCategories) {
+      let idx = 1;
+      let sum = 0;
+      const row = {};
+      for (let item of columns) {
+        if (item.key === "category") row[item.key] = key;
+        else if (item.key === "sum") {
+          row[item.key] = sum;
+          tempRows[1][item.key] += row[item.key];
+        } else {
+          row[item.key] = incomeCategories[key][idx++];
+          tempRows[1][item.key] += row[item.key];
+          sum += row[item.key];
+        }
+      }
+      tempRows.push(row);
+    }
+
+    tempRows.push(createMainRows("지출합계"));
+    let expenseSumRowPos = tempRows.length - 1;
+
+    const yearlyExpenseData = data.expenseReportList.filter(
+      (item) => item.year === currentYear.getFullYear()
+    );
+
+    const yearlyExpenseReport = yearlyExpenseData.map((data) =>
+      data.expenseReport ? data.expenseReport : 0
+    );
+
+    yearlyExpenseReport.forEach((report, idx) => {
+      // console.log(report);
+      if (report.length !== 0) {
+        for (let i = 0; i < report.length; i++) {
+          //categories[report[i].category][idx + 1] = report[i].categorySum;
+          if (!expenseCategories[report[i].category])
+            expenseCategories[report[i].category] = new Array(14).fill(0);
+          expenseCategories[report[i].category][idx + 1] =
+            report[i].categorySum;
+        }
+      }
+    });
+
+    for (let key in expenseCategories) {
+      let idx = 1;
+      let sum = 0;
+      const row = {};
+      for (let item of columns) {
+        if (item.key === "category") row[item.key] = key;
+        else if (item.key === "sum") {
+          row[item.key] = sum;
+          tempRows[expenseSumRowPos][item.key] += row[item.key];
+        } else {
+          row[item.key] = expenseCategories[key][idx++];
+          tempRows[expenseSumRowPos][item.key] += row[item.key];
+          sum += row[item.key];
+        }
+      }
+      tempRows.push(row);
+    }
+
+    const obj = {};
+    for (const property in tempRows[1]) {
+      obj[property] =
+        tempRows[1][property] - tempRows[expenseSumRowPos][property];
+    }
+    obj.category = "수입지출합계";
+    tempRows[0] = obj;
+    // tempRows[1].map((row, idx) => console.log(row));
+    categoryRows = tempRows.slice();
+    setRows(tempRows);
+  };
+
+  // test();
   const setReportDataWith = (data) => {
     switch (tabValue) {
       case TabSelected.MONTH:
-        const [newData, newLabel] = getMonthlyData(data[costOption]);
+        const [newData, newLabel] = getMonthlyData(data);
+        console.log(newData, newLabel);
         doughnutConfig.data.labels = newLabel;
         doughnutConfig.data.datasets[0].data = newData;
         barConfig.data.labels = newLabel;
         barConfig.data.datasets[0].data = newData;
-        lineConfig.data.labels = newLabel;
-        lineConfig.data.datasets[0].data = newData;
+        // lineConfig.data.labels = newLabel;
+        // lineConfig.data.datasets[0].data = newData;
         break;
+      case TabSelected.YEAR:
+        // console.log(currentYear.getFullYear());
+        const yearLabel = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        lineConfig.data.labels = yearLabel;
 
+        let categories = {
+          // 주수입: new Array(14).fill(0),
+        };
+
+        const yearlyIncomeData = data.incomeReportList.filter(
+          (item) => item.year === currentYear.getFullYear()
+        );
+        const yearlyIncomeMonthSums = yearlyIncomeData.map(
+          (data) => data.monthlySum
+        );
+        // lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
+        // renderIncomeYearReportOnGraph(data);
+        renderTotalYearReportOnGraph(data);
+        renderTotalYearReportOnTable(data);
+
+        // const yearlyIncomeReport = yearlyIncomeData.map((data) =>
+        //   data.incomeReport ? data.incomeReport : 0
+        // );
+
+        // yearlyIncomeReport.forEach((report, idx) => {
+        //   // console.log(report);
+        //   if (report.length !== 0) {
+        //     for (let i = 0; i < report.length; i++) {
+        //       //categories[report[i].category][idx + 1] = report[i].categorySum;
+        //       if (!categories[report[i].category])
+        //         categories[report[i].category] = new Array(14).fill(0);
+        //       categories[report[i].category][idx + 1] = report[i].categorySum;
+        //     }
+        //   }
+        // });
+        // console.log("categories", categories);
+
+        // const tempRows = [];
+        // for (let key in categories) {
+        //   let idx = 1;
+        //   let sum = 0;
+        //   const row = {};
+        //   for (let item of columns) {
+        //     if (item.key === "category") row[item.key] = key;
+        //     else if (item.key === "sum") row[item.key] = sum;
+        //     else {
+        //       row[item.key] = categories[key][idx++];
+        //       sum += row[item.key];
+        //     }
+        //   }
+        //   tempRows.push(row);
+        // }
+
+        // setRows(tempRows);
+
+        // console.log(yearlyIncomeReport);
+
+        // lineConfig.data.datasets[0].label = ""
+
+        break;
       default:
         break;
     }
@@ -325,17 +511,21 @@ export default function Report() {
     };
   });
 
-  const API_URL = "http://localhost:5000/report";
+  let API_URL =
+    tabValue === TabSelected.MONTH
+      ? `/api/report/month/${costOption}`
+      : `/api/report/year`;
   const params = {};
   setParam();
 
   const handleReportData = async (url, params) => {
     const fetchedData = await getReportDataFrom(url, params);
+
     setReportDataWith(fetchedData);
   };
 
   const { data, isLoading, refetch } = useQuery(
-    ["getReportData", costOption, tabValue],
+    ["getMonthReportData", costOption, tabValue],
     () => handleReportData(API_URL, params)
   );
 
@@ -423,9 +613,32 @@ export default function Report() {
           </div>
         )}
         {yearlyOption === "chart" && (
-          <div>
-            <ChartCanvas width={1000} height={500} ref={canvasRef} />
-          </div>
+          <>
+            <span>
+              <FormControl sx={{ ml: 70, minWidth: 120 }}>
+                <InputLabel id="category-select-label">카테고리</InputLabel>
+                <Select
+                  labelId="category-select-label"
+                  id="category-select"
+                  value={category}
+                  label="Age"
+                  autoWidth
+                  onChange={handleCategoryChange}
+                >
+                  {categoryRows.map((row) => {
+                    return (
+                      <MenuItem key={row.category} value={row.category}>
+                        {row.category}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </span>
+            <div>
+              <ChartCanvas width={1000} height={500} ref={canvasRef} />
+            </div>
+          </>
         )}
       </TabPanel>
     </Grid>
