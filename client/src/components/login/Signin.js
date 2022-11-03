@@ -9,6 +9,7 @@ import { signInSchema } from "../../schema/form_validation";
 
 import { loginStore, useStore2 } from "../../store/store.js";
 import DaumPostcode from "react-daum-postcode";
+import axios from "axios";
 
 import {
   Button,
@@ -67,23 +68,19 @@ export default function Signin() {
   };
 
   async function sendUserDataToServer() {
-    const response = await fetch("/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: id,
+    try {
+      const response = await axios.post("/api/signup", {
+        email: id,
         password: password,
-        nickname: nickname,
-        phoneNumber: phoneNumber,
-        birthdate: birthdate,
-        residence: residence,
+        nickName: nickname,
+        phone: phoneNumber,
+        birth: birthdate,
+        address: residence,
         gender: gender,
-      }),
-    });
+      });
 
-    console.log(response);
+      // console.log(response);
 
-    if (response.ok) {
       toast.success("회원가입 성공!", {
         position: toast.POSITION.TOP_CENTER,
       });
@@ -91,10 +88,12 @@ export default function Signin() {
         setLogState(true);
         navigate("/");
       }, 3000);
-    } else {
-      toast.warn("서버 연결에 문제가 있거나 이미 존재하는 아이디입니다!", {
+    } catch (error) {
+      toast.warn(error.response.data.message, {
         position: toast.POSITION.TOP_CENTER,
       });
+
+      console.log(error);
     }
   }
 

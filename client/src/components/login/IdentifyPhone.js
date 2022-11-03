@@ -37,11 +37,12 @@ export default function IdentifyPhone() {
 
   const phoneDataMutation = useMutation(
     async (phone) => {
-      const data = { phone };
+      const data = { email: state.email, phone: phone };
 
       const res = await axios.post(API_URL, data, {
         headers: { "Content-Type": "application/json" },
       });
+      console.log(res);
 
       return res.data;
     },

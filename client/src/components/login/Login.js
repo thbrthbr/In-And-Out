@@ -70,6 +70,7 @@ export default function Login() {
         email: e["email"],
         password: e["pw"],
       });
+      console.log(res);
       setLogState(true);
       setTimeout(() => {
         navigate("/calendar");

@@ -87,9 +87,9 @@ function App() {
               <Route
                 path="/initiate"
                 element={
-                  <PrivateRoute>
+                  <PublicRoute>
                     <RecoverInitiate />
-                  </PrivateRoute>
+                  </PublicRoute>
                 }
               ></Route>
               <Route
