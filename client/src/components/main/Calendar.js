@@ -15,6 +15,7 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
 const DIARY_API_URL = "http://localhost:5000/calendar";
+// api 연결 작업하면서 요청 api를 2개(다이어리데이터 + 수입지출쪽 데이터)로 수정
 
 const Container = styled.div`
   flex: 1.75;

@@ -90,6 +90,8 @@ export default function Diary({
     setEdit,
     specificDate,
     setSpecificDate,
+    calendarImage,
+    setCalendarImage,
   } = calenderStore();
 
   const [textValue, setTextValue] = useState("");
@@ -122,7 +124,7 @@ export default function Diary({
         : [],
       diary: {
         text: textValue,
-        diary_photo_url: "",
+        diary_photo_url: calendarImage ? calendarImage : "",
       },
     };
     closeModal();
@@ -133,6 +135,10 @@ export default function Diary({
   //date: startDate.format("MM/dd/yy"),
 
   const onSave = (e) => {
+    if (textValue === "") {
+      alert("내용을 입력해주세요");
+      return;
+    }
     e.preventDefault();
     console.log(startDate);
     let num = Math.floor(Math.random() * 100);
@@ -148,12 +154,13 @@ export default function Diary({
         : [],
       diary: {
         text: textValue,
-        diary_photo_url: "",
+        diary_photo_url: calendarImage ? calendarImage : "",
       },
     };
     console.log(body);
     closeModal();
     saveDataMutation.mutate(body);
+    setCalendarImage(null);
   };
 
   const onDelete = (e) => {
@@ -166,6 +173,7 @@ export default function Diary({
   };
 
   const fileInput = useRef();
+
   const onImageEdit = () => {};
 
   const handleButtonClick = (e) => {
@@ -179,7 +187,7 @@ export default function Diary({
     reader.readAsDataURL(file);
 
     reader.onloadend = () => {
-      setprofileImage(reader.result);
+      setCalendarImage(reader.result);
     };
   };
 
@@ -311,17 +319,19 @@ export default function Diary({
 
             {showWrittenDiary && !edit && (
               <>
-                <div>
-                  <img
-                    style={{
-                      width: "300px",
-                      height: "300px",
-                      marginTop: "15px",
-                    }}
-                    src={diaryData.diary.diary_photo_url}
-                    alt="이미지"
-                  />
-                </div>
+                {diaryData.diary.diary_photo_url ? (
+                  <div>
+                    <img
+                      style={{
+                        width: "300px",
+                        height: "300px",
+                        marginTop: "15px",
+                      }}
+                      src={diaryData.diary.diary_photo_url}
+                      alt="이미지"
+                    />
+                  </div>
+                ) : null}
                 <div>
                   <div>{diaryData.diary.text}</div>
                 </div>
@@ -341,8 +351,8 @@ export default function Diary({
                       marginTop: "15px",
                     }}
                     src={
-                      profileImage
-                        ? profileImage
+                      calendarImage
+                        ? calendarImage
                         : diaryData.diary.diary_photo_url
                     }
                     alt="이미지"
@@ -381,7 +391,7 @@ export default function Diary({
                       height: "300px",
                       marginTop: "15px",
                     }}
-                    src={profileImage ? profileImage : defaultUser}
+                    src={calendarImage ? calendarImage : defaultUser}
                     alt="이미지"
                     onClick={handleButtonClick}
                     htmlFor="input-file"
@@ -406,6 +416,14 @@ export default function Diary({
                   <button onClick={onImageEdit}>이미지 등록</button>
                   <button onClick={onSave}>완료</button>
                 </div>
+                <form
+                  action="/home/uploadfiles"
+                  method="post"
+                  enctype="multipart/form-data"
+                >
+                  파일명 : <input type="file" name="myfile" />
+                  <button type="submit">제출하기</button>
+                </form>
               </>
               // </form>
             )}

@@ -96,6 +96,9 @@ const calenderStore = create((set, get) => ({
 
   showInstanceTable: false,
   setShowInstanceTable: (input) => set({ showInstanceTable: input }),
+
+  calendarImage: null,
+  setCalendarImage: (input) => set({ calendarImage: input }),
 }));
 
 export { useStore, useStore2, useStore3, loginStore, calenderStore };
