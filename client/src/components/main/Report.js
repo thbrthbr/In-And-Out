@@ -388,6 +388,7 @@ export default function Report() {
     obj.category = "수입지출합계";
     tempRows[0] = obj;
     // tempRows[1].map((row, idx) => console.log(row));
+    console.log(tempRows);
     categoryRows = tempRows.slice();
     setRows(tempRows);
   };

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { recoverInitiateSchema } from "../../schema/form_validation";
@@ -14,6 +14,7 @@ import {
 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 export default function RecoverInitiate() {
   const {
@@ -24,8 +25,44 @@ export default function RecoverInitiate() {
     resolver: yupResolver(recoverInitiateSchema),
   });
 
+  const useQuery = () => new URLSearchParams(useLocation().search);
+  const query = useQuery();
+  const uuid = query.get("id");
+
+  const navigate = useNavigate();
+
+  const sendToServer = async (data) => {
+    try {
+      const res = await axios.post(
+        `api/password/email/phone/sending?id=${uuid}`,
+        data
+      );
+
+      toast.success("비밀번호 재설정이 성공적으로 처리됐습니다!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    } catch (err) {
+      console.log(err);
+      toast.warn("비밀번호 재설정이 실패했습니다!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+    }
+  };
+
   const onSubmit = (data) => {
-    alert("submit");
+    console.log(data);
+    const passwordData = {
+      newPassword: data.pw,
+      confirmNewPassword: data.passwordConfirm,
+    };
+
+    sendToServer(passwordData);
+
+    // console.log(params);
   };
 
   return (
@@ -38,6 +75,7 @@ export default function RecoverInitiate() {
         width: "100%",
       }}
     >
+      <ToastContainer />
       <Typography component="h1" variant="h5">
         비밀번호 재설정
       </Typography>
