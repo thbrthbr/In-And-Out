@@ -9,6 +9,10 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 
 import TabPanel from "./TabPanel";
 import RadioButton from "./RadioButton";
@@ -117,6 +121,8 @@ const TabSelected = Object.freeze({
 let currentMonth = new Date();
 let currentYear = new Date();
 
+let categoryRows = [];
+
 export default function Report() {
   const canvasRef = useRef(null);
 
@@ -126,6 +132,21 @@ export default function Report() {
   const [tabValue, setTabValue] = useState(0);
 
   const [rows, setRows] = useState([]);
+  const [category, setCategory] = useState("");
+
+  const handleCategoryChange = (event) => {
+    let data = [];
+    setCategory(event.target.value);
+    categoryRows.forEach((row) => {
+      if (row.category === event.target.value) {
+        data = Object.entries(row)
+          .slice(1, 13)
+          .map((entry) => entry[1]);
+        lineConfig.data.datasets[0].data = data;
+      }
+    });
+  };
+
   const setParamAndRefetch = () => {
     setParam();
     refetch();
@@ -214,13 +235,6 @@ export default function Report() {
     }
   };
 
-  const test = async () => {
-    const res = await axios.get("/api/report/month/income", {
-      params: { endDt: "2022-10-31", startDt: "2022-10-01" },
-    });
-    console.log(res);
-  };
-
   const renderTotalYearReportOnGraph = (data) => {
     const yearlyIncomeData = data.incomeReportList.filter(
       (item) => item.year === currentYear.getFullYear()
@@ -243,25 +257,25 @@ export default function Report() {
     lineConfig.data.datasets[0].data = yearlyTotalMonthSums;
   };
 
-  const renderIncomeYearReportOnGraph = (data) => {
-    const yearlyIncomeData = data.incomeReportList.filter(
-      (item) => item.year === currentYear.getFullYear()
-    );
-    const yearlyIncomeMonthSums = yearlyIncomeData.map(
-      (data) => data.monthlySum
-    );
-    lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
-  };
+  // const renderIncomeYearReportOnGraph = (data) => {
+  //   const yearlyIncomeData = data.incomeReportList.filter(
+  //     (item) => item.year === currentYear.getFullYear()
+  //   );
+  //   const yearlyIncomeMonthSums = yearlyIncomeData.map(
+  //     (data) => data.monthlySum
+  //   );
+  //   lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
+  // };
 
-  const renderExpenseYearReportOnGraph = (data) => {
-    const yearlyExpenseData = data.expenseReportList.filter(
-      (item) => item.year === currentYear.getFullYear()
-    );
-    const yearlyExpenseMonthSums = yearlyExpenseData.map(
-      (data) => data.monthlySum
-    );
-    lineConfig.data.datasets[0].data = yearlyExpenseMonthSums;
-  };
+  // const renderExpenseYearReportOnGraph = (data) => {
+  //   const yearlyExpenseData = data.expenseReportList.filter(
+  //     (item) => item.year === currentYear.getFullYear()
+  //   );
+  //   const yearlyExpenseMonthSums = yearlyExpenseData.map(
+  //     (data) => data.monthlySum
+  //   );
+  //   lineConfig.data.datasets[0].data = yearlyExpenseMonthSums;
+  // };
 
   const createMainRows = (categoryTitle) => {
     let obj = {};
@@ -374,6 +388,7 @@ export default function Report() {
     obj.category = "수입지출합계";
     tempRows[0] = obj;
     // tempRows[1].map((row, idx) => console.log(row));
+    categoryRows = tempRows.slice();
     setRows(tempRows);
   };
 
@@ -598,10 +613,32 @@ export default function Report() {
           </div>
         )}
         {yearlyOption === "chart" && (
-          <div>
-            <ChartCanvas width={1000} height={500} ref={canvasRef} />
-            <span>Test</span>
-          </div>
+          <>
+            <span>
+              <FormControl sx={{ ml: 70, minWidth: 120 }}>
+                <InputLabel id="category-select-label">카테고리</InputLabel>
+                <Select
+                  labelId="category-select-label"
+                  id="category-select"
+                  value={category}
+                  label="Age"
+                  autoWidth
+                  onChange={handleCategoryChange}
+                >
+                  {categoryRows.map((row) => {
+                    return (
+                      <MenuItem key={row.category} value={row.category}>
+                        {row.category}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </span>
+            <div>
+              <ChartCanvas width={1000} height={500} ref={canvasRef} />
+            </div>
+          </>
         )}
       </TabPanel>
     </Grid>

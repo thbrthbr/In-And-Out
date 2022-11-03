@@ -5,7 +5,7 @@ import styled from "styled-components";
 const Header = styled.div`
   width: 200px;
   height: 7%;
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: baseline;
