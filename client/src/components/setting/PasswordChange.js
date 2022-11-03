@@ -12,6 +12,10 @@ import {
   Typography,
 } from "@mui/material/";
 
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function PasswordChange() {
   const { id, nickname, phoneNumber, birthdate, residence, gender } =
     loginStore();
@@ -47,22 +51,44 @@ export default function PasswordChange() {
     }
   }
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const response = await fetch(`http://localhost:4000/users`);
+  const handlePasswordChange = async (passwordData) => {
+    try {
+      const response = await axios.patch("/api/member/password", passwordData);
 
-    if (response.ok) {
-      const users = await response.json();
-      const user = users.find((user) => user.id === id);
-      if (user.password !== e["oldPw"]) {
-        alert("기존 비밀번호와 일치하지 않습니다.");
-        throw new Error("아이디 또는 비밀번호가 일치하지 않습니다.");
-      }
-    } else {
-      throw new Error("서버 통신이 원할하지 않습니다.");
+      toast.success("비밀번호 변경이 성공적으로 처리됐습니다!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+    } catch (err) {
+      console.log(err);
+      toast.warn("비밀번호 변경이 성공적으로 처리되지 않았습니다!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
-    await put(e["pw"]);
-    window.location.reload();
+  };
+
+  const onSubmit = async (e) => {
+    console.log(e);
+    const obj = {};
+
+    obj.password = e.oldPw;
+    obj.newPassword = e.passwordConfirm;
+
+    handlePasswordChange(obj);
+    // e.preventDefault();
+    // const response = await fetch(`http://localhost:4000/users`);
+
+    // if (response.ok) {
+    //   const users = await response.json();
+    //   const user = users.find((user) => user.id === id);
+    //   if (user.password !== e["oldPw"]) {
+    //     alert("기존 비밀번호와 일치하지 않습니다.");
+    //     throw new Error("아이디 또는 비밀번호가 일치하지 않습니다.");
+    //   }
+    // } else {
+    //   throw new Error("서버 통신이 원할하지 않습니다.");
+    // }
+    // await put(e["pw"]);
+    // window.location.reload();
   };
 
   return (
@@ -74,6 +100,7 @@ export default function PasswordChange() {
         alignItems: "center",
       }}
     >
+      <ToastContainer />
       <Typography component="h1" variant="h5">
         비밀번호 변경
       </Typography>

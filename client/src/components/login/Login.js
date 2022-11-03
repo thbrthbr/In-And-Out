@@ -70,9 +70,11 @@ export default function Login() {
         email: e["email"],
         password: e["pw"],
       });
-      console.log(res);
+      // console.log(res);
+
       setLogState(true);
       setTimeout(() => {
+        setId(e["email"]);
         navigate("/calendar");
       }, 0);
     } catch (err) {
