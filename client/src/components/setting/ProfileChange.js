@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -20,6 +20,10 @@ import {
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ProfileChange() {
   const {
@@ -49,6 +53,7 @@ export default function ProfileChange() {
   const fileInput = useRef();
   const [openPostcode, setOpenPostcode] = useState(false);
   const [address, setAddress] = useState("");
+  const queryClient = useQueryClient();
 
   const handleButtonClick = (e) => {
     fileInput.current.click();
@@ -66,6 +71,23 @@ export default function ProfileChange() {
     };
   };
 
+  const onNameHandler = (event) => {
+    setNickname(event.currentTarget.value);
+  };
+
+  const onPhoneNumberHandler = (event) => {
+    setPhoneNumber(event.currentTarget.value);
+  };
+  const onBirthdateHandler = (event) => {
+    setBirthdate(event.currentTarget.value);
+  };
+  const onResidenceHandler = (event) => {
+    setResidence(event.currentTarget.value);
+  };
+  const onGenderHandler = (event) => {
+    setGender(event.currentTarget.value);
+  };
+
   async function ImagePut(e) {
     const response = await fetch(`http://localhost:4000/users/${id}`, {
       method: "PUT",
@@ -81,7 +103,7 @@ export default function ProfileChange() {
       }),
     });
 
-    console.log(response);
+    // console.log(response);
 
     if (response.ok) {
       alert("수정완료");
@@ -91,6 +113,7 @@ export default function ProfileChange() {
   }
 
   async function put(e) {
+    console.log(e);
     const response = await fetch(`http://localhost:4000/users/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -112,7 +135,7 @@ export default function ProfileChange() {
       setPhoneNumber(e["phone"]);
       setBirthdate(e["birthday"]);
       setResidence(e["residence"]);
-      setGender(e["gender"]);
+      setGender(e["gender"] === "남" ? "male" : "female");
       alert("수정완료");
     } else {
       alert("오류");
@@ -120,7 +143,17 @@ export default function ProfileChange() {
   }
 
   const onSubmit = async (e) => {
-    put(e);
+    // put(e);
+    e.address = e.residence;
+    e.birth = e.birthday;
+    e.nickname = e.name;
+    e.memberPhotoUrl = "";
+    delete e.email;
+    delete e.residence;
+    delete e.birthday;
+    delete e.name;
+    console.log("d", e);
+    saveDataMutation.mutate(e);
   };
 
   const handlePostButtonClick = () => {
@@ -133,6 +166,55 @@ export default function ProfileChange() {
     setOpenPostcode(false);
   };
 
+  const getUserData = async () => {
+    try {
+      const res = await axios.get("/api/member/info");
+      // console.log(res.data);
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const { data, isLoading } = useQuery(["getProfileData"], getUserData, {
+    onSuccess: (data) => {
+      setNickname(data["nickName"]);
+      setPhoneNumber(data["phone"]);
+      setBirthdate(data["birth"]);
+      setResidence(data["address"]);
+      setAddress(data["address"]);
+      setGender(data["gender"] === "남" ? "male" : "female");
+      setProfileImage(data["s3ImageUrl"]);
+    },
+  });
+
+  const saveDataMutation = useMutation(
+    async (userData) => {
+      // console.log("data", userData);
+      try {
+        const res = await axios.put("/api/member/info", userData, {
+          headers: { "Content-Type": "application/json" },
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    {
+      onSuccess: () => {
+        toast.success("프로필 변경이 성공적으로 처리됐습니다!", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        queryClient.invalidateQueries("getProfileData");
+      },
+      onError: () => {
+        toast.warn("프로필 변경이 성공적으로 처리되지 않았습니다.", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      },
+    }
+  );
+
   return (
     <Box
       sx={{
@@ -142,6 +224,7 @@ export default function ProfileChange() {
         alignItems: "center",
       }}
     >
+      <ToastContainer />
       <Typography component="h1" variant="h5">
         프로필 변경
       </Typography>
@@ -194,7 +277,7 @@ export default function ProfileChange() {
                 label="닉네임"
                 error={!!errors.name}
                 defaultValue={nickname}
-                {...register("name")}
+                {...register("name", { onChange: onNameHandler })}
                 helperText={errors.name?.message}
               />
             </Grid>
@@ -207,7 +290,7 @@ export default function ProfileChange() {
                 label="전화번호"
                 error={!!errors.phone}
                 defaultValue={phoneNumber}
-                {...register("phone")}
+                {...register("phone", { onChange: onPhoneNumberHandler })}
                 helperText={errors.phone?.message}
               />
             </Grid>
@@ -220,7 +303,7 @@ export default function ProfileChange() {
                 label="생년월일"
                 error={!!errors.birthday}
                 defaultValue={birthdate}
-                {...register("birthday")}
+                {...register("birthday", { onChange: onBirthdateHandler })}
                 helperText={errors.birthday?.message}
               />
             </Grid>
@@ -237,6 +320,7 @@ export default function ProfileChange() {
                 {...register("residence", {
                   onChange: (e) => {
                     setAddress(e.target.value);
+                    onResidenceHandler(e);
                   },
                 })}
                 helperText={errors.residence?.message}
@@ -262,7 +346,8 @@ export default function ProfileChange() {
                   control={<Radio />}
                   label="여자"
                   defaultChecked={gender === "female" ? true : false}
-                  {...register("gender")}
+                  checked={gender === "female" ? true : false}
+                  {...register("gender", { onChange: onGenderHandler })}
                   error={!!errors.gender}
                   helperText={errors.gender?.message}
                 />
@@ -271,7 +356,8 @@ export default function ProfileChange() {
                   control={<Radio />}
                   label="남자"
                   defaultChecked={gender === "male" ? true : false}
-                  {...register("gender")}
+                  checked={gender === "male" ? true : false}
+                  {...register("gender", { onChange: onGenderHandler })}
                   error={!!errors.gender}
                   helperText={errors.gender?.message}
                 />
