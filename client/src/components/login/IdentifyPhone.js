@@ -74,7 +74,7 @@ export default function IdentifyPhone() {
         width: "100%",
       }}
     >
-      <ToastContainer />
+      <ToastContainer pauseOnHover={false} />
       <Typography component="h1" variant="h5">
         비밀번호 찾기 (전화번호 인증)
       </Typography>

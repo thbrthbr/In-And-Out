@@ -133,7 +133,7 @@ export default function Signin() {
         alignItems: "center",
       }}
     >
-      <ToastContainer />
+      <ToastContainer pauseOnHover={false} />
       <Typography component="h1" variant="h5">
         in & out 회원가입
       </Typography>

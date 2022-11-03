@@ -124,7 +124,7 @@ export default function Login() {
               alignItems: "center",
             }}
           >
-            <ToastContainer />
+            <ToastContainer pauseOnHover={false} />
             <Typography component="h1" variant="h5">
               in&out에 로그인
             </Typography>

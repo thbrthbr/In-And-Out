@@ -75,7 +75,7 @@ export default function RecoverInitiate() {
         width: "100%",
       }}
     >
-      <ToastContainer />
+      <ToastContainer pauseOnHover={false} />
       <Typography component="h1" variant="h5">
         비밀번호 재설정
       </Typography>

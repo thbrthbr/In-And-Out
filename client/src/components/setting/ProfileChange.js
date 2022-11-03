@@ -112,35 +112,35 @@ export default function ProfileChange() {
     }
   }
 
-  async function put(e) {
-    console.log(e);
-    const response = await fetch(`http://localhost:4000/users/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        password: password,
-        nickname: e["name"],
-        phoneNumber: e["phone"],
-        birthdate: e["birthday"],
-        residence: e["residence"],
-        gender: e["gender"],
-        profileImage: profileImage,
-      }),
-    });
+  // async function put(e) {
+  //   console.log(e);
+  //   const response = await fetch(`http://localhost:4000/users/${id}`, {
+  //     method: "PUT",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       password: password,
+  //       nickname: e["name"],
+  //       phoneNumber: e["phone"],
+  //       birthdate: e["birthday"],
+  //       residence: e["residence"],
+  //       gender: e["gender"],
+  //       profileImage: profileImage,
+  //     }),
+  //   });
 
-    console.log(response);
+  //   console.log(response);
 
-    if (response.ok) {
-      setNickname(e["name"]);
-      setPhoneNumber(e["phone"]);
-      setBirthdate(e["birthday"]);
-      setResidence(e["residence"]);
-      setGender(e["gender"] === "남" ? "male" : "female");
-      alert("수정완료");
-    } else {
-      alert("오류");
-    }
-  }
+  //   if (response.ok) {
+  //     setNickname(e["name"]);
+  //     setPhoneNumber(e["phone"]);
+  //     setBirthdate(e["birthday"]);
+  //     setResidence(e["residence"]);
+  //     setGender(e["gender"] === "남" ? "male" : "female");
+  //     alert("수정완료");
+  //   } else {
+  //     alert("오류");
+  //   }
+  // }
 
   const onSubmit = async (e) => {
     // put(e);
