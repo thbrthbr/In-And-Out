@@ -66,10 +66,13 @@ export default function Login() {
     //   setLogState(true);
     // }
     try {
-      const res = await axios.post("/api/signin", {
-        email: e["email"],
-        password: e["pw"],
-      });
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/signin`,
+        {
+          email: e["email"],
+          password: e["pw"],
+        }
+      );
       // console.log(res);
 
       setLogState(true);
@@ -124,7 +127,7 @@ export default function Login() {
               alignItems: "center",
             }}
           >
-            <ToastContainer />
+            <ToastContainer pauseOnHover={false} />
             <Typography component="h1" variant="h5">
               in&out에 로그인
             </Typography>
