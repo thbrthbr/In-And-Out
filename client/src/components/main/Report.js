@@ -37,7 +37,7 @@ import {
   doughnutConfig,
   barConfig,
   lineConfig,
-} from "../../option/graphOptions";
+} from "../../utils/graphOptions";
 
 import {
   Chart,
@@ -134,17 +134,18 @@ export default function Report() {
   const [rows, setRows] = useState([]);
   const [category, setCategory] = useState("");
 
-  const handleCategoryChange = (event) => {
-    let data = [];
-    setCategory(event.target.value);
+  const handleDropdownCategoryChange = (event) => {
+    let newData = [];
     categoryRows.forEach((row) => {
       if (row.category === event.target.value) {
-        data = Object.entries(row)
+        newData = Object.entries(row)
           .slice(1, 13)
           .map((entry) => entry[1]);
-        lineConfig.data.datasets[0].data = data;
+        lineConfig.data.datasets[0].data = newData;
       }
     });
+
+    setCategory(event.target.value);
   };
 
   const setParamAndRefetch = () => {
@@ -624,7 +625,7 @@ export default function Report() {
                   value={category}
                   label="Age"
                   autoWidth
-                  onChange={handleCategoryChange}
+                  onChange={handleDropdownCategoryChange}
                 >
                   {categoryRows.map((row) => {
                     return (

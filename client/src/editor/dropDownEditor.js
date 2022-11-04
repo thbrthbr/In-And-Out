@@ -1,6 +1,10 @@
-const titles = ["", "교통비", "전화비", "식비"];
+import { useCategoryDropDownItemStore } from "../store/store.js";
+// const titles = ["", "교통비", "전화비", "식비"];
 
-export default function dropDownEditor({ row, onRowChange }) {
+export default function DropDownEditor({ row, onRowChange }) {
+  const { categoryItemList, setCategoryItemList } =
+    useCategoryDropDownItemStore();
+
   return (
     <select
       value={row.category}
@@ -9,7 +13,7 @@ export default function dropDownEditor({ row, onRowChange }) {
       }
       autoFocus
     >
-      {titles.map((title) => (
+      {categoryItemList.map((title) => (
         <option key={title} value={title}>
           {title}
         </option>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import "react-data-grid/lib/styles.css";
 import DataGrid, { SelectColumn, textEditor } from "react-data-grid";
-import dropDownEditor from "../../editor/dropDownEditor";
+import DropDownEditor from "../../editor/dropDownEditor";
 import DateEditor from "../../editor/DateEditor";
 
 import axios from "axios";
@@ -11,7 +11,6 @@ import { startOfMonth, endOfMonth, addMonths, subMonths } from "date-fns";
 
 import DateHeader from "../common/DateHeader";
 
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 
 import Tabs from "@mui/material/Tabs";
@@ -24,13 +23,18 @@ import TabPanel from "./TabPanel";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
-const INCOME_API_URL = "http://localhost:5000/income";
-const EXPENSE_API_URL = "http://localhost:5000/expense";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import { useCategoryDropDownItemStore } from "../../store/store.js";
+
+const INCOME_API_URL = "/api/income";
+const EXPENSE_API_URL = "/api/expense";
 
 const incomeColumns = [
   SelectColumn,
   {
-    key: "incomeDate",
+    key: "incomeDt",
     name: "날짜",
     width: 200,
     formatter(props) {
@@ -41,6 +45,7 @@ const incomeColumns = [
   {
     key: "incomeItem",
     name: "사용내역",
+    width: 200,
     editor: textEditor,
   },
   {
@@ -55,7 +60,7 @@ const incomeColumns = [
       return <>{props.row.category}</>;
     },
     resizable: true,
-    editor: dropDownEditor,
+    editor: DropDownEditor,
     editorOptions: {
       editOnClick: true,
     },
@@ -71,7 +76,7 @@ const incomeColumns = [
 const expenseColumns = [
   SelectColumn,
   {
-    key: "expenseDate",
+    key: "expenseDt",
     name: "날짜",
     width: 200,
     formatter(props) {
@@ -81,6 +86,7 @@ const expenseColumns = [
   },
   {
     key: "expenseItem",
+    width: 200,
     name: "사용내역",
     editor: textEditor,
   },
@@ -101,7 +107,7 @@ const expenseColumns = [
       return <>{props.row.category}</>;
     },
     resizable: true,
-    editor: dropDownEditor,
+    editor: DropDownEditor,
     editorOptions: {
       editOnClick: true,
     },
@@ -133,14 +139,22 @@ export default function Inout() {
   const [selectedRows, setSelectedRows] = useState(() => new Set());
   const queryClient = useQueryClient();
   const [tabValue, setTabValue] = useState(0);
+  const { categoryItemList, setCategoryItemList } =
+    useCategoryDropDownItemStore();
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
+  const formatDate = (date) => {
+    return `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+  };
+
   const setParam = () => {
-    params.start_dt = startOfMonth(currentMonth);
-    params.end_dt = endOfMonth(currentMonth);
+    params.startDt = formatDate(startOfMonth(currentMonth));
+    params.endDt = formatDate(endOfMonth(currentMonth));
   };
 
   const setParamAndRefetch = () => {
@@ -159,8 +173,7 @@ export default function Inout() {
 
   async function getInoutDataFrom(url, params) {
     try {
-      const res = await axios(url, { params: params });
-
+      const res = await axios.get(url, { params: params });
       return res.data;
     } catch (err) {
       console.log(err);
@@ -170,10 +183,46 @@ export default function Inout() {
   const setInoutDataWith = (data) => {
     switch (tabValue) {
       case TabSelected.INCOME:
-        setRows(data.income);
+        const incomeCategoryList = data.incomeCategoryDtoList
+          .map((item) => item.detailIncomeCategoryDtoList)
+          .reduce((acc, cur) => [...acc, ...cur]);
+        const incomeCategoryNames = incomeCategoryList.map(
+          (item) => item.detailIncomeCategoryName
+        );
+
+        setCategoryItemList(["", ...incomeCategoryNames]);
+
+        const incomeData = data.incomeDtoList.map((item) => {
+          item.date = item.incomeDt;
+          item.category = incomeCategoryList.find(
+            (category) =>
+              category.detailIncomeCategoryId === item.detailIncomeCategoryId
+          ).detailIncomeCategoryName;
+          return item;
+        });
+
+        setRows(incomeData);
         break;
       case TabSelected.EXPENSE:
-        setRows(data.expense);
+        const expenseCategoryList = data.expenseCategoryDtos
+          .map((item) => item.detailExpenseCategoryDtos)
+          .reduce((acc, cur) => [...acc, ...cur]);
+        const expenseCategoryNames = expenseCategoryList.map(
+          (item) => item.detailExpenseCategoryName
+        );
+
+        setCategoryItemList(["", ...expenseCategoryNames]);
+
+        const expenseData = data.expenseDtos.map((item) => {
+          item.date = item.expenseDt;
+          item.category = expenseCategoryList.find(
+            (category) =>
+              category.detailExpenseCategoryId === item.detailExpenseCategoryId
+          ).detailExpenseCategoryName;
+          return item;
+        });
+
+        setRows(expenseData);
         break;
       default:
         break;
@@ -188,7 +237,7 @@ export default function Inout() {
   function createNewRow() {
     const newIncomeData = {
       incomeId: rows[rows.length - 1].incomeId + 1,
-      incomeDate: "",
+      incomeDt: "",
       incomeItem: "",
       incomeAmount: "",
       incomeCategoryName: "",
@@ -197,7 +246,7 @@ export default function Inout() {
 
     const newExpenseData = {
       expenseId: rows[rows.length - 1].expenseId + 1,
-      expenseDate: "",
+      expenseDt: "",
       expenseItem: "",
       expenseCash: "",
       expenseCard: "",
@@ -300,6 +349,7 @@ export default function Inout() {
 
   return (
     <div>
+      <ToastContainer pauseOnHover={false} />
       <Grid container spacing={0}>
         <Grid xs={12}>
           <Box sx={{ width: "100%" }}>
