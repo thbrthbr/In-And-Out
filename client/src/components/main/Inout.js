@@ -134,6 +134,9 @@ const TabSelected = Object.freeze({
 
 let currentMonth = new Date();
 
+let incomeCategoryList = [];
+let expenseCategoryList = [];
+
 export default function Inout() {
   const [rows, setRows] = useState([]); // 나중에 빈배열로 처리
   const [selectedRows, setSelectedRows] = useState(() => new Set());
@@ -183,12 +186,13 @@ export default function Inout() {
   const setInoutDataWith = (data) => {
     switch (tabValue) {
       case TabSelected.INCOME:
-        const incomeCategoryList = data.incomeCategoryDtoList
+        incomeCategoryList = data.incomeCategoryDtoList
           .map((item) => item.detailIncomeCategoryDtoList)
           .reduce((acc, cur) => [...acc, ...cur]);
         const incomeCategoryNames = incomeCategoryList.map(
           (item) => item.detailIncomeCategoryName
         );
+        console.log(incomeCategoryList);
 
         setCategoryItemList(["", ...incomeCategoryNames]);
 
@@ -204,7 +208,7 @@ export default function Inout() {
         setRows(incomeData);
         break;
       case TabSelected.EXPENSE:
-        const expenseCategoryList = data.expenseCategoryDtos
+        expenseCategoryList = data.expenseCategoryDtos
           .map((item) => item.detailExpenseCategoryDtos)
           .reduce((acc, cur) => [...acc, ...cur]);
         const expenseCategoryNames = expenseCategoryList.map(
@@ -236,21 +240,21 @@ export default function Inout() {
 
   function createNewRow() {
     const newIncomeData = {
-      incomeId: rows[rows.length - 1].incomeId + 1,
+      incomeId: "",
       incomeDt: "",
       incomeItem: "",
       incomeAmount: "",
-      incomeCategoryName: "",
+      detailIncomeCategoryId: "",
       incomeMemo: "",
     };
 
     const newExpenseData = {
-      expenseId: rows[rows.length - 1].expenseId + 1,
+      expenseId: "",
       expenseDt: "",
       expenseItem: "",
       expenseCash: "",
       expenseCard: "",
-      expenseCategoryName: "",
+      detailExpenseCategoryId: "",
       expenseMemo: "",
     };
     let newData =
@@ -261,10 +265,43 @@ export default function Inout() {
 
   const saveDataMutation = useMutation(
     async (rowData) => {
-      const data =
-        tabValue === TabSelected.INCOME
-          ? { income: rowData }
-          : { expense: rowData };
+      const data = rowData
+        .filter((item) => {
+          return tabValue === TabSelected.INCOME
+            ? item.incomeId === ""
+            : item.expenseId === "";
+        })
+        .map((ele) => {
+          return tabValue === TabSelected.INCOME
+            ? { ...ele, incomeDt: ele.date }
+            : { ...ele, expenseDt: ele.date };
+        });
+
+      switch (tabValue) {
+        case TabSelected.INCOME:
+          data.forEach(
+            (item) =>
+              (item.detailIncomeCategoryId = incomeCategoryList.find(
+                (category) =>
+                  category.detailIncomeCategoryName === item.category
+              ).detailIncomeCategoryId)
+          );
+          break;
+        case TabSelected.EXPENSE:
+          data.forEach(
+            (item) =>
+              (item.detailExpenseCategoryId = expenseCategoryList.find(
+                (category) =>
+                  category.detailExpenseCategoryName === item.category
+              ).detailExpenseCategoryId)
+          );
+          break;
+        default:
+          break;
+      }
+
+      // const data = [rowData]; //tabValue === TabSelected.INCOME ? { [rowData } : { rowData };
+
       const api =
         tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL;
       try {
@@ -284,13 +321,18 @@ export default function Inout() {
   );
 
   const deleteDataMutation = useMutation(
-    async (rowData) => {
+    async (itemIds) => {
+      console.log("ids", itemIds);
       const api =
         tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL;
       try {
-        const res = await axios.delete(api, rowData, {
-          headers: { "Content-Type": "application/json" },
-        });
+        const res = await axios.delete(
+          api,
+          { data: itemIds },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
         return res.data;
       } catch (err) {
         console.log(err);
@@ -309,14 +351,19 @@ export default function Inout() {
 
   function onDeleteData() {
     console.log("deleted");
-
-    deleteDataMutation.mutate(selectedRows);
     const newRows = rows.slice();
     const filteredRow = newRows.filter((row, idx) => {
       const id = tabValue === TabSelected.INCOME ? row.incomeId : row.expenseId;
-      return !selectedRows.has(id);
+      return selectedRows.has(id);
     });
-    console.log("filtered", filteredRow);
+    const itemIds = filteredRow.reduce((acc, cur) => {
+      tabValue === TabSelected.INCOME
+        ? acc.push({ incomeId: cur.incomeId })
+        : acc.push({ expenseId: cur.expenseId });
+      return acc;
+      // return TabSelected.INCOME ? item.incomeId : item.expenseId;
+    }, []);
+    deleteDataMutation.mutate(itemIds);
   }
 
   const handleInoutData = async (url, params) => {
