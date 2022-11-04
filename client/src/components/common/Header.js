@@ -73,7 +73,7 @@ export default function Header() {
           <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
             <img
               alt="로고"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/calendar")}
               style={{ width: "200px", cursor: "pointer" }}
               src={logo}
             />
