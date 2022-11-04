@@ -133,7 +133,7 @@ export default function Signin() {
         alignItems: "center",
       }}
     >
-      <ToastContainer />
+      <ToastContainer pauseOnHover={false} />
       <Typography component="h1" variant="h5">
         in & out 회원가입
       </Typography>
@@ -156,7 +156,6 @@ export default function Signin() {
                 id="email"
                 name="email"
                 label="아이디(이메일)"
-                defaultValue={id}
                 error={!!errors.email}
                 {...register("email", { onChange: onEmailHandler })}
                 helperText={errors.email?.message}
@@ -197,7 +196,6 @@ export default function Signin() {
                 name="name"
                 label="닉네임"
                 error={!!errors.name}
-                defaultValue={nickname}
                 {...register("name", { onChange: onNameHandler })}
                 helperText={errors.name?.message}
               />
@@ -211,7 +209,6 @@ export default function Signin() {
                 name="phone"
                 label="전화번호"
                 error={!!errors.phone}
-                defaultValue={phoneNumber}
                 {...register("phone", { onChange: onPhoneNumberHandler })}
                 helperText={errors.phone?.message}
               />
@@ -225,7 +222,6 @@ export default function Signin() {
                 name="birthday"
                 label="생년월일(ex.2011-01-01)"
                 error={!!errors.birthday}
-                defaultValue={birthdate}
                 {...register("birthday", { onChange: onBirthdateHandler })}
                 helperText={errors.birthday?.message}
               />
@@ -240,7 +236,7 @@ export default function Signin() {
                 value={address}
                 label="거주지"
                 error={!!errors.residence}
-                defaultValue={residence}
+                defaultValue={address}
                 {...register("residence", {
                   onChange: (e) => {
                     setAddress(e.target.value);

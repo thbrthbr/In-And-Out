@@ -28,32 +28,32 @@ export default function PasswordChange() {
     resolver: yupResolver(recoverInitiateSchema),
   });
 
-  async function put(e) {
-    const response = await fetch(`http://localhost:4000/users/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        password: e,
-        nickname: nickname,
-        phoneNumber: phoneNumber,
-        birthdate: birthdate,
-        residence: residence,
-        gender: gender,
-      }),
-    });
+  // async function put(e) {
+  //   const response = await fetch(`http://localhost:4000/users/${id}`, {
+  //     method: "PUT",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       password: e,
+  //       nickname: nickname,
+  //       phoneNumber: phoneNumber,
+  //       birthdate: birthdate,
+  //       residence: residence,
+  //       gender: gender,
+  //     }),
+  //   });
 
-    console.log(response);
+  //   console.log(response);
 
-    if (response.ok) {
-      alert("수정완료");
-    } else {
-      alert("오류");
-    }
-  }
+  //   if (response.ok) {
+  //     alert("수정완료");
+  //   } else {
+  //     alert("오류");
+  //   }
+  // }
 
   const handlePasswordChange = async (passwordData) => {
     try {
-      const response = await axios.patch("/api/member/password", passwordData);
+      const res = await axios.patch("/api/member/password", passwordData);
 
       toast.success("비밀번호 변경이 성공적으로 처리됐습니다!", {
         position: toast.POSITION.TOP_CENTER,

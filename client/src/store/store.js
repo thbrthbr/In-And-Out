@@ -8,6 +8,11 @@ import {
   endOfMonth,
 } from "date-fns";
 
+const useCategoryDropDownItemStore = create((set) => ({
+  categoryItemList: [""],
+  setCategoryItemList: (input) => set({ categoryItemList: input }),
+}));
+
 const useStore = create(
   persist((set) => ({
     profileImage: null,
@@ -147,4 +152,11 @@ const calenderStore = create((set, get) => ({
   // },
 }));
 
-export { useStore, useStore2, useStore3, loginStore, calenderStore };
+export {
+  useStore,
+  useStore2,
+  useStore3,
+  loginStore,
+  calenderStore,
+  useCategoryDropDownItemStore,
+};
