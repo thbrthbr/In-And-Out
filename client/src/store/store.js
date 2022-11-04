@@ -1,6 +1,12 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
-import { format, addMonths, subMonths } from "date-fns";
+import {
+  format,
+  addMonths,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+} from "date-fns";
 
 const useCategoryDropDownItemStore = create((set) => ({
   categoryItemList: [""],
@@ -101,6 +107,49 @@ const calenderStore = create((set, get) => ({
 
   showInstanceTable: false,
   setShowInstanceTable: (input) => set({ showInstanceTable: input }),
+
+  calendarImage: null,
+  setCalendarImage: (input) => set({ calendarImage: input }),
+
+  tabMonth: 0,
+  setTabMonth: (input) => set({ tabMonth: input }),
+
+  // startDay: startOfMonth(get().currentMonth),
+  // setStartDay: (input) => set({ startDay: input }),
+
+  // endDay: endOfMonth(get().currentMonth),
+  // setEndDay: (input) => set({ endDay: input }),
+
+  // st: (input) => {
+  //   let res = format(startOfMonth(input), "yyyy-MM-dd");
+  //   return res;
+  // },
+
+  // ed: (input) => {
+  //   let res = format(endOfMonth(input), "yyyy-MM-dd");
+  //   return res;
+  // },
+
+  // daymaker: (a, b) => {
+  //   let fir = format(endOfMonth(a), "yyyy-MM-dd");
+  //   let sec = format(endOfMonth(b), "yyyy-MM-dd");
+  //   return [fir, sec];
+  // },
+
+  // setParam() {
+  //   switch (get().tabMonth) {
+  //     case TabSelected.MONTH:
+  //       params.startDt = formatDate(startOfMonth(currentMonth));
+  //       params.endDt = formatDate(endOfMonth(currentMonth));
+  //       break;
+  //     case TabSelected.YEAR:
+  //       params.startDt = formatDate(startOfYear(currentYear));
+  //       params.endDt = formatDate(endOfYear(currentYear));
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // },
 }));
 
 export {

@@ -38,13 +38,14 @@ const ModalCloseBtn = styled.div`
 `;
 
 function DiaryModal(props) {
-  const { edit, setEdit } = calenderStore();
+  const { edit, setEdit, setCalendarImage } = calenderStore();
 
   function closeModal() {
     if (edit === true) {
       setEdit(!edit);
     }
     props.closeModal();
+    setCalendarImage(null);
   }
 
   return (

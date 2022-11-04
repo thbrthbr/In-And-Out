@@ -6,6 +6,19 @@ import { calenderStore } from "../../store/store.js";
 
 import defaultUser from "../../img/default-user.jpg";
 
+import axios from "axios";
+
+import {
+  addMonths,
+  subMonths,
+  addYears,
+  subYears,
+  startOfMonth,
+  endOfMonth,
+  startOfYear,
+  endOfYear,
+} from "date-fns";
+
 Date.prototype.format = function (f) {
   if (!this.valueOf()) return " ";
   var weekName = [
@@ -90,12 +103,21 @@ export default function Diary({
     setEdit,
     specificDate,
     setSpecificDate,
+    calendarImage,
+    setCalendarImage,
   } = calenderStore();
 
   const [textValue, setTextValue] = useState("");
   const [startDate, setStartDate] = useState(new Date());
 
   const [profileImage, setprofileImage] = useState();
+
+  // diaryDate가지고 데이터 요청
+  const diaryData =
+    showWrittenDiary &&
+    calendarData &&
+    calendarData.filter((data) => data.date === diaryDate)[0];
+  // console.log(diaryData);
 
   const handleSetValue = (e) => {
     setTextValue(e.target.value);
@@ -122,7 +144,7 @@ export default function Diary({
         : [],
       diary: {
         text: textValue,
-        diary_photo_url: "",
+        diary_photo_url: calendarImage ? calendarImage : "",
       },
     };
     closeModal();
@@ -133,6 +155,10 @@ export default function Diary({
   //date: startDate.format("MM/dd/yy"),
 
   const onSave = (e) => {
+    if (textValue === "") {
+      alert("내용을 입력해주세요");
+      return;
+    }
     e.preventDefault();
     console.log(startDate);
     let num = Math.floor(Math.random() * 100);
@@ -148,12 +174,13 @@ export default function Diary({
         : [],
       diary: {
         text: textValue,
-        diary_photo_url: "",
+        diary_photo_url: calendarImage ? calendarImage : "",
       },
     };
     console.log(body);
     closeModal();
     saveDataMutation.mutate(body);
+    setCalendarImage(null);
   };
 
   const onDelete = (e) => {
@@ -166,6 +193,7 @@ export default function Diary({
   };
 
   const fileInput = useRef();
+
   const onImageEdit = () => {};
 
   const handleButtonClick = (e) => {
@@ -179,16 +207,76 @@ export default function Diary({
     reader.readAsDataURL(file);
 
     reader.onloadend = () => {
-      setprofileImage(reader.result);
+      setCalendarImage(reader.result);
     };
   };
 
-  // diaryDate가지고 데이터 요청
-  const diaryData =
-    showWrittenDiary &&
-    calendarData &&
-    calendarData.filter((data) => data.date === diaryDate)[0];
-  // console.log(diaryData);
+  const [sendingImage, setSendingImage] = useState([]);
+
+  const handleChange2 = (e) => {
+    e.preventDefault();
+
+    const reader = new FileReader();
+    const file = fileInput.current.files[0];
+
+    reader.readAsDataURL(file);
+
+    reader.onloadend = () => {
+      setCalendarImage(reader.result);
+    };
+
+    const fileOrigin = e.target.files[0];
+    console.log(fileOrigin);
+    setSendingImage([...sendingImage, { uploadedFile: fileOrigin }]);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("발동됨ㅇㅇㅇㅇ");
+
+    const formData = new FormData();
+
+    formData.append("photo", sendingImage[0].uploadedFile);
+
+    // axios({
+    //   method: "post",
+    //   url: "http://localhost:5000/temp", //환경변수
+    //   data: formData,
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //     Authorization: localStorage.getItem("access_token"),
+    //   },
+    // });
+
+    setSendingImage([]);
+
+    if (textValue === "") {
+      alert("내용을 입력해주세요");
+      return;
+    }
+    e.preventDefault();
+    console.log(startDate);
+    let num = Math.floor(Math.random() * 100);
+    const body = {
+      id: num,
+      diary_id: num,
+      date: specificDate,
+      dailyIncomeList: diaryData.dailyIncomeList
+        ? diaryData.dailyIncomeList
+        : [],
+      dailyExpenseList: diaryData.dailyExpenseList
+        ? diaryData.dailyExpenseList
+        : [],
+      diary: {
+        text: textValue,
+        diary_photo_url: formData ? formData : "",
+      },
+    };
+    console.log(body);
+    closeModal();
+    saveDataMutation.mutate(body);
+    setCalendarImage(null);
+  };
 
   return (
     <div>
@@ -308,20 +396,21 @@ export default function Diary({
                 }}
               />
             )}
-
             {showWrittenDiary && !edit && (
               <>
-                <div>
-                  <img
-                    style={{
-                      width: "300px",
-                      height: "300px",
-                      marginTop: "15px",
-                    }}
-                    src={diaryData.diary.diary_photo_url}
-                    alt="이미지"
-                  />
-                </div>
+                {diaryData.diary.diary_photo_url ? (
+                  <div>
+                    <img
+                      style={{
+                        width: "300px",
+                        height: "300px",
+                        marginTop: "15px",
+                      }}
+                      src={diaryData.diary.diary_photo_url}
+                      alt="이미지"
+                    />
+                  </div>
+                ) : null}
                 <div>
                   <div>{diaryData.diary.text}</div>
                 </div>
@@ -341,8 +430,8 @@ export default function Diary({
                       marginTop: "15px",
                     }}
                     src={
-                      profileImage
-                        ? profileImage
+                      calendarImage
+                        ? calendarImage
                         : diaryData.diary.diary_photo_url
                     }
                     alt="이미지"
@@ -372,42 +461,42 @@ export default function Diary({
               </>
             )}
             {showNewDiary && (
-              // <form style={{ width: "100%" }}>
               <>
-                <div>
-                  <img
-                    style={{
-                      width: "300px",
-                      height: "300px",
-                      marginTop: "15px",
-                    }}
-                    src={profileImage ? profileImage : defaultUser}
-                    alt="이미지"
-                    onClick={handleButtonClick}
-                    htmlFor="input-file"
-                  />
-                  <input
-                    type="file"
-                    id="input-file"
-                    accept="image/*"
-                    ref={fileInput}
-                    style={{ display: "none" }}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <textarea
-                    placeholder="여기에 입력하세요"
-                    value={textValue}
-                    onChange={(e) => handleSetValue(e)}
-                  ></textarea>
-                </div>
-                <div>
-                  <button onClick={onImageEdit}>이미지 등록</button>
-                  <button onClick={onSave}>완료</button>
-                </div>
+                <form encType="multipart/form-data" onSubmit={handleSubmit}>
+                  <div>
+                    <img
+                      style={{
+                        width: "300px",
+                        height: "300px",
+                        marginTop: "15px",
+                      }}
+                      src={calendarImage ? calendarImage : defaultUser}
+                      alt="이미지"
+                      onClick={handleButtonClick}
+                      htmlFor="input-file"
+                    />
+                    <input
+                      type="file"
+                      id="input-file"
+                      accept="image/*"
+                      ref={fileInput}
+                      style={{ display: "none" }}
+                      onChange={handleChange2}
+                    />
+                  </div>
+                  <div>
+                    <textarea
+                      placeholder="여기에 입력하세요"
+                      value={textValue}
+                      onChange={(e) => handleSetValue(e)}
+                    ></textarea>
+                  </div>
+                  <div>
+                    {/* onClick={onSave} */}
+                    <button type="submit">완료</button>
+                  </div>
+                </form>
               </>
-              // </form>
             )}
           </DiaryContext>
         </Container>
