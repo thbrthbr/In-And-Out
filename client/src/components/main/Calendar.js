@@ -6,6 +6,17 @@ import styled from "styled-components";
 import { Icon } from "@iconify/react";
 import DiaryModal from "./WriteModal";
 import Diary from "./Diary";
+import {
+  addMonths,
+  subMonths,
+  addYears,
+  subYears,
+  startOfMonth,
+  endOfMonth,
+  startOfYear,
+  endOfYear,
+  format,
+} from "date-fns";
 
 import { calenderStore } from "../../store/store.js";
 
@@ -24,7 +35,54 @@ const Container = styled.div`
   justify-content: center;
 `;
 
+let month = new Date();
+
 export default function Calendar() {
+  // const prevMonth = () => {
+  //   currentMonth = subMonths(currentMonth, 1);
+  //   setParamAndRefetch();
+  // };
+  // const nextMonth = () => {
+  //   currentMonth = addMonths(currentMonth, 1);
+  //   setParamAndRefetch();
+  // };
+
+  // const formatDate = (date) => {
+  //   return `${date.getFullYear()}-${(date.getMonth() + 1)
+  //     .toString()
+  //     .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+  // };
+
+  // const setParam = () => {
+  //   switch (tabValue) {
+  //     case TabSelected.MONTH:
+  //       params.startDt = formatDate(startOfMonth(currentMonth));
+  //       params.endDt = formatDate(endOfMonth(currentMonth));
+  //       break;
+  //     case TabSelected.YEAR:
+  //       params.startDt = formatDate(startOfYear(currentYear));
+  //       params.endDt = formatDate(endOfYear(currentYear));
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
+
+  // const getCalendarDataFrom = async (url, params) => {
+  //   try {
+  //     const res = await axios(url, { params: params });
+  //     console.log(res);
+  //     return res.data;
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
+  // const setParamAndRefetch = () => {
+  //   setParam();
+  //   refetch();
+  // };
+
   const {
     showWrittenDiary,
     setShowWrittenDiary,
@@ -35,19 +93,53 @@ export default function Calendar() {
     detailDate,
     setDetailDate,
     setShowInstanceTable,
+    tabMonth,
+    setTabMonth,
+    currentMonth,
+    st,
+    ed,
+    startDay,
+    endDay,
   } = calenderStore();
 
   const queryClient = useQueryClient();
 
+  // console.log(currentMonth);
+
+  // console.log(st(currentMonth));
+  // console.log(ed(currentMonth));
+
+  // let tempMonth = new Date();
+  // let go = st(tempMonth);
+  // let stop = ed(tempMonth);
+
+  let stdt = format(startOfMonth(month), "yyyy-MM-dd");
+
+  let eddt = format(endOfMonth(month), "yyyy-MM-dd");
+
+  console.log(stdt);
+
+  const changeValue = (a, b) => {
+    stdt = a;
+    eddt = b;
+    refetch();
+  };
+
   const getData = async () => {
     try {
-      const res = await axios.get(DIARY_API_URL, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await axios.get(
+        `/api/calendar?endDt=${eddt}&startDt=${stdt}`,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       console.log(res.data);
+      // console.log(res.data.calendarExpenseDtoList[0].expenseDt);
       return res.data;
     } catch (err) {
       console.log(err);
+      console.log(stdt);
+      console.log(eddt);
     }
   };
 
@@ -55,7 +147,7 @@ export default function Calendar() {
     async (data) => {
       try {
         const editted = await getData();
-        console.log(editted);
+        // console.log(editted);
         for (let i = 0; i < editted.length; i++) {
           if (editted[i].date === data.date) {
             alert("해당 날짜에는 이미 다이어리가 등록되어 있습니다.");
@@ -67,7 +159,7 @@ export default function Calendar() {
         });
         return res.data;
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     },
     {
@@ -85,7 +177,7 @@ export default function Calendar() {
         });
         return res.data;
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     },
     {
@@ -103,7 +195,7 @@ export default function Calendar() {
         });
         return res.data;
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     },
     {
@@ -113,12 +205,17 @@ export default function Calendar() {
     }
   );
 
-  const { data, isLoading, refetch } = useQuery(["getCalendarData"], getData, {
-    staleTime: Infinity,
-  });
+  //tabMonth 추가하기
+  const { data, isLoading, refetch } = useQuery(
+    ["getCalendarData", tabMonth],
+    getData,
+    {
+      staleTime: Infinity,
+    }
+  );
 
   if (isLoading) return <PacmanLoader color="#36d7b7" />;
-  console.log("data", data);
+  // console.log("data", data);
 
   return (
     <Container
@@ -126,7 +223,7 @@ export default function Calendar() {
         setShowInstanceTable(false);
       }}
     >
-      <FullCalendar calendarData={data} />
+      <FullCalendar changeValue={changeValue} calendarData={data} />
       {/* <Icon
         icon="heroicons:pencil-square"
         style={{
