@@ -81,11 +81,11 @@ export default function Signin() {
 
       // console.log(response);
 
-      toast.success("회원가입 성공!", {
+      toast.success("회원가입 성공! 이메일로 인증 해주세요", {
         position: toast.POSITION.TOP_CENTER,
       });
       setTimeout(() => {
-        setLogState(true);
+        // setLogState(true);
         navigate("/");
       }, 3000);
     } catch (error) {
