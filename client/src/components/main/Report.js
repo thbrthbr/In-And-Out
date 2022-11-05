@@ -16,6 +16,7 @@ import Select from "@mui/material/Select";
 
 import TabPanel from "./TabPanel";
 import RadioButton from "./RadioButton";
+import DatePicker from "react-datepicker";
 
 import {
   addMonths,
@@ -26,6 +27,7 @@ import {
   endOfMonth,
   startOfYear,
   endOfYear,
+  format,
 } from "date-fns";
 
 import axios from "axios";
@@ -89,7 +91,22 @@ const costOptions = [
   { value: "expense", label: "지출" },
 ];
 
-const columns = [
+const months = [
+  "jan",
+  "feb",
+  "mar",
+  "apr",
+  "may",
+  "june",
+  "jul",
+  "aug",
+  "sep",
+  "oct",
+  "nov",
+  "dec",
+];
+
+let columns = [
   { key: "category", name: "내용", width: 200 },
   { key: "jan", name: "1월" },
   { key: "feb", name: "2월" },
@@ -133,6 +150,7 @@ export default function Report() {
 
   const [rows, setRows] = useState([]);
   const [category, setCategory] = useState("");
+  const [startMonth, setStartMonth] = useState(new Date());
 
   const handleDropdownCategoryChange = (event) => {
     let newData = [];
@@ -218,8 +236,16 @@ export default function Report() {
         params.endDt = formatDate(endOfMonth(currentMonth));
         break;
       case TabSelected.YEAR:
-        params.startDt = formatDate(startOfYear(currentYear));
-        params.endDt = formatDate(endOfYear(currentYear));
+        const startYear = format(startMonth, "yyyy");
+        const startMon = startMonth;
+        const startDay = format(startOfMonth(startMon), "dd");
+        const endYear = format(addYears(startMonth, 1), "yyyy");
+        const endMon = subMonths(startMonth, 1);
+        const endDay = format(endOfMonth(endMon), "dd");
+
+        params.startDt = `${startYear}-${format(startMon, "MM")}-${startDay}`; //formatDate(startOfYear(currentYear));
+        params.endDt = `${endYear}-${format(endMon, "MM")}-${endDay}`; //formatDate(endOfYear(currentYear));
+
         break;
       default:
         break;
@@ -240,14 +266,14 @@ export default function Report() {
     const yearlyIncomeData = data.incomeReportList.filter(
       (item) => item.year === currentYear.getFullYear()
     );
-    const yearlyIncomeMonthSums = yearlyIncomeData.map(
+    const yearlyIncomeMonthSums = data.incomeReportList.map(
       (data) => data.monthlySum
     );
 
     const yearlyExpenseData = data.expenseReportList.filter(
       (item) => item.year === currentYear.getFullYear()
     );
-    const yearlyExpenseMonthSums = yearlyExpenseData.map(
+    const yearlyExpenseMonthSums = data.expenseReportList.map(
       (data) => data.monthlySum
     );
 
@@ -289,12 +315,9 @@ export default function Report() {
   };
 
   const renderTotalYearReportOnTable = (data) => {
-    let incomeCategories = {
-      // 주수입: new Array(14).fill(0),
-    };
-    let expenseCategories = {
-      // 주수입: new Array(14).fill(0),
-    };
+    console.log(data);
+    let incomeCategories = {};
+    let expenseCategories = {};
     const tempRows = [];
 
     tempRows.push(createMainRows("수입지출합계"));
@@ -305,7 +328,7 @@ export default function Report() {
       (item) => item.year === currentYear.getFullYear()
     );
 
-    const yearlyIncomeReport = yearlyIncomeData.map((data) =>
+    const yearlyIncomeReport = data.incomeReportList.map((data) =>
       data.incomeReport ? data.incomeReport : 0
     );
 
@@ -346,7 +369,7 @@ export default function Report() {
       (item) => item.year === currentYear.getFullYear()
     );
 
-    const yearlyExpenseReport = yearlyExpenseData.map((data) =>
+    const yearlyExpenseReport = data.expenseReportList.map((data) =>
       data.expenseReport ? data.expenseReport : 0
     );
 
@@ -409,7 +432,18 @@ export default function Report() {
         break;
       case TabSelected.YEAR:
         // console.log(currentYear.getFullYear());
-        const yearLabel = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+        const yearLabel = [];
+        let month = startMonth;
+        for (let i = 1; i <= 12; i++) {
+          const curMonth = month.getMonth();
+          yearLabel.push(curMonth + 1);
+
+          columns[i].key = months[curMonth];
+          columns[i].name = `${curMonth + 1}월`;
+          month = addMonths(month, 1);
+        }
+
         lineConfig.data.labels = yearLabel;
 
         let categories = {
@@ -424,8 +458,8 @@ export default function Report() {
         );
         // lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
         // renderIncomeYearReportOnGraph(data);
-        renderTotalYearReportOnGraph(data);
-        renderTotalYearReportOnTable(data);
+        yearlyOption === "chart" && renderTotalYearReportOnGraph(data);
+        yearlyOption === "table" && renderTotalYearReportOnTable(data);
 
         // const yearlyIncomeReport = yearlyIncomeData.map((data) =>
         //   data.incomeReport ? data.incomeReport : 0
@@ -527,8 +561,15 @@ export default function Report() {
   };
 
   const { data, isLoading, refetch } = useQuery(
-    ["getMonthReportData", costOption, tabValue],
-    () => handleReportData(API_URL, params)
+    [
+      "getMonthOrYearReportData",
+      costOption,
+      tabValue,
+      startMonth,
+      yearlyOption,
+    ],
+    () => handleReportData(API_URL, params),
+    { staleTime: 0, cacheTime: 0 }
   );
 
   if (isLoading)
@@ -607,8 +648,18 @@ export default function Report() {
             handleChange={handleCheckboxChange}
           />
         </Grid>
-
-        <DateHeader currentTime={currentYear} prev={prevYear} next={nextYear} />
+        <DatePicker
+          selected={startMonth}
+          onChange={(date) => setStartMonth(date)}
+          dateFormat="MM/yyyy"
+          showMonthYearPicker
+        />
+        <DateHeader
+          type={"year"}
+          currentTime={startMonth}
+          prev={setStartMonth}
+          next={setStartMonth}
+        />
         {yearlyOption === "table" && (
           <div>
             <DataGrid columns={columns} rows={rows} height={500} />

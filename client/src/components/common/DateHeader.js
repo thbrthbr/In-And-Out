@@ -1,9 +1,9 @@
-import { format } from "date-fns";
+import { format, addMonths, subMonths, addYears, subYears } from "date-fns";
 import { Icon } from "@iconify/react";
 import styled from "styled-components";
 
 const Header = styled.div`
-  width: 200px;
+  width: 300px;
   height: 7%;
   display: inline-flex;
   flex-direction: row;
@@ -50,20 +50,46 @@ const Text = styled.span`
   font-weight: 600;
 `;
 
+const Spacer = styled.span`
+  font-weight: 800;
+  margin-right: 10px;
+`;
+
 const DateHeader = ({ type, currentTime, prev, next }) => {
   return (
-    <Header>
-      <ColFirst>
-        <span className="text">
-          {type === "month" && <Text>{format(currentTime, "M")}월</Text>}
-          <Text>{format(currentTime, "yyyy")}</Text>
-        </span>
-      </ColFirst>
-      <ColEnd>
-        <Icon icon="bi:arrow-left-circle-fill" onClick={prev} />
-        <Icon icon="bi:arrow-right-circle-fill" onClick={next} />
-      </ColEnd>
-    </Header>
+    <>
+      {type === "month" && (
+        <Header>
+          <ColFirst>
+            <span className="text">
+              <Text>{format(currentTime, "M")}월</Text>
+              <Text>{format(currentTime, "yyyy")}</Text>
+            </span>
+          </ColFirst>
+          <ColEnd>
+            <Icon icon="bi:arrow-left-circle-fill" onClick={prev} />
+            <Icon icon="bi:arrow-right-circle-fill" onClick={next} />
+          </ColEnd>
+        </Header>
+      )}
+      {type === "year" && (
+        <Header>
+          <ColFirst>
+            <span className="text">
+              <Text>{format(currentTime, "M")}월</Text>
+              <Text>{format(currentTime, "yyyy")}</Text>
+            </span>
+          </ColFirst>
+          <Spacer>-</Spacer>
+          <ColFirst>
+            <span className="text">
+              <Text>{format(subMonths(currentTime, 1), "M")}월</Text>
+              <Text>{format(addYears(currentTime, 1), "yyyy")}</Text>
+            </span>
+          </ColFirst>
+        </Header>
+      )}
+    </>
   );
 };
 
