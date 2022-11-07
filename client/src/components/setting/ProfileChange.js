@@ -352,7 +352,7 @@ export default function ProfileChange() {
                   helperText={errors.gender?.message}
                 />
                 <FormControlLabel
-                  value="남자"
+                  value="male"
                   control={<Radio />}
                   label="남자"
                   defaultChecked={gender === "male" ? true : false}

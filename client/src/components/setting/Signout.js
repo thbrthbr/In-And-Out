@@ -4,6 +4,11 @@ import { recoverInitiateSchema } from "../../schema/form_validation";
 import { loginStore, useStore2 } from "../../store/store.js";
 import { useNavigate } from "react-router-dom";
 
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import axios from "axios";
+
 import {
   Button,
   TextField,
@@ -44,30 +49,63 @@ export default function Signout() {
     alert("회원 탈퇴 완료");
   }
 
-  const onSubmit = async (e) => {
-    const response = await fetch(`http://localhost:4000/users`);
-    if (response.ok) {
-      const users = await response.json();
-      const user = users.find((user) => user.id === id);
-      if (user.password !== e["pw"]) {
-        alert("비밀번호가 맞지 않습니다.");
-        throw new Error("비밀번호가 맞지 않습니다.");
-      }
-    } else {
-      throw new Error("서버 통신이 원할하지 않습니다.");
+  const sendToServer = async (data) => {
+    console.log(data);
+    try {
+      const res = await axios.delete("/api/member/info", data, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      toast.success(
+        "회원탈퇴가 성공적으로 처리됐습니다! 3초후에 메인페이지로 이동합니다",
+        {
+          position: toast.POSITION.TOP_CENTER,
+        }
+      );
+
+      setTimeout(() => {
+        sessionStorage.clear();
+        navigate("/");
+      }, 3000);
+    } catch (err) {
+      console.log(err);
+      toast.warn("회원탈퇴 처리에 실패했습니다!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
-    await signout();
-    setLogState(false);
-    setId("");
-    setNickname("");
-    setPhoneNumber("");
-    setBirthdate("");
-    setResidence("");
-    setGender("");
-    setPassword("");
-    sessionStorage.clear();
-    navigate("/");
   };
+  const onSubmit = (data) => {
+    const passwordData = {
+      password: data.passwordConfirm,
+    };
+
+    sendToServer(passwordData);
+  };
+  // const onSubmit = async (e) => {
+  //   const response = await fetch(`http://localhost:4000/users`);
+  //   if (response.ok) {
+  //     const users = await response.json();
+  //     const user = users.find((user) => user.id === id);
+  //     if (user.password !== e["pw"]) {
+  //       alert("비밀번호가 맞지 않습니다.");
+  //       throw new Error("비밀번호가 맞지 않습니다.");
+  //     }
+  //   } else {
+  //     throw new Error("서버 통신이 원할하지 않습니다.");
+  //   }
+  //   await signout();
+  //   setLogState(false);
+  //   setId("");
+  //   setNickname("");
+  //   setPhoneNumber("");
+  //   setBirthdate("");
+  //   setResidence("");
+  //   setGender("");
+  //   setPassword("");
+
+  //   sessionStorage.clear();
+  //   navigate("/");
+  // };
 
   return (
     <Box
@@ -78,6 +116,7 @@ export default function Signout() {
         alignItems: "center",
       }}
     >
+      <ToastContainer pauseOnHover={false} />
       <Typography component="h1" variant="h5">
         회원 탈퇴
       </Typography>
