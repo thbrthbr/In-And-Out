@@ -28,8 +28,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { useCategoryDropDownItemStore } from "../../store/store.js";
 
-const INCOME_API_URL = "/api/income";
-const EXPENSE_API_URL = "/api/expense";
+const INCOME_API_URL = `${process.env.REACT_APP_API_URL}/api/income`;
+const EXPENSE_API_URL = `${process.env.REACT_APP_API_URL}/api/expense`;
 
 const incomeColumns = [
   SelectColumn,

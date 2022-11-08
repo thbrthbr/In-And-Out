@@ -1,6 +1,5 @@
 {
   "name": "inandout",
-  "homepage": "https://re-zero-in-and-out.github.io/In-And-Out/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
