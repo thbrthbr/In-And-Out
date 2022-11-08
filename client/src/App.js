@@ -25,6 +25,8 @@ import Layout from "./components/common/Layout";
 
 import Screen from "./components/common/Screen";
 
+import SignupCheck from "./components/login/SignupCheck";
+
 import { QueryClientProvider, QueryClient } from "react-query";
 
 import PublicRoute from "./components/route/publicRoute";
@@ -85,10 +87,19 @@ function App() {
                 }
               ></Route>
               <Route
-                path="/initiate"
+                path="/password_reset/sending"
                 element={
                   <PublicRoute>
                     <RecoverInitiate />
+                  </PublicRoute>
+                }
+              ></Route>
+
+              <Route
+                path="/signup_check/sending"
+                element={
+                  <PublicRoute>
+                    <SignupCheck />
                   </PublicRoute>
                 }
               ></Route>

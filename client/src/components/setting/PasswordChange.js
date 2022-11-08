@@ -53,7 +53,10 @@ export default function PasswordChange() {
 
   const handlePasswordChange = async (passwordData) => {
     try {
-      const res = await axios.patch("/api/member/password", passwordData);
+      const res = await axios.patch(
+        "${process.env.REACT_APP_API_URL}/api/member/password",
+        passwordData
+      );
 
       toast.success("비밀번호 변경이 성공적으로 처리됐습니다!", {
         position: toast.POSITION.TOP_CENTER,

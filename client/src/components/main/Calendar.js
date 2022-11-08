@@ -91,7 +91,7 @@ export default function Calendar() {
     try {
       let dateArr = [];
       const res = await axios.get(
-        `/api/calendar?endDt=${eddt}&startDt=${stdt}`,
+        `${process.env.REACT_APP_API_URL}/api/calendar?endDt=${eddt}&startDt=${stdt}`,
         {
           headers: { "Content-Type": "application/json" },
         }

@@ -168,7 +168,9 @@ export default function ProfileChange() {
 
   const getUserData = async () => {
     try {
-      const res = await axios.get("/api/member/info");
+      const res = await axios.get(
+        "${process.env.REACT_APP_API_URL}/api/member/info"
+      );
       // console.log(res.data);
       return res.data;
     } catch (err) {
@@ -352,7 +354,7 @@ export default function ProfileChange() {
                   helperText={errors.gender?.message}
                 />
                 <FormControlLabel
-                  value="남자"
+                  value="male"
                   control={<Radio />}
                   label="남자"
                   defaultChecked={gender === "male" ? true : false}

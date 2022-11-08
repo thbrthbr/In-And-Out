@@ -69,23 +69,26 @@ export default function Signin() {
 
   async function sendUserDataToServer() {
     try {
-      const response = await axios.post("/api/signup", {
-        email: id,
-        password: password,
-        nickName: nickname,
-        phone: phoneNumber,
-        birth: birthdate,
-        address: residence,
-        gender: gender,
-      });
+      const response = await axios.post(
+        "${process.env.REACT_APP_API_URL}/api/signup",
+        {
+          email: id,
+          password: password,
+          nickName: nickname,
+          phone: phoneNumber,
+          birth: birthdate,
+          address: residence,
+          gender: gender,
+        }
+      );
 
-      // console.log(response);
+      console.log(response);
 
-      toast.success("회원가입 성공!", {
+      toast.success("회원가입 성공! 이메일로 인증 해주세요", {
         position: toast.POSITION.TOP_CENTER,
       });
       setTimeout(() => {
-        setLogState(true);
+        // setLogState(true);
         navigate("/");
       }, 3000);
     } catch (error) {
