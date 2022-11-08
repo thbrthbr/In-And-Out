@@ -52,9 +52,13 @@ export default function Signout() {
   const sendToServer = async (data) => {
     console.log(data);
     try {
-      const res = await axios.delete("/api/member/info", data, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await axios.delete(
+        "${process.env.REACT_APP_API_URL}/api/member/info",
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       toast.success(
         "회원탈퇴가 성공적으로 처리됐습니다! 3초후에 메인페이지로 이동합니다",

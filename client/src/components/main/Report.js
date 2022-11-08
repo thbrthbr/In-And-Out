@@ -549,8 +549,8 @@ export default function Report() {
 
   let API_URL =
     tabValue === TabSelected.MONTH
-      ? `/api/report/month/${costOption}`
-      : `/api/report/year`;
+      ? `${process.env.REACT_APP_API_URL}/api/report/month/${costOption}`
+      : `${process.env.REACT_APP_API_URL}/api/report/year`;
   const params = {};
   setParam();
 

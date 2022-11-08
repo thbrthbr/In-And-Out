@@ -34,7 +34,7 @@ export default function RecoverInitiate() {
   const sendToServer = async (data) => {
     try {
       const res = await axios.post(
-        `/api/password/email/phone/sending?id=${uuid}`,
+        `${process.env.REACT_APP_API_URL}/api/password/email/phone/sending?id=${uuid}`,
         data
       );
 
