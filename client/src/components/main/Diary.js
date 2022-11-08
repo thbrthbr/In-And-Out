@@ -17,6 +17,7 @@ import {
   endOfMonth,
   startOfYear,
   endOfYear,
+  format,
 } from "date-fns";
 
 Date.prototype.format = function (f) {
@@ -79,16 +80,37 @@ const Container = styled.div`
 
 const Pyo = styled.div`
   height: 300px;
+  overflow: scroll;
+`;
+
+const DeleteImage = styled.div`
+  height: 30px;
+  width: 100px;
+  border: 1px solid rgb(186, 186, 186);
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  &:hover {
+    background-color: rgb(186, 186, 186);
+  }
+`;
+
+const EditPlace = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const DiaryContext = styled.div``;
 
 export default function Diary({
+  diaryDatas,
   calendarData,
   saveDataMutation,
   saveEditDataMutation,
   deleteDataMutation,
   closeModal,
+  changeValue2,
+  dateList,
 }) {
   const {
     showWrittenDiary,
@@ -105,91 +127,115 @@ export default function Diary({
     setSpecificDate,
     calendarImage,
     setCalendarImage,
+    dateOrigin,
+    setDateOrigin,
+    text,
+    setText,
+    diaryImage,
+    diaryId,
+    sendingImage,
+    setSendingImage,
+    currentMonth,
+    setcurrentMonth,
+    showDiary,
+    setTempText,
   } = calenderStore();
 
-  const [textValue, setTextValue] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
+  // const [textValue, setTextValue] = useState("");
+  // const [startDate, setStartDate] = useState(new Date());
 
-  const [profileImage, setprofileImage] = useState();
+  // const [profileImage, setprofileImage] = useState();
 
   // diaryDate가지고 데이터 요청
-  const diaryData =
-    showWrittenDiary &&
-    calendarData &&
-    calendarData.filter((data) => data.date === diaryDate)[0];
+  // const diaryData =
+  //   showWrittenDiary &&
+  //   calendarData &&
+  //   calendarData.filter((data) => data.date === diaryDate)[0];
+  // const diaryData = 1;
   // console.log(diaryData);
 
+  const temp = () => {
+    console.log(sendingImage);
+  };
+
   const handleSetValue = (e) => {
-    setTextValue(e.target.value);
+    setText(e.target.value);
+    console.log(specificDate);
   };
 
   const onEdit = () => {
     setEdit(!edit);
-    setTextValue(diaryData.diary.text);
   };
 
-  const onEditSave = (e) => {
-    e.preventDefault();
-
-    console.log(diaryData.date);
-    const body = {
-      id: diaryData.id,
-      diary_id: diaryData.diary_id,
-      date: diaryData.date,
-      dailyIncomeList: diaryData.dailyIncomeList
-        ? diaryData.dailyIncomeList
-        : [],
-      dailyExpenseList: diaryData.dailyExpenseList
-        ? diaryData.dailyExpenseList
-        : [],
-      diary: {
-        text: textValue,
-        diary_photo_url: calendarImage ? calendarImage : "",
-      },
-    };
-    closeModal();
-    setEdit(!edit);
-    saveEditDataMutation.mutate([body, diaryData.id]);
+  const onImageDelete = () => {
+    setSendingImage([100, 101, 108, 101, 116, 101]);
+    setCalendarImage(defaultUser);
   };
+
+  // const onEditSave = (e) => {
+  //   e.preventDefault();
+
+  //   console.log(diaryData.date);
+  //   const body = {
+  //     id: diaryData.id,
+  //     diary_id: diaryData.diary_id,
+  //     date: diaryData.date,
+  //     dailyIncomeList: diaryData.dailyIncomeList
+  //       ? diaryData.dailyIncomeList
+  //       : [],
+  //     dailyExpenseList: diaryData.dailyExpenseList
+  //       ? diaryData.dailyExpenseList
+  //       : [],
+  //     diary: {
+  //       text: textValue,
+  //       diary_photo_url: calendarImage ? calendarImage : "",
+  //     },
+  //   };
+  //   closeModal();
+  //   setEdit(!edit);
+  //   saveEditDataMutation.mutate([body, diaryData.id]);
+  // };
 
   //date: startDate.format("MM/dd/yy"),
 
-  const onSave = (e) => {
-    if (textValue === "") {
-      alert("내용을 입력해주세요");
-      return;
-    }
-    e.preventDefault();
-    console.log(startDate);
-    let num = Math.floor(Math.random() * 100);
-    const body = {
-      id: num,
-      diary_id: num,
-      date: specificDate,
-      dailyIncomeList: diaryData.dailyIncomeList
-        ? diaryData.dailyIncomeList
-        : [],
-      dailyExpenseList: diaryData.dailyExpenseList
-        ? diaryData.dailyExpenseList
-        : [],
-      diary: {
-        text: textValue,
-        diary_photo_url: calendarImage ? calendarImage : "",
-      },
-    };
-    console.log(body);
-    closeModal();
-    saveDataMutation.mutate(body);
-    setCalendarImage(null);
-  };
+  // const onSave = (e) => {
+  //   if (textValue === "") {
+  //     alert("내용을 입력해주세요");
+  //     return;
+  //   }
+  //   e.preventDefault();
+  //   console.log(startDate);
+  //   let num = Math.floor(Math.random() * 100);
+  //   const body = {
+  //     id: num,
+  //     diary_id: num,
+  //     date: specificDate,
+  //     dailyIncomeList: diaryData.dailyIncomeList
+  //       ? diaryData.dailyIncomeList
+  //       : [],
+  //     dailyExpenseList: diaryData.dailyExpenseList
+  //       ? diaryData.dailyExpenseList
+  //       : [],
+  //     diary: {
+  //       text: textValue,
+  //       diary_photo_url: calendarImage ? calendarImage : "",
+  //     },
+  //   };
+  //   console.log(body);
+  //   closeModal();
+  //   saveDataMutation.mutate(body);
+  //   setCalendarImage(null);
+  // };
 
   const onDelete = (e) => {
     e.preventDefault();
+
     const body = {
-      diary_id: diaryData.diary_id,
+      diaryId: diaryId,
     };
+    const input = JSON.stringify(body);
+    deleteDataMutation.mutate(input);
     closeModal();
-    deleteDataMutation.mutate([body, diaryData.id]);
   };
 
   const fileInput = useRef();
@@ -211,7 +257,11 @@ export default function Diary({
     };
   };
 
-  const [sendingImage, setSendingImage] = useState([]);
+  //01/01/22
+  // const formatter = (e) => {
+  //   let string = "";
+  //   string = e[]
+  // }
 
   const handleChange2 = (e) => {
     e.preventDefault();
@@ -226,150 +276,97 @@ export default function Diary({
     };
 
     const fileOrigin = e.target.files[0];
+    console.log(typeof fileOrigin);
     console.log(fileOrigin);
-    setSendingImage([...sendingImage, { uploadedFile: fileOrigin }]);
+    setSendingImage(fileOrigin);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("발동됨ㅇㅇㅇㅇ");
-
-    const formData = new FormData();
-
-    formData.append("photo", sendingImage[0].uploadedFile);
-
-    // axios({
-    //   method: "post",
-    //   url: "http://localhost:5000/temp", //환경변수
-    //   data: formData,
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //     Authorization: localStorage.getItem("access_token"),
-    //   },
-    // });
-
-    setSendingImage([]);
-
-    if (textValue === "") {
+    if (text === "") {
       alert("내용을 입력해주세요");
       return;
     }
-    e.preventDefault();
-    console.log(startDate);
-    let num = Math.floor(Math.random() * 100);
-    const body = {
-      id: num,
-      diary_id: num,
-      date: specificDate,
-      dailyIncomeList: diaryData.dailyIncomeList
-        ? diaryData.dailyIncomeList
-        : [],
-      dailyExpenseList: diaryData.dailyExpenseList
-        ? diaryData.dailyExpenseList
-        : [],
-      diary: {
-        text: textValue,
-        diary_photo_url: formData ? formData : "",
-      },
-    };
-    console.log(body);
-    closeModal();
-    saveDataMutation.mutate(body);
-    setCalendarImage(null);
+    const body2 = new FormData();
+
+    if (edit !== true) {
+      const input = { diaryDt: dateOrigin, text: basicSetting[0] };
+      body2.append(
+        "input",
+        new Blob([JSON.stringify(input)], { type: "application/json" })
+      );
+      body2.append("file", sendingImage);
+      setSendingImage(null);
+      closeModal();
+      // saveDataMutation.mutate(body);
+      saveDataMutation.mutate(body2);
+      setCalendarImage(null);
+      setText("");
+    } else {
+      const input = {
+        diaryId: diaryId,
+        diaryDt: dateOrigin,
+        text: text,
+      };
+      body2.append(
+        "input",
+        new Blob([JSON.stringify(input)], { type: "application/json" })
+      );
+      body2.append("file", sendingImage);
+      setSendingImage(null);
+
+      // saveDataMutation.mutate(body);
+      saveEditDataMutation.mutate(body2);
+      onEdit();
+      setCalendarImage(null);
+      setText("");
+      closeModal();
+    }
   };
+
+  function formatter(e) {
+    let a = e;
+    let string = a[5] + a[6] + "/" + a[8] + a[9] + "/" + a[2] + a[3];
+    return string;
+  }
+
+  const basicSetting = (a, b) => {
+    return [a, b];
+  };
+  let checking = 0;
 
   return (
     <div>
-      {(showWrittenDiary || showNewDiary) && (
+      {showDiary && (
         <Container>
           <Pyo>
-            {showWrittenDiary && !edit && (
-              <>
-                {/* 작성된 화면 */}
-                <div style={{ height: "300px" }}>
-                  <div>수입</div>
-                  {diaryData.dailyIncomeList.length &&
-                    diaryData.dailyIncomeList.map((income) => {
-                      return (
-                        <div>
-                          <span>{income.income_item}</span>
-                          <span>{income.income_amount}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-                <div style={{ height: "300px" }}>
-                  <div>지출</div>
-                  {diaryData.dailyExpenseList.length &&
-                    diaryData.dailyExpenseList.map((expense) => {
-                      return (
-                        <div>
-                          <span>{expense.expense_item}</span>
-                          <span>{expense.expense_amount}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-              </>
-            )}
-            {showWrittenDiary && edit && (
-              <>
-                {/* 작성된 화면 수정 화면 */}
-                <div style={{ height: "300px" }}>
-                  <div>수입</div>
-                  {diaryData.dailyIncomeList.length &&
-                    diaryData.dailyIncomeList.map((income) => {
-                      return (
-                        <div>
-                          <span>{income.income_item}</span>
-                          <span>{income.income_amount}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-                <div style={{ height: "300px" }}>
-                  <div>지출</div>
-                  {diaryData.dailyExpenseList.length &&
-                    diaryData.dailyExpenseList.map((expense) => {
-                      return (
-                        <div>
-                          <span>{expense.expense_item}</span>
-                          <span>{expense.expense_amount}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-              </>
-            )}
-            {showNewDiary && (
-              <>
-                {/* 아직 작성되지 않은 화면 */}
-                <div style={{ height: "300px" }}>
-                  <div>수입</div>
-                  {diaryData.dailyIncomeList &&
-                    diaryData.dailyIncomeList.map((income) => {
-                      return (
-                        <div>
-                          <span>{income.income_item}</span>
-                          <span>{income.income_amount}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-                <div style={{ height: "300px" }}>
-                  <div>지출</div>
-                  {diaryData.dailyExpenseList &&
-                    diaryData.dailyExpenseList.map((expense) => {
-                      return (
-                        <div>
-                          <span>{expense.expense_item}</span>
-                          <span>{expense.expense_amount}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-              </>
-            )}
+            <div style={{ height: "300px" }}>
+              <div>수입</div>
+              {calendarData.calendarIncomeDtoList.length > 0 &&
+                calendarData.calendarIncomeDtoList.map((income) => {
+                  if (formatter(income.incomeDt) === diaryDate)
+                    return (
+                      <div>
+                        <span>{income.item}</span>
+                        <span>{income.amount}</span>
+                      </div>
+                    );
+                })}
+            </div>
+            <div style={{ height: "300px" }}>
+              <div>지출</div>
+              {calendarData.calendarExpenseDtoList.length > 0 &&
+                calendarData.calendarExpenseDtoList.map((expense) => {
+                  if (formatter(expense.expenseDt) === diaryDate) {
+                    return (
+                      <div>
+                        <span>{expense.item}</span>
+                        <span>{expense.amount}</span>
+                      </div>
+                    );
+                  }
+                })}
+            </div>
           </Pyo>
           <DiaryContext>
             {edit ? (
@@ -378,27 +375,84 @@ export default function Diary({
               <DatePicker
                 selected={new Date(specificDate)}
                 onChange={(date) => {
-                  setSpecificDate(date.format("MM/dd/yy"));
-                  setDiaryDate(date.format("MM/dd/yy"));
-                  let checker = 0;
-                  calendarData.map((data) => {
-                    if (date.format("MM/dd/yy") === data.date) {
-                      checker++;
+                  // 여기에 월 이동에 따른 데이터 재요청 함수 만들어서 넣어야함
+                  // changeValue(,);
+                  console.log(date.format("MM"));
+                  console.log(currentMonth.format("MM"));
+                  if (date.format("MM") !== currentMonth.format("MM")) {
+                    if (
+                      parseInt(date.format("MM")) <
+                      parseInt(currentMonth.format("MM"))
+                    ) {
+                      changeValue2(
+                        format(
+                          startOfMonth(
+                            subMonths(
+                              currentMonth,
+                              parseInt(
+                                currentMonth.format("MM") -
+                                  parseInt(date.format("MM"))
+                              )
+                            )
+                          ),
+                          "yyyy-MM-dd"
+                        ),
+                        format(
+                          endOfMonth(
+                            subMonths(
+                              currentMonth,
+                              parseInt(currentMonth.format("MM")) -
+                                parseInt(date.format("MM"))
+                            )
+                          ),
+                          "yyyy-MM-dd"
+                        ),
+                        date
+                      );
+                    } else if (
+                      parseInt(date.format("MM")) >
+                      parseInt(currentMonth.format("MM"))
+                    ) {
+                      changeValue2(
+                        format(
+                          startOfMonth(
+                            addMonths(
+                              currentMonth,
+                              parseInt(date.format("MM")) -
+                                parseInt(currentMonth.format("MM"))
+                            )
+                          ),
+                          "yyyy-MM-dd"
+                        ),
+                        format(
+                          endOfMonth(
+                            addMonths(
+                              currentMonth,
+                              parseInt(date.format("MM")) -
+                                parseInt(currentMonth.format("MM"))
+                            )
+                          ),
+                          "yyyy-MM-dd"
+                        ),
+                        date
+                      );
                     }
-                  });
-                  if (checker == 0) {
-                    setShowWrittenDiary(false);
-                    setShowNewDiary(true);
+
+                    setDateOrigin(date.format("yyyy-MM-dd"));
+                    setSpecificDate(date.format("MM/dd/yy"));
+                    setDiaryDate(date.format("MM/dd/yy"));
+                    let checker = 0;
                   } else {
-                    setShowWrittenDiary(true);
-                    setShowNewDiary(false);
+                    setDateOrigin(date.format("yyyy-MM-dd"));
+                    setSpecificDate(date.format("MM/dd/yy"));
+                    setDiaryDate(date.format("MM/dd/yy"));
                   }
                 }}
               />
             )}
-            {showWrittenDiary && !edit && (
-              <>
-                {diaryData.diary.diary_photo_url ? (
+            {edit ? (
+              <form encType="multipart/form-data" onSubmit={handleSubmit}>
+                <EditPlace>
                   <div>
                     <img
                       style={{
@@ -406,71 +460,7 @@ export default function Diary({
                         height: "300px",
                         marginTop: "15px",
                       }}
-                      src={diaryData.diary.diary_photo_url}
-                      alt="이미지"
-                    />
-                  </div>
-                ) : null}
-                <div>
-                  <div>{diaryData.diary.text}</div>
-                </div>
-                <div>
-                  <button onClick={onEdit}>수정하기</button>
-                  <button onClick={onDelete}>삭제</button>
-                </div>
-              </>
-            )}
-            {showWrittenDiary && edit && (
-              <>
-                <div>
-                  <img
-                    style={{
-                      width: "300px",
-                      height: "300px",
-                      marginTop: "15px",
-                    }}
-                    src={
-                      calendarImage
-                        ? calendarImage
-                        : diaryData.diary.diary_photo_url
-                    }
-                    alt="이미지"
-                    onClick={handleButtonClick}
-                    htmlFor="input-file"
-                  />
-                  <input
-                    type="file"
-                    id="input-file"
-                    accept="image/*"
-                    ref={fileInput}
-                    style={{ display: "none" }}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <textarea
-                    // placeholder="여기에 입력하세요"
-                    value={textValue}
-                    onChange={(e) => handleSetValue(e)}
-                  ></textarea>
-                </div>
-                <div>
-                  <button onClick={onImageEdit}>이미지 등록</button>
-                  <button onClick={onEditSave}>수정</button>
-                </div>
-              </>
-            )}
-            {showNewDiary && (
-              <>
-                <form encType="multipart/form-data" onSubmit={handleSubmit}>
-                  <div>
-                    <img
-                      style={{
-                        width: "300px",
-                        height: "300px",
-                        marginTop: "15px",
-                      }}
-                      src={calendarImage ? calendarImage : defaultUser}
+                      src={calendarImage ? calendarImage : diaryImage}
                       alt="이미지"
                       onClick={handleButtonClick}
                       htmlFor="input-file"
@@ -486,17 +476,105 @@ export default function Diary({
                   </div>
                   <div>
                     <textarea
-                      placeholder="여기에 입력하세요"
-                      value={textValue}
+                      // placeholder="여기에 입력하세요"
+                      value={basicSetting[0]}
                       onChange={(e) => handleSetValue(e)}
                     ></textarea>
                   </div>
                   <div>
-                    {/* onClick={onSave} */}
-                    <button type="submit">완료</button>
+                    <DeleteImage onClick={onImageDelete}>
+                      이미지 삭제
+                    </DeleteImage>
+                    <button type="submit">수정</button>
                   </div>
-                </form>
-              </>
+                </EditPlace>
+              </form>
+            ) : dateList.includes(diaryDate) ? (
+              diaryDatas.map((data) => {
+                if (formatter(data.diaryDt) === diaryDate) {
+                  basicSetting(data.text, data.s3ImageUrl);
+                  {
+                    if (data.s3ImageUrl !== "") {
+                      // setCalendarImage(data.s3ImageUrl);
+                      return (
+                        <div>
+                          <img
+                            style={{
+                              width: "300px",
+                              height: "300px",
+                              marginTop: "15px",
+                            }}
+                            src={data.s3ImageUrl}
+                            alt="이미지"
+                          />
+                          <div>
+                            <div>{data.text}</div>
+                          </div>
+                          <div>
+                            <button onClick={onEdit}>수정하기</button>
+                            <button onClick={onDelete}>삭제</button>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div>
+                          <img
+                            style={{
+                              width: "300px",
+                              height: "300px",
+                              marginTop: "15px",
+                            }}
+                            src=""
+                            alt="이미지"
+                          />
+                          <div>
+                            <div>{text}</div>
+                          </div>
+                          <div>
+                            <button onClick={onEdit}>수정하기</button>
+                            <button onClick={onDelete}>삭제</button>
+                          </div>
+                        </div>
+                      );
+                    }
+                  }
+                }
+              })
+            ) : (
+              <form encType="multipart/form-data" onSubmit={handleSubmit}>
+                <div>
+                  <img
+                    style={{
+                      width: "300px",
+                      height: "300px",
+                      marginTop: "15px",
+                    }}
+                    src={calendarImage ? calendarImage : defaultUser}
+                    alt="이미지"
+                    onClick={handleButtonClick}
+                    htmlFor="input-file"
+                  />
+                  <input
+                    type="file"
+                    id="input-file"
+                    accept="image/*"
+                    ref={fileInput}
+                    style={{ display: "none" }}
+                    onChange={handleChange2}
+                  />
+                </div>
+                <div>
+                  <textarea
+                    placeholder="여기에 입력하세요"
+                    value={text}
+                    onChange={(e) => handleSetValue(e)}
+                  ></textarea>
+                </div>
+                <div>
+                  <button type="submit">완료</button>
+                </div>
+              </form>
             )}
           </DiaryContext>
         </Container>

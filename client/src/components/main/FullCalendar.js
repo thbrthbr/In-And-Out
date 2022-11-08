@@ -66,7 +66,6 @@ const RenderHeader = (props) => {
       format(endOfMonth(subMonths(currentMonth, 1)), "yyyy-MM-dd")
     );
     setcurrentMonth(subMonths(currentMonth, 1));
-    console.log("돼라");
   };
   const nextMonth = () => {
     props.changeValue(
@@ -117,8 +116,11 @@ const RenderDays = () => {
   return <div className="days row">{days}</div>;
 };
 
-const RenderCells = ({ diaryData }) => {
+const RenderCells = ({ diaryDatas, calendarData }) => {
   const {
+    showDiary,
+    setShowDiary,
+    setCalendarImage,
     showWrittenDiary,
     setShowWrittenDiary,
     diaryDate,
@@ -130,9 +132,15 @@ const RenderCells = ({ diaryData }) => {
     setCurrentMonth,
     showNewDiary,
     setShowNewDiary,
+    specificDate,
     setSpecificDate,
     showInstanceTable,
     setShowInstanceTable,
+    dateOrigin,
+    setDateOrigin,
+    setText,
+    setDiaryImage,
+    setDiaryId,
   } = calenderStore();
 
   const onDateClick = (day) => {
@@ -142,7 +150,8 @@ const RenderCells = ({ diaryData }) => {
 
   // const tempDiaryData = diaryData.filter((data) => data.date === diaryDate)[0];
 
-  const tempDiaryData2 = diaryData;
+  const tempDiaryData = diaryDatas;
+  const tempDiaryData2 = calendarData;
 
   let expenseDT = [];
 
@@ -197,7 +206,8 @@ const RenderCells = ({ diaryData }) => {
   while (day <= endDate) {
     for (let i = 0; i < 7; i++) {
       formattedDate = format(day, "d");
-      const cloneDay = day;
+      // console.log(day.format("yyyy-MM-dd"));
+      const cloneDay = day.format("yyyy-MM-dd");
       const formattedDataForDiary = day.format("MM/dd/yy");
       days.push(
         <div
@@ -218,24 +228,20 @@ const RenderCells = ({ diaryData }) => {
             justifyContent: "space-between",
             cursor: "pointer",
           }}
-          id={formattedDataForDiary}
-          // onClick={(e) => {
-          //   setSpecificDate(formattedDataForDiary);
-          //   let check = 0;
-          //   {
-          //     diaryData.map((data) => {
-          //       if (formattedDataForDiary === data.date) {
-          //         setShowWrittenDiary(!showWrittenDiary);
-          //         setDiaryDate(e.target.id);
-          //         check++;
-          //       }
-          //     });
-          //   }
-          //   if (check == 0) {
-          //     setDiaryDate(e.target.id);
-          //     setShowNewDiary(!showNewDiary);
-          //   }
-          // }}
+          id={cloneDay}
+          onClick={(e) => {
+            // diaryDatas.map((data) => {
+            //   if (data.diaryDt === e.target.id) {
+            //     setCalendarImage(data.s3ImageUrl);
+            //     setText(data.text);
+            //   }
+            // });
+
+            setSpecificDate(formattedDataForDiary);
+            setDiaryDate(formattedDataForDiary);
+            setDateOrigin(e.target.id);
+            setShowDiary(!showDiary);
+          }}
         >
           <span
             className={
@@ -243,6 +249,7 @@ const RenderCells = ({ diaryData }) => {
                 ? "text not-valid"
                 : ""
             }
+            key={cloneDay}
           >
             {formattedDate}
           </span>
@@ -256,19 +263,25 @@ const RenderCells = ({ diaryData }) => {
             }}
             id={formattedDataForDiary}
           >
-            {/* {diaryData.map((data) => {
-              if (formattedDataForDiary === data.date) {
-                return (
-                  <Icon
-                    icon="arcticons:diary"
-                    id={formattedDataForDiary}
-                    key={data.date}
-                  ></Icon>
-                );
-              } else {
-                return <div style={{ display: "none" }} key={data.date}></div>;
-              }
-            })} */}
+            {tempDiaryData.length > 0 &&
+              tempDiaryData.map((data) => {
+                if (formattedDataForDiary === formatter(data.diaryDt)) {
+                  return (
+                    <Icon
+                      icon="arcticons:diary"
+                      id={formattedDataForDiary}
+                      key={formatter(data.diaryDt)}
+                    ></Icon>
+                  );
+                } else {
+                  return (
+                    <div
+                      style={{ display: "none" }}
+                      key={formatter(data.diaryDt)}
+                    ></div>
+                  );
+                }
+              })}
             {dateArr.length > 0 &&
               dateArr.map((data) => {
                 if (data == formattedDataForDiary) {
@@ -279,6 +292,7 @@ const RenderCells = ({ diaryData }) => {
                         id={formattedDataForDiary}
                         key={data.date}
                         onClick={(e) => {
+                          // console.log(diaryData);
                           e.stopPropagation();
                           setDetailDate(e.target.id);
                           setShowInstanceTable(!showInstanceTable);
@@ -286,8 +300,6 @@ const RenderCells = ({ diaryData }) => {
                           console.log(showInstanceTable);
                         }}
                       ></Icon>
-
-                      {/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */}
                       {showInstanceTable &&
                         formattedDataForDiary === diaryDate && (
                           <InstanceTable
@@ -428,12 +440,12 @@ const RenderCells = ({ diaryData }) => {
   return <div className="body">{rows}</div>;
 };
 
-export const FullCalendar = ({ changeValue, calendarData }) => {
+export const FullCalendar = ({ diaryDatas, changeValue, calendarData }) => {
   return (
     <div className="calendar">
       <RenderHeader changeValue={changeValue} />
       <RenderDays />
-      <RenderCells diaryData={calendarData} />
+      <RenderCells diaryDatas={diaryDatas} calendarData={calendarData} />
     </div>
   );
 };

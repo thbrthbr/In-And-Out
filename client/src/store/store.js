@@ -77,6 +77,12 @@ const loginStore = create(
 );
 
 const calenderStore = create((set, get) => ({
+  tempText: "",
+  setTempText: (input) => set({ tempText: input }),
+
+  showDiary: false,
+  setShowDiary: (input) => set({ showDiary: input }),
+
   showWrittenDiary: false,
   setShowWrittenDiary: (input) => set({ showWrittenDiary: input }),
 
@@ -114,42 +120,23 @@ const calenderStore = create((set, get) => ({
   tabMonth: 0,
   setTabMonth: (input) => set({ tabMonth: input }),
 
-  // startDay: startOfMonth(get().currentMonth),
-  // setStartDay: (input) => set({ startDay: input }),
+  dateOrigin: null,
+  setDateOrigin: (input) => set({ dateOrigin: input }),
 
-  // endDay: endOfMonth(get().currentMonth),
-  // setEndDay: (input) => set({ endDay: input }),
+  text: null,
+  setText: (input) => set({ text: input }),
 
-  // st: (input) => {
-  //   let res = format(startOfMonth(input), "yyyy-MM-dd");
-  //   return res;
-  // },
+  diaryImage: "",
+  setDiaryImage: (input) => set({ diaryImage: input }),
 
-  // ed: (input) => {
-  //   let res = format(endOfMonth(input), "yyyy-MM-dd");
-  //   return res;
-  // },
+  diaryId: "",
+  setDiaryId: (input) => set({ diaryId: input }),
 
-  // daymaker: (a, b) => {
-  //   let fir = format(endOfMonth(a), "yyyy-MM-dd");
-  //   let sec = format(endOfMonth(b), "yyyy-MM-dd");
-  //   return [fir, sec];
-  // },
+  sendingImage: null,
+  setSendingImage: (input) => set({ sendingImage: input }),
 
-  // setParam() {
-  //   switch (get().tabMonth) {
-  //     case TabSelected.MONTH:
-  //       params.startDt = formatDate(startOfMonth(currentMonth));
-  //       params.endDt = formatDate(endOfMonth(currentMonth));
-  //       break;
-  //     case TabSelected.YEAR:
-  //       params.startDt = formatDate(startOfYear(currentYear));
-  //       params.endDt = formatDate(endOfYear(currentYear));
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // },
+  dateList: [],
+  setDateList: (input) => set({ dateList: input }),
 }));
 
 export {
