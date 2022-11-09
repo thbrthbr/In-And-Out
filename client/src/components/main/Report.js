@@ -254,7 +254,12 @@ export default function Report() {
 
   const getReportDataFrom = async (url, params) => {
     try {
-      const res = await axios(url, { params: params });
+      const res = await axios(
+        `${url}?endDt=${params.endDt}&startDt=${params.startDt}`,
+        {
+          withCredentials: true,
+        }
+      );
       console.log(res);
       return res.data;
     } catch (err) {
@@ -314,8 +319,23 @@ export default function Report() {
     return obj;
   };
 
-  const renderTotalYearReportOnTable = (data) => {
+  const renderTotalYearReportOnTableAndGraph = (data) => {
     console.log(data);
+
+    const yearlyIncomeMonthSums = data.incomeReportList.map(
+      (data) => data.monthlySum
+    );
+
+    const yearlyExpenseMonthSums = data.expenseReportList.map(
+      (data) => data.monthlySum
+    );
+
+    const yearlyTotalMonthSums = yearlyIncomeMonthSums.map(
+      (x, y) => x - yearlyExpenseMonthSums[y]
+    );
+
+    lineConfig.data.datasets[0].data = yearlyTotalMonthSums;
+
     let incomeCategories = {};
     let expenseCategories = {};
     const tempRows = [];
@@ -458,8 +478,9 @@ export default function Report() {
         );
         // lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
         // renderIncomeYearReportOnGraph(data);
-        yearlyOption === "chart" && renderTotalYearReportOnGraph(data);
-        yearlyOption === "table" && renderTotalYearReportOnTable(data);
+        // yearlyOption === "chart" && renderTotalYearReportOnGraph(data);
+        // yearlyOption === "table" && renderTotalYearReportOnTable(data);
+        renderTotalYearReportOnTableAndGraph(data);
 
         // const yearlyIncomeReport = yearlyIncomeData.map((data) =>
         //   data.incomeReport ? data.incomeReport : 0
