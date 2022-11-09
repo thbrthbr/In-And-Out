@@ -56,7 +56,7 @@ export default function Signout() {
         "${process.env.REACT_APP_API_URL}/api/member/info",
         data,
         {
-          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
         }
       );
 

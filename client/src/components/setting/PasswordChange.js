@@ -54,8 +54,11 @@ export default function PasswordChange() {
   const handlePasswordChange = async (passwordData) => {
     try {
       const res = await axios.patch(
-        "${process.env.REACT_APP_API_URL}/api/member/password",
-        passwordData
+        `${process.env.REACT_APP_API_URL}/api/member/password`,
+        passwordData,
+        {
+          withCredentials: true,
+        }
       );
 
       toast.success("비밀번호 변경이 성공적으로 처리됐습니다!", {

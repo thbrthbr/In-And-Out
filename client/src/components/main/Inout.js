@@ -176,7 +176,12 @@ export default function Inout() {
 
   async function getInoutDataFrom(url, params) {
     try {
-      const res = await axios.get(url, { params: params });
+      const res = await axios.get(
+        `${url}?endDt=${params.endDt}&startDt=${params.startDt}`,
+        {
+          withCredentials: true,
+        }
+      );
       return res.data;
     } catch (err) {
       console.log(err);

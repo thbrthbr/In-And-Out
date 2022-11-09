@@ -130,7 +130,7 @@ export default function Calendar() {
       const res = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/calendar?endDt=${eddt}&startDt=${stdt}`,
         {
-          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
         }
       );
       console.log(res.data);

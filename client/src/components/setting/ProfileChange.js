@@ -169,9 +169,12 @@ export default function ProfileChange() {
   const getUserData = async () => {
     try {
       const res = await axios.get(
-        "${process.env.REACT_APP_API_URL}/api/member/info"
+        `${process.env.REACT_APP_API_URL}/api/member/info`,
+        {
+          withCredentials: true,
+        }
       );
-      // console.log(res.data);
+      console.log(res.data);
       return res.data;
     } catch (err) {
       console.log(err);

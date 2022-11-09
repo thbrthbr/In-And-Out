@@ -71,9 +71,14 @@ export default function Login() {
         {
           email: e["email"],
           password: e["pw"],
+        },
+        {
+          withCredentials: true,
         }
       );
-      // console.log(res);
+      console.log(res.headers.get("Set-cookie"));
+      console.log(res.headers);
+      // console.log(document.cookie);
 
       setLogState(true);
       setTimeout(() => {
@@ -105,10 +110,20 @@ export default function Login() {
   }
 
   const test = async () => {
-    const res = await axios.post("/api/signin", {
-      email: "yellowghost@hanmail.com",
-      password: "yel123!@",
-    });
+    const res = await axios.post(
+      "/api/signin",
+      {
+        email: "yellowghost@hanmail.com",
+        password: "yel123!@",
+      },
+      {
+        headers: {
+          "Content-Type": `application/json`,
+          "Access-Control-Allow-Origin": "*",
+          withCredentials: true,
+        },
+      }
+    );
     console.log(res);
   };
   // test();

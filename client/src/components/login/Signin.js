@@ -70,7 +70,8 @@ export default function Signin() {
   async function sendUserDataToServer() {
     try {
       const response = await axios.post(
-        "${process.env.REACT_APP_API_URL}/api/signup",
+        `${process.env.REACT_APP_API_URL}/api/signup`,
+
         {
           email: id,
           password: password,
@@ -79,6 +80,13 @@ export default function Signin() {
           birth: birthdate,
           address: residence,
           gender: gender,
+        },
+        {
+          headers: {
+            "Content-Type": `application/json`,
+            "Access-Control-Allow-Origin": "*",
+            withCredentials: true,
+          },
         }
       );
 

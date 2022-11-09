@@ -18,7 +18,7 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_URL = "${process.env.REACT_APP_API_URL}/api/password/email/phone";
+const API_URL = `${process.env.REACT_APP_API_URL}/api/password/email/phone`;
 
 export default function IdentifyPhone() {
   const {
