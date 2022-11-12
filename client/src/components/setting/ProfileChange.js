@@ -24,6 +24,7 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PacmanLoader from "react-spinners/PacmanLoader";
 
 export default function ProfileChange() {
   const {
@@ -52,7 +53,7 @@ export default function ProfileChange() {
 
   const fileInput = useRef();
   const [openPostcode, setOpenPostcode] = useState(false);
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState();
   const queryClient = useQueryClient();
 
   const handleButtonClick = (e) => {
@@ -185,23 +186,28 @@ export default function ProfileChange() {
     return res.data;
   };
 
-  const { data, isLoading } = useQuery(["getProfileData"], getUserData, {
-    onSuccess: (data) => {
-      console.log(data);
-      setNickname(data["nickName"]);
-      setPhoneNumber(data["phone"]);
-      setBirthdate(data["birth"]);
-      // setResidence(data["address"]);
-      setAddress(data["address"]);
-      setGender(data["gender"] === "남" ? "male" : "female");
-      setProfileImage(data["s3ImageUrl"]);
+  const { data, isLoading } = useQuery(
+    ["getProfileData"],
+    getUserData,
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        setNickname(data["nickName"]);
+        setPhoneNumber(data["phone"]);
+        setBirthdate(data["birth"]);
+        setResidence(data["address"]);
+        // setAddress(data["address"]);
+        setGender(data["gender"]);
+        setProfileImage(data["s3ImageUrl"]);
+      },
+      onError: (data) => {
+        // toast.warn("회원 정보를 가져오는데 실패하였습니다.", {
+        //   position: toast.POSITION.TOP_CENTER,
+        // });
+      },
     },
-    onError: (data) => {
-      // toast.warn("회원 정보를 가져오는데 실패하였습니다.", {
-      //   position: toast.POSITION.TOP_CENTER,
-      // });
-    },
-  });
+    { staleTime: 500 }
+  );
 
   const saveDataMutation = useMutation(
     async (userData) => {
@@ -236,10 +242,14 @@ export default function ProfileChange() {
         console.log(value);
       }
 
-      const res = await axios.put("/api/member/info", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
+      const res = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/member/info`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
+      );
       return res.data;
     },
     {
@@ -256,6 +266,20 @@ export default function ProfileChange() {
       },
     }
   );
+
+  if (isLoading)
+    return (
+      <PacmanLoader
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+        color="#36d7b7"
+        size={50}
+      />
+    );
 
   return (
     <Box
@@ -293,7 +317,14 @@ export default function ProfileChange() {
             style={{ display: "none" }}
             onChange={handleChange}
           />
-          <button onClick={() => setProfileImage("")}>이미지 삭제</button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setProfileImage("");
+            }}
+          >
+            이미지 삭제
+          </button>
         </Photo>
         <FormControl component="fieldset" variant="standard">
           <Grid container spacing={2}>
@@ -358,11 +389,11 @@ export default function ProfileChange() {
                 name="residence"
                 label="거주지"
                 error={!!errors.residence}
-                value={address}
+                value={residence}
                 defaultValue={residence}
                 {...register("residence", {
                   onChange: (e) => {
-                    setAddress(e.target.value);
+                    setResidence(e.target.value);
                     onResidenceHandler(e);
                   },
                 })}
