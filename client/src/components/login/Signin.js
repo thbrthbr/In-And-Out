@@ -25,6 +25,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PacmanLoader from "react-spinners/PacmanLoader";
 
 export default function Signin() {
   const {
@@ -48,6 +49,7 @@ export default function Signin() {
   const navigate = useNavigate();
   const [openPostcode, setOpenPostcode] = useState(false);
   const [address, setAddress] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -81,13 +83,7 @@ export default function Signin() {
           address: residence,
           gender: gender,
         },
-        {
-          headers: {
-            "Content-Type": `application/json`,
-            "Access-Control-Allow-Origin": "*",
-            withCredentials: true,
-          },
-        }
+        { withCredentials: true }
       );
 
       console.log(response);
@@ -95,21 +91,24 @@ export default function Signin() {
       toast.success("회원가입 성공! 이메일로 인증 해주세요", {
         position: toast.POSITION.TOP_CENTER,
       });
+      setLoading(false);
       setTimeout(() => {
         // setLogState(true);
         navigate("/");
-      }, 3000);
+      }, 5000);
     } catch (error) {
       toast.warn(error.response.data.message, {
         position: toast.POSITION.TOP_CENTER,
       });
 
       console.log(error);
+      setLoading(false);
     }
   }
 
   const onSubmit = (data) => {
     sendUserDataToServer();
+    setLoading(true);
     // console.log(id);
   };
 
@@ -134,6 +133,20 @@ export default function Signin() {
   const onGenderHandler = (event) => {
     setGender(event.currentTarget.value);
   };
+
+  if (loading)
+    return (
+      <PacmanLoader
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+        color="#36d7b7"
+        size={50}
+      />
+    );
 
   return (
     <Box
