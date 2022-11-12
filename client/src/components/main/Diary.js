@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import DatePicker from "react-datepicker";
+import { Icon } from "@iconify/react";
 
 import { calenderStore } from "../../store/store.js";
 
 import defaultUser from "../../img/default-user.jpg";
+import none from "../../img/none.png";
 
 import axios from "axios";
 
@@ -17,7 +19,10 @@ import {
   endOfMonth,
   startOfYear,
   endOfYear,
+  format,
 } from "date-fns";
+import { ko } from "date-fns/esm/locale";
+import Form from "react-bootstrap/Form";
 
 Date.prototype.format = function (f) {
   if (!this.valueOf()) return " ";
@@ -64,12 +69,12 @@ Number.prototype.zf = function (len) {
 const Container = styled.div`
   display: flex;
   background-color: white;
-  margin-top: 35px;
+  margin-top: 10px;
   > div:first-child {
     text-align: center;
     flex: 0.5;
     border-right: 3px solid gray;
-    height: 700px;
+    height: 550px;
   }
   > div:last-child {
     text-align: center;
@@ -77,24 +82,137 @@ const Container = styled.div`
   }
 `;
 
-const Pyo = styled.div`
-  height: 300px;
+const FixButtons = styled.button`
+  border: none;
+  background-color: transparent;
 `;
 
-const DiaryContext = styled.div``;
+const TextArea = styled.textarea`
+  width: 400px;
+  height: 150px;
+  border: 1px solid #ebebeb;
+  font-size: 25px;
+  font-family: "OTWelcomeRA";
+  &:focus {
+    outline: none;
+  }
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    width: 5x;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    height: 30%;
+    background: #c0c0c0;
+
+    border-radius: 10px;
+  }
+`;
+
+const Pre = styled.pre`
+  // height: 450px;
+  width: 400px;
+
+  resize: none;
+  white-space: pre-wrap;
+  font-family: "OTWelcomeRA";
+`;
+
+const Pyo = styled.div`
+  height: 300px;
+  width: 200px;
+  white-space: pre-wrap;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    height: 20%;
+    background: #c0c0c0;
+    border-radius: 10px;
+  }
+`;
+
+const DeleteImage = styled.div`
+  position: absolute;
+  margin-left: 120px;
+  margin-top: -275px;
+  height: 20px;
+  width: 20px;
+  font-size: 25px;
+  color: rgb(186, 186, 186);
+  opacity: 70%;
+  // border: 1px solid rgb(186, 186, 186);
+  background-color: #f5f5f5;
+  border-radius: 50%;
+  &:active {
+    background-color: rgb(186, 186, 186);
+  }
+`;
+
+const WriteButton = styled.button`
+  margin-left: 5px;
+  height: 155px;
+  width: 80px;
+  margin-top: -28px;
+  border: 0px;
+  cursor: pointer;
+  &:active {
+    color: white;
+  }
+`;
+
+const EditPlace = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+`;
+
+const ImagePlace = styled.div`
+  width: 500px;
+  height: 330px;
+`;
+
+const Upload = styled.div`
+  position: absolute;
+  margin-left: 250px;
+  margin-top: -50px;
+  background-color: white;
+  opacity: 50%;
+  cursor: pointer;
+  border: 1px solid white;
+  border-radius: 10px;
+`;
+
+const DiaryContext = styled.div`
+  width: 400px;
+  height: 550px;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    height: 20%;
+    background: #c0c0c0;
+
+    border-radius: 10px;
+  }
+`;
 
 export default function Diary({
+  diaryDatas,
   calendarData,
   saveDataMutation,
   saveEditDataMutation,
   deleteDataMutation,
   closeModal,
+  changeValue2,
+  dateList,
 }) {
   const {
-    showWrittenDiary,
-    setShowWrittenDiary,
-    showNewDiary,
-    setShowNewDiary,
     diaryDate,
     setDiaryDate,
     detailDate,
@@ -105,113 +223,59 @@ export default function Diary({
     setSpecificDate,
     calendarImage,
     setCalendarImage,
+    dateOrigin,
+    setDateOrigin,
+    text,
+    setText,
+    diaryImage,
+    diaryId,
+    setDiaryId,
+    sendingImage,
+    setSendingImage,
+    currentMonth,
+    setcurrentMonth,
+    showDiary,
+    setTempText,
   } = calenderStore();
 
-  const [textValue, setTextValue] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
-
-  const [profileImage, setprofileImage] = useState();
-
-  // diaryDate가지고 데이터 요청
-  const diaryData =
-    showWrittenDiary &&
-    calendarData &&
-    calendarData.filter((data) => data.date === diaryDate)[0];
-  // console.log(diaryData);
-
   const handleSetValue = (e) => {
-    setTextValue(e.target.value);
+    setText(e.target.value);
   };
 
   const onEdit = () => {
+    setCalendarImage(basicImg);
+    setText(basicText);
+    setDiaryId(basicDiaryId);
     setEdit(!edit);
-    setTextValue(diaryData.diary.text);
   };
 
-  const onEditSave = (e) => {
-    e.preventDefault();
-
-    console.log(diaryData.date);
-    const body = {
-      id: diaryData.id,
-      diary_id: diaryData.diary_id,
-      date: diaryData.date,
-      dailyIncomeList: diaryData.dailyIncomeList
-        ? diaryData.dailyIncomeList
-        : [],
-      dailyExpenseList: diaryData.dailyExpenseList
-        ? diaryData.dailyExpenseList
-        : [],
-      diary: {
-        text: textValue,
-        diary_photo_url: calendarImage ? calendarImage : "",
-      },
-    };
-    closeModal();
-    setEdit(!edit);
-    saveEditDataMutation.mutate([body, diaryData.id]);
+  const onImageDelete = () => {
+    let hi = new File([100, 101, 108, 101, 116, 101], "delete");
+    setSendingImage(hi);
+    setCalendarImage(none);
   };
 
-  //date: startDate.format("MM/dd/yy"),
-
-  const onSave = (e) => {
-    if (textValue === "") {
-      alert("내용을 입력해주세요");
-      return;
-    }
-    e.preventDefault();
-    console.log(startDate);
-    let num = Math.floor(Math.random() * 100);
-    const body = {
-      id: num,
-      diary_id: num,
-      date: specificDate,
-      dailyIncomeList: diaryData.dailyIncomeList
-        ? diaryData.dailyIncomeList
-        : [],
-      dailyExpenseList: diaryData.dailyExpenseList
-        ? diaryData.dailyExpenseList
-        : [],
-      diary: {
-        text: textValue,
-        diary_photo_url: calendarImage ? calendarImage : "",
-      },
-    };
-    console.log(body);
-    closeModal();
-    saveDataMutation.mutate(body);
-    setCalendarImage(null);
+  const onImageDelete2 = () => {
+    setSendingImage(null);
+    setCalendarImage(none);
   };
 
   const onDelete = (e) => {
     e.preventDefault();
+
     const body = {
-      diary_id: diaryData.diary_id,
+      diaryId: basicDiaryId,
     };
+    const input = JSON.stringify(body);
+    deleteDataMutation.mutate(input);
     closeModal();
-    deleteDataMutation.mutate([body, diaryData.id]);
   };
 
   const fileInput = useRef();
 
-  const onImageEdit = () => {};
-
   const handleButtonClick = (e) => {
     fileInput.current.click();
   };
-
-  const handleChange = () => {
-    const reader = new FileReader();
-    const file = fileInput.current.files[0];
-
-    reader.readAsDataURL(file);
-
-    reader.onloadend = () => {
-      setCalendarImage(reader.result);
-    };
-  };
-
-  const [sendingImage, setSendingImage] = useState([]);
 
   const handleChange2 = (e) => {
     e.preventDefault();
@@ -226,255 +290,458 @@ export default function Diary({
     };
 
     const fileOrigin = e.target.files[0];
-    console.log(fileOrigin);
-    setSendingImage([...sendingImage, { uploadedFile: fileOrigin }]);
+    setSendingImage(fileOrigin);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("발동됨ㅇㅇㅇㅇ");
-
-    const formData = new FormData();
-
-    formData.append("photo", sendingImage[0].uploadedFile);
-
-    // axios({
-    //   method: "post",
-    //   url: "http://localhost:5000/temp", //환경변수
-    //   data: formData,
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //     Authorization: localStorage.getItem("access_token"),
-    //   },
-    // });
-
-    setSendingImage([]);
-
-    if (textValue === "") {
+    if (text === "") {
       alert("내용을 입력해주세요");
       return;
     }
-    e.preventDefault();
-    console.log(startDate);
-    let num = Math.floor(Math.random() * 100);
-    const body = {
-      id: num,
-      diary_id: num,
-      date: specificDate,
-      dailyIncomeList: diaryData.dailyIncomeList
-        ? diaryData.dailyIncomeList
-        : [],
-      dailyExpenseList: diaryData.dailyExpenseList
-        ? diaryData.dailyExpenseList
-        : [],
-      diary: {
-        text: textValue,
-        diary_photo_url: formData ? formData : "",
-      },
-    };
-    console.log(body);
-    closeModal();
-    saveDataMutation.mutate(body);
-    setCalendarImage(null);
+    const body2 = new FormData();
+
+    if (edit !== true) {
+      // 새로 쓸 때
+      const input = { diaryDt: dateOrigin, text: text };
+      body2.append(
+        "input",
+        new Blob([JSON.stringify(input)], { type: "application/json" })
+      );
+
+      if (sendingImage === null) {
+        let nullTaker = new File([110, 117, 108, 108], "null");
+        body2.append("file", nullTaker);
+      } else {
+        body2.append("file", sendingImage);
+      }
+      setSendingImage(null);
+      closeModal();
+
+      saveDataMutation.mutate(body2);
+      setCalendarImage(null);
+      setText("");
+    } else {
+      //수정할 때
+      const input = {
+        diaryId: diaryId,
+        diaryDt: dateOrigin,
+        text: text,
+      };
+
+      body2.append(
+        "input",
+        new Blob([JSON.stringify(input)], { type: "application/json" })
+      );
+      if (sendingImage === null) {
+        let nullTaker = new File([110, 117, 108, 108], "null");
+        body2.append("file", nullTaker);
+      } else {
+        body2.append("file", sendingImage);
+      }
+      saveEditDataMutation.mutate(body2);
+      onEdit();
+      setSendingImage(null);
+      setCalendarImage(null);
+      setText("");
+      closeModal();
+    }
   };
+
+  function formatter(e) {
+    let a = e;
+    let string = a[5] + a[6] + "/" + a[8] + a[9] + "/" + a[2] + a[3];
+    return string;
+  }
+
+  let basicImg = null;
+
+  let basicText = "";
+
+  let basicDiaryId = 0;
+
+  const basicSetting = (a, b, c) => {
+    basicText = a;
+    basicImg = b;
+    basicDiaryId = c;
+  };
+
+  let check = 0;
+  let isChecker = 0;
+  let flag = 0;
+  let num = 0;
+
+  let check2 = 0;
+  let isChecker2 = 0;
+  let flag2 = 0;
+  let num2 = 0;
 
   return (
     <div>
-      {(showWrittenDiary || showNewDiary) && (
+      {showDiary && (
         <Container>
           <Pyo>
-            {showWrittenDiary && !edit && (
-              <>
-                {/* 작성된 화면 */}
-                <div style={{ height: "300px" }}>
-                  <div>수입</div>
-                  {diaryData.dailyIncomeList.length &&
-                    diaryData.dailyIncomeList.map((income) => {
+            <div>
+              <div>&lt;수입&gt;</div>
+              {calendarData.calendarIncomeDtoList.length > 0 ? (
+                calendarData.calendarIncomeDtoList.map((income) => {
+                  check++;
+                  if (formatter(income.incomeDt) === diaryDate) {
+                    num++;
+                    isChecker = 1;
+                    if (
+                      check === calendarData.calendarIncomeDtoList.length &&
+                      num < 9
+                    ) {
+                      return (
+                        <>
+                          <div>
+                            <span>{income.item}</span>
+                            <span>&nbsp; : &nbsp;</span>
+                            <span>{income.amount}</span>
+                          </div>
+                          <div
+                            style={{ height: `calc(300px - ${num}*30px)` }}
+                          ></div>
+                        </>
+                      );
+                    }
+                    if (income.item.length > 26 || income.amount.length > 26) {
+                      let temp1 = [];
+                      let temp2 = [];
+                      if (income.item.length > 26) {
+                        let partition = "";
+                        for (let i = 0; i < income.item.length; i++) {
+                          partition += income.item[i];
+                          if (partition.length == 26) {
+                            temp1.push(partition);
+                            partition = "";
+                          }
+                          if (i == income.item.length - 1) {
+                            temp1.push(partition);
+                            partition = "";
+                          }
+                        }
+                      } else {
+                        temp1.push(income.item);
+                      }
+                      if (income.amount.length > 26) {
+                        let partition = "";
+                        for (let i = 0; i < income.amount.length; i++) {
+                          partition += income.amount[i];
+                          if (partition.length == 26) {
+                            temp2.push(partition);
+                            partition = "";
+                          }
+                          if (i == income.amount.length - 1) {
+                            temp2.push(partition);
+                            partition = "";
+                          }
+                        }
+                      } else {
+                        temp2.push(income.amount);
+                      }
+                      console.log(temp2);
                       return (
                         <div>
-                          <span>{income.income_item}</span>
-                          <span>{income.income_amount}</span>
+                          {temp1.map((data) => {
+                            return (
+                              <>
+                                <span>{data}</span> <br></br>
+                              </>
+                            );
+                          })}
+                          <span>&nbsp; : &nbsp;</span>
+                          {temp2.map((data) => {
+                            return (
+                              <>
+                                <span>{data}</span> <br></br>
+                              </>
+                            );
+                          })}
                         </div>
                       );
-                    })}
-                </div>
-                <div style={{ height: "300px" }}>
-                  <div>지출</div>
-                  {diaryData.dailyExpenseList.length &&
-                    diaryData.dailyExpenseList.map((expense) => {
+                    } else {
                       return (
                         <div>
-                          <span>{expense.expense_item}</span>
-                          <span>{expense.expense_amount}</span>
+                          <span>{income.item}</span>
+                          <span>&nbsp; : &nbsp;</span>
+                          <span>{income.amount}</span>
                         </div>
                       );
-                    })}
-                </div>
-              </>
-            )}
-            {showWrittenDiary && edit && (
-              <>
-                {/* 작성된 화면 수정 화면 */}
-                <div style={{ height: "300px" }}>
-                  <div>수입</div>
-                  {diaryData.dailyIncomeList.length &&
-                    diaryData.dailyIncomeList.map((income) => {
+                    }
+                  } else {
+                    if (isChecker > 0) {
+                      flag = 1;
+                      if (
+                        check === calendarData.calendarIncomeDtoList.length &&
+                        num < 9
+                      ) {
+                        return (
+                          <div
+                            style={{ height: `calc(300px - ${num}*30px)` }}
+                          ></div>
+                        );
+                      }
+                    }
+                    if (
+                      check === calendarData.calendarIncomeDtoList.length &&
+                      flag == 0
+                    ) {
+                      flag = 1;
+                      return <div style={{ height: "300px" }}></div>;
+                    }
+                  }
+                })
+              ) : (
+                <div style={{ height: "300px" }}></div>
+              )}
+            </div>
+            <div>
+              <div>&lt;지출&gt;</div>
+              {calendarData.calendarExpenseDtoList.length > 0 ? (
+                calendarData.calendarExpenseDtoList.map((expense) => {
+                  console.log(expense.item);
+                  check2++;
+                  if (formatter(expense.expenseDt) === diaryDate) {
+                    num2++;
+                    isChecker2 = 1;
+                    if (
+                      check2 === calendarData.calendarExpenseDtoList.length &&
+                      num2 < 9
+                    ) {
+                      return (
+                        <>
+                          <div>
+                            <span>{expense.item}</span>
+                            <span>&nbsp; : &nbsp;</span>
+                            <span>{expense.amount}</span>
+                          </div>
+                          <div
+                            style={{ height: `calc(300px - ${num}*30px)` }}
+                          ></div>
+                        </>
+                      );
+                    }
+                    if (
+                      expense.item.length > 26 ||
+                      expense.amount.length > 26
+                    ) {
+                      let temp1 = [];
+                      let temp2 = [];
+                      if (expense.item.length > 26) {
+                        let partition = "";
+                        for (let i = 0; i < expense.item.length; i++) {
+                          partition += expense.item[i];
+                          if (partition.length == 26) {
+                            temp1.push(partition);
+                            partition = "";
+                          }
+                          if (i == expense.item.length - 1) {
+                            temp1.push(partition);
+                            partition = "";
+                          }
+                        }
+                      } else {
+                        temp1.push(expense.item);
+                      }
+                      if (expense.amount.length > 26) {
+                        let partition = "";
+                        for (let i = 0; i < expense.amount.length; i++) {
+                          partition += expense.amount[i];
+                          if (partition.length == 26) {
+                            temp2.push(partition);
+                            partition = "";
+                          }
+                          if (i == expense.amount.length - 1) {
+                            temp2.push(partition);
+                            partition = "";
+                          }
+                        }
+                      } else {
+                        temp2.push(expense.amount);
+                      }
+                      console.log(temp2);
                       return (
                         <div>
-                          <span>{income.income_item}</span>
-                          <span>{income.income_amount}</span>
+                          {temp1.map((data) => {
+                            return (
+                              <>
+                                <span>{data}</span> <br></br>
+                              </>
+                            );
+                          })}
+                          <span>&nbsp; : &nbsp;</span>
+                          {temp2.map((data) => {
+                            return (
+                              <>
+                                <span>{data}</span> <br></br>
+                              </>
+                            );
+                          })}
                         </div>
                       );
-                    })}
-                </div>
-                <div style={{ height: "300px" }}>
-                  <div>지출</div>
-                  {diaryData.dailyExpenseList.length &&
-                    diaryData.dailyExpenseList.map((expense) => {
+                    } else {
                       return (
                         <div>
-                          <span>{expense.expense_item}</span>
-                          <span>{expense.expense_amount}</span>
+                          <span>{expense.item}</span>
+                          <span>&nbsp; : &nbsp;</span>
+                          <span>{expense.amount}</span>
                         </div>
                       );
-                    })}
-                </div>
-              </>
-            )}
-            {showNewDiary && (
-              <>
-                {/* 아직 작성되지 않은 화면 */}
-                <div style={{ height: "300px" }}>
-                  <div>수입</div>
-                  {diaryData.dailyIncomeList &&
-                    diaryData.dailyIncomeList.map((income) => {
-                      return (
-                        <div>
-                          <span>{income.income_item}</span>
-                          <span>{income.income_amount}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-                <div style={{ height: "300px" }}>
-                  <div>지출</div>
-                  {diaryData.dailyExpenseList &&
-                    diaryData.dailyExpenseList.map((expense) => {
-                      return (
-                        <div>
-                          <span>{expense.expense_item}</span>
-                          <span>{expense.expense_amount}</span>
-                        </div>
-                      );
-                    })}
-                </div>
-              </>
-            )}
+                    }
+                  } else {
+                    if (isChecker2 > 0) {
+                      flag2 = 1;
+                      if (
+                        check2 === calendarData.calendarExpenseDtoList.length &&
+                        num2 < 9
+                      ) {
+                        return (
+                          <div
+                            style={{ height: `calc(300px - ${num2}*20px)` }}
+                          ></div>
+                        );
+                      }
+                    }
+                    if (
+                      check2 === calendarData.calendarExpenseDtoList.length &&
+                      flag2 == 0
+                    ) {
+                      flag2 = 1;
+                      return <div style={{ height: "300px" }}></div>;
+                    }
+                  }
+                })
+              ) : (
+                <div style={{ height: "300px" }}></div>
+              )}
+            </div>
           </Pyo>
           <DiaryContext>
             {edit ? (
               specificDate
             ) : (
               <DatePicker
+                locale={ko}
                 selected={new Date(specificDate)}
+                customInput={
+                  <Form.Control
+                    as="textarea"
+                    rows={1}
+                    style={{
+                      marginTop: "10px",
+                      paddingTop: "5px",
+                      width: "78px",
+                      fontFamily: "OTWelcomeRA",
+                      resize: "none",
+                      cursor: "pointer",
+                      border: "0.5px solid #C0C0C0",
+                      borderRadius: "50px",
+                    }}
+                    readOnly
+                  />
+                }
                 onChange={(date) => {
-                  setSpecificDate(date.format("MM/dd/yy"));
-                  setDiaryDate(date.format("MM/dd/yy"));
-                  let checker = 0;
-                  calendarData.map((data) => {
-                    if (date.format("MM/dd/yy") === data.date) {
-                      checker++;
+                  if (date.format("MM") !== currentMonth.format("MM")) {
+                    if (
+                      parseInt(date.format("MM")) <
+                      parseInt(currentMonth.format("MM"))
+                    ) {
+                      changeValue2(
+                        format(
+                          startOfMonth(
+                            subMonths(
+                              currentMonth,
+                              parseInt(
+                                currentMonth.format("MM") -
+                                  parseInt(date.format("MM"))
+                              )
+                            )
+                          ),
+                          "yyyy-MM-dd"
+                        ),
+                        format(
+                          endOfMonth(
+                            subMonths(
+                              currentMonth,
+                              parseInt(currentMonth.format("MM")) -
+                                parseInt(date.format("MM"))
+                            )
+                          ),
+                          "yyyy-MM-dd"
+                        ),
+                        date
+                      );
+                    } else if (
+                      parseInt(date.format("MM")) >
+                      parseInt(currentMonth.format("MM"))
+                    ) {
+                      changeValue2(
+                        format(
+                          startOfMonth(
+                            addMonths(
+                              currentMonth,
+                              parseInt(date.format("MM")) -
+                                parseInt(currentMonth.format("MM"))
+                            )
+                          ),
+                          "yyyy-MM-dd"
+                        ),
+                        format(
+                          endOfMonth(
+                            addMonths(
+                              currentMonth,
+                              parseInt(date.format("MM")) -
+                                parseInt(currentMonth.format("MM"))
+                            )
+                          ),
+                          "yyyy-MM-dd"
+                        ),
+                        date
+                      );
                     }
-                  });
-                  if (checker == 0) {
-                    setShowWrittenDiary(false);
-                    setShowNewDiary(true);
+
+                    setDateOrigin(date.format("yyyy-MM-dd"));
+                    setSpecificDate(date.format("MM/dd/yy"));
+                    setDiaryDate(date.format("MM/dd/yy"));
                   } else {
-                    setShowWrittenDiary(true);
-                    setShowNewDiary(false);
+                    setDateOrigin(date.format("yyyy-MM-dd"));
+                    setSpecificDate(date.format("MM/dd/yy"));
+                    setDiaryDate(date.format("MM/dd/yy"));
                   }
                 }}
               />
             )}
-            {showWrittenDiary && !edit && (
-              <>
-                {diaryData.diary.diary_photo_url ? (
-                  <div>
+            {edit ? (
+              <form encType="multipart/form-data" onSubmit={handleSubmit}>
+                <EditPlace>
+                  <ImagePlace>
                     <img
                       style={{
-                        width: "300px",
-                        height: "300px",
+                        width: "250px",
+                        height: "250px",
                         marginTop: "15px",
+                        position: "relative",
                       }}
-                      src={diaryData.diary.diary_photo_url}
+                      src={calendarImage === "" ? none : calendarImage}
                       alt="이미지"
-                    />
-                  </div>
-                ) : null}
-                <div>
-                  <div>{diaryData.diary.text}</div>
-                </div>
-                <div>
-                  <button onClick={onEdit}>수정하기</button>
-                  <button onClick={onDelete}>삭제</button>
-                </div>
-              </>
-            )}
-            {showWrittenDiary && edit && (
-              <>
-                <div>
-                  <img
-                    style={{
-                      width: "300px",
-                      height: "300px",
-                      marginTop: "15px",
-                    }}
-                    src={
-                      calendarImage
-                        ? calendarImage
-                        : diaryData.diary.diary_photo_url
-                    }
-                    alt="이미지"
-                    onClick={handleButtonClick}
-                    htmlFor="input-file"
-                  />
-                  <input
-                    type="file"
-                    id="input-file"
-                    accept="image/*"
-                    ref={fileInput}
-                    style={{ display: "none" }}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <textarea
-                    // placeholder="여기에 입력하세요"
-                    value={textValue}
-                    onChange={(e) => handleSetValue(e)}
-                  ></textarea>
-                </div>
-                <div>
-                  <button onClick={onImageEdit}>이미지 등록</button>
-                  <button onClick={onEditSave}>수정</button>
-                </div>
-              </>
-            )}
-            {showNewDiary && (
-              <>
-                <form encType="multipart/form-data" onSubmit={handleSubmit}>
-                  <div>
-                    <img
-                      style={{
-                        width: "300px",
-                        height: "300px",
-                        marginTop: "15px",
-                      }}
-                      src={calendarImage ? calendarImage : defaultUser}
-                      alt="이미지"
-                      onClick={handleButtonClick}
                       htmlFor="input-file"
                     />
+                    <DeleteImage onClick={onImageDelete}>
+                      <div
+                        style={{
+                          cursor: "pointer",
+                          marginLeft: "2px",
+                          marginTop: "-5px",
+                        }}
+                      >
+                        &#215;
+                      </div>
+                    </DeleteImage>
+                    <Upload onClick={handleButtonClick}>
+                      클릭해서 이미지 업로드
+                    </Upload>
                     <input
                       type="file"
                       id="input-file"
@@ -483,20 +750,228 @@ export default function Diary({
                       style={{ display: "none" }}
                       onChange={handleChange2}
                     />
+                  </ImagePlace>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div>
+                      <TextArea
+                        // placeholder="여기에 입력하세요"
+                        value={text}
+                        onChange={(e) => handleSetValue(e)}
+                        style={{ resize: "none" }}
+                      ></TextArea>
+                    </div>
+                    <div>
+                      <WriteButton
+                        style={{
+                          marginTop: "-18px",
+                        }}
+                        type="submit"
+                      >
+                        <Icon
+                          icon="heroicons:pencil-square"
+                          style={{
+                            width: "3rem",
+                            height: "3rem",
+                            cursor: "pointer",
+                          }}
+                        ></Icon>
+                      </WriteButton>
+                    </div>
                   </div>
+                </EditPlace>
+              </form>
+            ) : dateList.includes(diaryDate) ? (
+              diaryDatas.map((data) => {
+                if (formatter(data.diaryDt) === diaryDate) {
+                  basicSetting(data.text, data.s3ImageUrl, data.diaryId);
+                  {
+                    if (data.s3ImageUrl === "") {
+                      return (
+                        <div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Pre>{data.text}</Pre>
+                          </div>
+                          <div
+                            style={{
+                              marginLeft: "390px",
+                              display: "flex",
+                              width: "100px",
+                              flexDirection: "row",
+                            }}
+                          >
+                            <FixButtons onClick={onEdit}>
+                              <Icon
+                                icon="heroicons:pencil-square"
+                                style={{
+                                  width: "3rem",
+                                  height: "3rem",
+                                  cursor: "pointer",
+                                }}
+                              ></Icon>
+                            </FixButtons>
+                            <FixButtons onClick={onDelete}>
+                              <Icon
+                                icon="mdi:trash-can-outline"
+                                style={{
+                                  width: "3rem",
+                                  height: "3rem",
+                                  cursor: "pointer",
+                                  color: "red",
+                                }}
+                              ></Icon>
+                            </FixButtons>
+                          </div>
+                          <div
+                            style={{
+                              height: "50px",
+                            }}
+                          ></div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div>
+                          <img
+                            style={{
+                              width: "250px",
+                              height: "250px",
+                              marginTop: "5px",
+                            }}
+                            src={data.s3ImageUrl}
+                            alt="이미지"
+                          />
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Pre>{data.text}</Pre>
+                          </div>
+                          <div
+                            style={{
+                              marginLeft: "390px",
+                              display: "flex",
+                              width: "100px",
+                              flexDirection: "row",
+                            }}
+                          >
+                            <FixButtons onClick={onEdit}>
+                              <Icon
+                                icon="heroicons:pencil-square"
+                                style={{
+                                  width: "3rem",
+                                  height: "3rem",
+                                  cursor: "pointer",
+                                }}
+                              ></Icon>
+                            </FixButtons>
+                            <FixButtons onClick={onDelete}>
+                              <Icon
+                                icon="mdi:trash-can-outline"
+                                style={{
+                                  width: "3rem",
+                                  height: "3rem",
+                                  cursor: "pointer",
+                                  color: "red",
+                                }}
+                              ></Icon>
+                            </FixButtons>
+                          </div>
+                          <div
+                            style={{
+                              height: "50px",
+                            }}
+                          ></div>
+                        </div>
+                      );
+                    }
+                  }
+                }
+              })
+            ) : (
+              <form encType="multipart/form-data" onSubmit={handleSubmit}>
+                <div>
+                  <ImagePlace>
+                    <img
+                      style={{
+                        width: "250px",
+                        height: "250px",
+                        marginTop: "5px",
+                      }}
+                      src={calendarImage ? calendarImage : none}
+                      alt="이미지"
+                      htmlFor="input-file"
+                    />
+                    <DeleteImage onClick={onImageDelete2}>
+                      <div
+                        style={{
+                          cursor: "pointer",
+                          marginLeft: "2px",
+                          marginTop: "-5px",
+                        }}
+                      >
+                        &#215;
+                      </div>
+                    </DeleteImage>
+                    <Upload onClick={handleButtonClick}>
+                      클릭해서 이미지 업로드
+                    </Upload>
+                  </ImagePlace>
+                  <input
+                    type="file"
+                    id="input-file"
+                    accept="image/*"
+                    ref={fileInput}
+                    style={{ display: "none" }}
+                    onChange={handleChange2}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   <div>
-                    <textarea
+                    <TextArea
                       placeholder="여기에 입력하세요"
-                      value={textValue}
+                      value={text}
                       onChange={(e) => handleSetValue(e)}
-                    ></textarea>
+                      style={{ resize: "none", marginTop: "-10px" }}
+                      wrap="physical"
+                      rows="10"
+                      cols="60"
+                    ></TextArea>
                   </div>
                   <div>
-                    {/* onClick={onSave} */}
-                    <button type="submit">완료</button>
+                    <WriteButton type="submit">
+                      <Icon
+                        icon="heroicons:pencil-square"
+                        style={{
+                          width: "3rem",
+                          height: "3rem",
+                          cursor: "pointer",
+                        }}
+                      ></Icon>
+                    </WriteButton>
                   </div>
-                </form>
-              </>
+                </div>
+              </form>
             )}
           </DiaryContext>
         </Container>
