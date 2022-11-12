@@ -13,6 +13,8 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 
 import TabPanel from "./TabPanel";
 import RadioButton from "./RadioButton";
@@ -97,7 +99,7 @@ const months = [
   "mar",
   "apr",
   "may",
-  "june",
+  "jun",
   "jul",
   "aug",
   "sep",
@@ -164,6 +166,51 @@ export default function Report() {
     });
 
     setCategory(event.target.value);
+  };
+
+  const downloadToExcel = async (type) => {
+    let url = "";
+    switch (type) {
+      case "income":
+      case "expense":
+        url = `${process.env.REACT_APP_API_URL}/api/excel/${type}?startDt=${params.startDt}&endDt=${params.endDt}`;
+        break;
+      case "year":
+        url = `${process.env.REACT_APP_API_URL}/api/excel/${type}?startDt=${params.startDt}`;
+        break;
+      default:
+        break;
+    }
+
+    try {
+      // const res = await axios.get(url, { withCredentials: true });
+
+      const obj = {
+        yearlyExcelDtoList: [rows[0]],
+      };
+      await axios(url, {
+        method: type === "year" ? "POST" : "GET",
+        data: type === "year" ? obj.yearlyExcelDtoList : {},
+        responseType: "blob", // important
+        withCredentials: true,
+      }).then((response) => {
+        console.log(response);
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], { type: response.headers["content-type"] })
+        );
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `${type}-report-${params.startDt}-${params.endDt}.xlsx`
+        );
+        document.body.appendChild(link);
+        link.click();
+        return response;
+      });
+    } catch (err) {
+      console.log(err.response.data);
+    }
   };
 
   const setParamAndRefetch = () => {
@@ -239,12 +286,12 @@ export default function Report() {
         const startYear = format(startMonth, "yyyy");
         const startMon = startMonth;
         const startDay = format(startOfMonth(startMon), "dd");
-        const endYear = format(addYears(startMonth, 1), "yyyy");
+        const endYear = format(subYears(startMonth, 1), "yyyy");
         const endMon = subMonths(startMonth, 1);
         const endDay = format(endOfMonth(endMon), "dd");
 
-        params.startDt = `${startYear}-${format(startMon, "MM")}-${startDay}`; //formatDate(startOfYear(currentYear));
-        params.endDt = `${endYear}-${format(endMon, "MM")}-${endDay}`; //formatDate(endOfYear(currentYear));
+        params.endDt = `${startYear}-${format(endMon, "MM")}-${endDay}`; //formatDate(startOfYear(currentYear));
+        params.startDt = `${endYear}-${format(startMon, "MM")}-${startDay}`; //formatDate(endOfYear(currentYear));
 
         break;
       default:
@@ -657,7 +704,7 @@ export default function Report() {
         <Grid
           display="flex"
           justifyContent="flex-end"
-          sx={{ mb: 5, mt: -10 }}
+          sx={{ mb: 5, mt: -5 }}
           alignItems="baseline"
         >
           <RadioButton
@@ -684,6 +731,17 @@ export default function Report() {
         {yearlyOption === "table" && (
           <div>
             <DataGrid columns={columns} rows={rows} height={500} />
+            <Stack direction="row" spacing={2}>
+              {/* <Button onClick={() => downloadToExcel("income")}>
+                엑셀 다운로드 (수입)
+              </Button>
+              <Button onClick={() => downloadToExcel("expense")}>
+                엑셀 다운로드 (지출)
+              </Button> */}
+              <Button onClick={() => downloadToExcel("year")}>
+                엑셀 다운로드 (연간 보고서)
+              </Button>
+            </Stack>
           </div>
         )}
         {yearlyOption === "chart" && (
