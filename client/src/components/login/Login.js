@@ -3,6 +3,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schema/form_validation";
+import naverLogin from "../../img/naverLogin.png";
+import googleLogin from "../../img/googleLogin.png";
 
 import axios from "axios";
 
@@ -76,8 +78,7 @@ export default function Login() {
           withCredentials: true,
         }
       );
-      console.log(res.headers.get("Set-cookie"));
-      console.log(res.headers);
+      console.log(res);
       // console.log(document.cookie);
 
       setLogState(true);
@@ -220,10 +221,52 @@ export default function Login() {
               비밀번호 찾기
             </Button>
           </Box>
+          <Box
+            sx={{
+              marginTop: 8,
+              display: "flex",
+
+              justifyContent: "center",
+            }}
+          >
+            <Button
+              sx={{
+                mr: 5,
+                width: "10%",
+              }}
+              size="large"
+              href="http://3.34.206.181:8080/oauth2/authorization/google"
+              target="_blank"
+              rel="noopener noreferrer"
+              // onClick={() => navigate("/signin")}
+            >
+              <img
+                width="280px"
+                height="49px"
+                alt="google"
+                src={googleLogin}
+              ></img>
+            </Button>
+            <Button
+              sx={{
+                width: "10%",
+              }}
+              size="large"
+              href="http://3.34.206.181:8080/oauth2/authorization/naver"
+              target="_blank"
+              rel="noopener noreferrer"
+              // onClick={() => navigate("/identify_email")}
+            >
+              <img
+                width="280px"
+                height="49px"
+                alt="naver"
+                src={naverLogin}
+              ></img>
+            </Button>
+          </Box>
         </>
       )}
-
-      <div>로그인 상태 : {logState ? "로그인됨" : "로그아웃됨"}</div>
     </div>
   );
 }
