@@ -17,7 +17,8 @@ export default function SignupCheck() {
   const sendToServer = async () => {
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/signup/sending?id=${uuid}`
+        `${process.env.REACT_APP_API_URL}/api/signup/sending?id=${uuid}`,
+        { withCredentials: true }
       );
 
       toast.success("회원가입 인증이 성공적으로 처리됐습니다!", {

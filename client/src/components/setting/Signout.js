@@ -49,15 +49,11 @@ export default function Signout() {
     alert("회원 탈퇴 완료");
   }
 
-  const sendToServer = async (data) => {
-    console.log(data);
+  const sendToServer = async (passwordData) => {
     try {
       const res = await axios.delete(
-        "${process.env.REACT_APP_API_URL}/api/member/info",
-        data,
-        {
-          withCredentials: true,
-        }
+        `${process.env.REACT_APP_API_URL}/api/member/info`,
+        { data: passwordData, withCredentials: true }
       );
 
       toast.success(
@@ -69,8 +65,10 @@ export default function Signout() {
 
       setTimeout(() => {
         sessionStorage.clear();
+
         navigate("/");
       }, 3000);
+      return res.data;
     } catch (err) {
       console.log(err);
       toast.warn("회원탈퇴 처리에 실패했습니다!", {
