@@ -317,8 +317,9 @@ export default function Inout() {
       // const data = [rowData]; //tabValue === TabSelected.INCOME ? { [rowData } : { rowData };
       let diff = rowData.filter((ele) => !prevRows.includes(ele));
       console.log(diff);
+      console.log(TabSelected.INCOME);
       diff = diff.map((ele) =>
-        TabSelected.INCOME
+        tabValue === TabSelected.INCOME
           ? { ...ele, incomeDt: ele.date }
           : { ...ele, expenseDt: ele.date }
       );
