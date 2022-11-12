@@ -77,14 +77,14 @@ const DateHeader = ({ type, currentTime, prev, next }) => {
           <ColFirst>
             <span className="text">
               <Text>{format(currentTime, "M")}월</Text>
-              <Text>{format(currentTime, "yyyy")}</Text>
+              <Text>{format(subYears(currentTime, 1), "yyyy")}</Text>
             </span>
           </ColFirst>
           <Spacer>-</Spacer>
           <ColFirst>
             <span className="text">
               <Text>{format(subMonths(currentTime, 1), "M")}월</Text>
-              <Text>{format(addYears(currentTime, 1), "yyyy")}</Text>
+              <Text>{format(currentTime, "yyyy")}</Text>
             </span>
           </ColFirst>
         </Header>

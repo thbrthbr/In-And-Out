@@ -18,8 +18,7 @@ import {
   Typography,
 } from "@mui/material/";
 
-const API_URL =
-  "${process.env.REACT_APP_API_URL}${process.env.REACT_APP_API_URL}/api/password/email";
+const API_URL = `${process.env.REACT_APP_API_URL}${process.env.REACT_APP_API_URL}/api/password/email`;
 
 export default function IdentifyEmail() {
   const {

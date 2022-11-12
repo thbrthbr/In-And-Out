@@ -4,10 +4,14 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
-export default function SignupCheck() {
+import { useStore2 } from "../../store/store.js";
+
+export default function SocialLoginCheck() {
   useEffect(() => {
     sendToServer();
   }, []);
+
+  const { logState, setLogState } = useStore2();
 
   const useQuery = () => new URLSearchParams(useLocation().search);
   const query = useQuery();
@@ -17,22 +21,27 @@ export default function SignupCheck() {
   const sendToServer = async () => {
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/signup/sending?id=${uuid}`,
+        `${process.env.REACT_APP_API_URL}/api/social_check/sending?id=${uuid}`,
         { withCredentials: true }
       );
 
-      toast.success("회원가입 인증이 성공적으로 처리됐습니다!", {
+      toast.success("성공적으로 로그인 되었습니다!", {
         position: toast.POSITION.TOP_CENTER,
       });
 
       setTimeout(() => {
-        navigate("/");
+        setLogState(true);
+        navigate("/calendar");
       }, 3000);
     } catch (err) {
       console.log(err);
-      toast.warn("회원가입 인증이 실패했습니다!", {
+      toast.warn("로그인이 실패했습니다!", {
         position: toast.POSITION.TOP_CENTER,
       });
+      setTimeout(() => {
+        // setLogState(true);
+        navigate("/");
+      }, 3000);
     }
   };
 

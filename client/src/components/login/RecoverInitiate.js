@@ -35,7 +35,8 @@ export default function RecoverInitiate() {
     try {
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/password/email/phone/sending?id=${uuid}`,
-        data
+        data,
+        { withCredentials: true }
       );
 
       toast.success("비밀번호 재설정이 성공적으로 처리됐습니다!", {
