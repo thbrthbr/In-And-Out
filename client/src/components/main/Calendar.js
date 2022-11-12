@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FullCalendar } from "./FullCalendar";
 import "./_styles.scss";
@@ -15,7 +15,9 @@ import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
-const DIARY_API_URL = "http://localhost:5000/calendar";
+import useMouse from "@react-hook/mouse-position";
+
+// const DIARY_API_URL = "http://localhost:5000/calendar";
 // api 연결 작업하면서 요청 api를 2개(다이어리데이터 + 수입지출쪽 데이터)로 수정
 
 const Container = styled.div`
@@ -27,6 +29,12 @@ const Container = styled.div`
 let month = new Date();
 
 export default function Calendar() {
+  const mouseMoveArea = React.useRef(null);
+  const mouse = useMouse(mouseMoveArea, {
+    enterDelay: 100,
+    leaveDelay: 100,
+  });
+
   const {
     showDiary,
     setShowDiary,
@@ -41,6 +49,7 @@ export default function Calendar() {
     setSpecificDate,
     dateList,
     setDateList,
+    currentMonth,
   } = calenderStore();
 
   const queryClient = useQueryClient();
@@ -55,7 +64,7 @@ export default function Calendar() {
 
   let eddt = format(endOfMonth(month), "yyyy-MM-dd");
 
-  console.log(stdt);
+  // console.log(stdt);
 
   const changeValue = (a, b) => {
     stdt = a;
@@ -96,17 +105,20 @@ export default function Calendar() {
           headers: { "Content-Type": "application/json" },
         }
       );
-      const res2 = await axios.get(`/api/diary?endDt=${eddt}&startDt=${stdt}`, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const res2 = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/diary?endDt=${eddt}&startDt=${stdt}`,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       res2.data.map((data) => {
         dateArr.push(formatter(data.diaryDt));
       });
 
-      //여기에 이런식으로 한 번에 api 두 개 요청
-      console.log(res.data);
-      console.log(res2.data);
-      console.log(dateArr);
+      // //여기에 이런식으로 한 번에 api 두 개 요청
+      // console.log(res.data);
+      // console.log(res2.data);
+      // console.log(dateArr);
       // console.log(res.data.calendarExpenseDtoList[0].expenseDt);
       return [res.data, res2.data, dateArr];
     } catch (err) {
@@ -125,11 +137,11 @@ export default function Calendar() {
         //     return;
         //   }
         // }
-        console.log(data);
-        console.log(data.get("input"));
+        // console.log(data);
+        // console.log(data.get("input"));
         const res = await axios({
           method: "post",
-          url: "/api/diary",
+          url: `${process.env.REACT_APP_API_URL}/api/diary`,
           data: data,
           headers: { "Content-Type": "multipart/form-data" },
         });
@@ -151,7 +163,7 @@ export default function Calendar() {
         const res = await axios({
           //이거 patch로 해야할거같음
           method: "put",
-          url: "/api/diary",
+          url: `${process.env.REACT_APP_API_URL}/api/diary`,
           data: data,
           headers: { "Content-Type": "multipart/form-data" },
         });
@@ -159,10 +171,10 @@ export default function Calendar() {
         // const res = await axios.put(`${DIARY_API_URL}/${data[1]}`, data[0], {
         //   headers: { "Content-Type": "application/json" },
         // });
-        refetch();
+        // refetch();
         return res.data;
       } catch (err) {
-        // console.log(err);
+        console.log(err);
       }
     },
     {
@@ -193,14 +205,16 @@ export default function Calendar() {
   const deleteDataMutation = useMutation(
     async (data) => {
       try {
-        console.log(data);
-        const res = await axios.delete("/api/diary", {
+        // console.log(data);
+        const res = await axios({
+          method: "delete",
+          url: `${process.env.REACT_APP_API_URL}/api/diary`,
           data: data,
           headers: { "Content-Type": "application/json" },
         });
         return res.data;
       } catch (err) {
-        // console.log(err);
+        console.log(err);
       }
     },
     {
@@ -210,21 +224,30 @@ export default function Calendar() {
     }
   );
 
+  useEffect(() => {
+    setcurrentMonth(new Date());
+    refetch();
+  }, []);
+
   //tabMonth 추가하기
   const { data, isLoading, refetch } = useQuery(["getCalendarData"], getData, {
     staleTime: Infinity,
   });
 
   if (isLoading) return <PacmanLoader color="#36d7b7" />;
-  console.log("data", data);
+  // console.log("data", data);
 
   return (
     <Container
+      ref={mouseMoveArea}
       onClick={() => {
         setShowInstanceTable(false);
       }}
     >
       <FullCalendar
+        X={mouse.x}
+        Y={mouse.y}
+        ref={mouseMoveArea}
         dateList={data[2]}
         changeValue={changeValue}
         diaryDatas={data[1]}
@@ -258,7 +281,6 @@ export default function Calendar() {
           ></Diary>
         </DiaryModal>
       )}
-
       {/* {showNewDiary && (
         <DiaryModal closeModal={() => setShowNewDiary(!showNewDiary)}>
           <Diary

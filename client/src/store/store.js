@@ -137,6 +137,9 @@ const calenderStore = create((set, get) => ({
 
   dateList: [],
   setDateList: (input) => set({ dateList: input }),
+
+  position: 0,
+  setPosition: (input) => set({ position: input }),
 }));
 
 export {
