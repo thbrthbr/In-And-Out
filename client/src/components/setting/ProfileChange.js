@@ -56,18 +56,19 @@ export default function ProfileChange() {
   const queryClient = useQueryClient();
 
   const handleButtonClick = (e) => {
+    e.preventDefault();
     fileInput.current.click();
   };
 
-  const handleChange = async () => {
+  const handleChange = async (e) => {
     const reader = new FileReader();
     const file = fileInput.current.files[0];
 
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       setProfileImage(reader.result);
-      console.log(reader.result);
-      ImagePut(reader.result);
+      // console.log(reader.result);
+      // ImagePut(reader.result);
     };
   };
 
@@ -88,29 +89,29 @@ export default function ProfileChange() {
     setGender(event.currentTarget.value);
   };
 
-  async function ImagePut(e) {
-    const response = await fetch(`http://localhost:4000/users/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        password: password,
-        nickname: nickname,
-        phoneNumber: phoneNumber,
-        birthdate: birthdate,
-        residence: residence,
-        gender: gender,
-        profileImage: e == null ? profileImage : e,
-      }),
-    });
+  // async function ImagePut(e) {
+  //   const response = await fetch(`http://localhost:4000/users/${id}`, {
+  //     method: "PUT",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       password: password,
+  //       nickname: nickname,
+  //       phoneNumber: phoneNumber,
+  //       birthdate: birthdate,
+  //       residence: residence,
+  //       gender: gender,
+  //       profileImage: e == null ? profileImage : e,
+  //     }),
+  //   });
 
-    // console.log(response);
+  //   // console.log(response);
 
-    if (response.ok) {
-      alert("수정완료");
-    } else {
-      alert("오류");
-    }
-  }
+  //   if (response.ok) {
+  //     alert("수정완료");
+  //   } else {
+  //     alert("오류");
+  //   }
+  // }
 
   // async function put(e) {
   //   console.log(e);
@@ -144,15 +145,22 @@ export default function ProfileChange() {
 
   const onSubmit = async (e) => {
     // put(e);
-    e.address = e.residence;
-    e.birth = e.birthday;
-    e.nickname = e.name;
-    e.memberPhotoUrl = "";
-    delete e.email;
-    delete e.residence;
-    delete e.birthday;
-    delete e.name;
-    console.log("d", e);
+    // password,
+    // console.log(e["name"]);
+    // console.log(e["phone"]);
+    // console.log(e["birthday"]);
+    // console.log(e["residence"]);
+    // console.log(e["gender"]);
+    // console.log(profileImage);
+    // e.address = e.residence;
+    // e.birth = e.birthday;
+    // e.nickname = e.name;
+    // e.memberPhotoUrl = "";
+    // delete e.email;
+    // delete e.residence;
+    // delete e.birthday;
+    // delete e.name;
+    // console.log("d", e);
     saveDataMutation.mutate(e);
   };
 
@@ -167,52 +175,81 @@ export default function ProfileChange() {
   };
 
   const getUserData = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/member/info`,
-        {
-          withCredentials: true,
-        }
-      );
-      console.log(res.data);
-      return res.data;
-    } catch (err) {
-      console.log(err);
-    }
+    const res = await axios.get(
+      `${process.env.REACT_APP_API_URL}/api/member/info`,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(res.data);
+    return res.data;
   };
 
   const { data, isLoading } = useQuery(["getProfileData"], getUserData, {
     onSuccess: (data) => {
-      setNickname(data["nickName"]);
+      console.log(data);
+      // setNickname(data["nickName"]);
       setPhoneNumber(data["phone"]);
       setBirthdate(data["birth"]);
-      setResidence(data["address"]);
+      // setResidence(data["address"]);
       setAddress(data["address"]);
       setGender(data["gender"] === "남" ? "male" : "female");
       setProfileImage(data["s3ImageUrl"]);
+    },
+    onError: (data) => {
+      // toast.warn("회원 정보를 가져오는데 실패하였습니다.", {
+      //   position: toast.POSITION.TOP_CENTER,
+      // });
     },
   });
 
   const saveDataMutation = useMutation(
     async (userData) => {
-      // console.log("data", userData);
-      try {
-        const res = await axios.put("/api/member/info", userData, {
-          headers: { "Content-Type": "application/json" },
-        });
-        return res.data;
-      } catch (err) {
-        console.log(err);
+      const file =
+        fileInput.current.files[0] === undefined
+          ? fileInput.current.files[0]
+          : fileInput.current.files[0];
+      userData = {
+        ...userData,
+        address: userData.residence,
+        nickName: userData.name,
+        birth: userData.birthday,
+      };
+      delete userData.residence;
+      delete userData.birthday;
+      delete userData.name;
+      console.log("data", userData, file, new Blob([file]));
+      const formData = new FormData();
+      formData.append("file", new Blob([file]));
+      formData.append(
+        "input",
+        new Blob([JSON.stringify(userData)], { type: "application/json" })
+      );
+
+      // FormData의 key 확인
+      for (let key of formData.keys()) {
+        console.log(key);
       }
+
+      // FormData의 value 확인
+      for (let value of formData.values()) {
+        console.log(value);
+      }
+
+      const res = await axios.put("/api/member/info", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
+      return res.data;
     },
     {
-      onSuccess: () => {
+      onSuccess: (data, variables, context) => {
         toast.success("프로필 변경이 성공적으로 처리됐습니다!", {
           position: toast.POSITION.TOP_CENTER,
         });
         queryClient.invalidateQueries("getProfileData");
       },
-      onError: () => {
+      onError: (data, variables, context) => {
         toast.warn("프로필 변경이 성공적으로 처리되지 않았습니다.", {
           position: toast.POSITION.TOP_CENTER,
         });
@@ -243,7 +280,7 @@ export default function ProfileChange() {
           <img
             alt="프로필사진"
             src={profileImage ? profileImage : defaultUser}
-            style={{ width: "200px" }}
+            style={{ width: "200px", height: "180px" }}
           />
           <File onClick={handleButtonClick} htmlFor="input-file">
             이미지 업로드
@@ -256,6 +293,7 @@ export default function ProfileChange() {
             style={{ display: "none" }}
             onChange={handleChange}
           />
+          <button onClick={() => setProfileImage("")}>이미지 삭제</button>
         </Photo>
         <FormControl component="fieldset" variant="standard">
           <Grid container spacing={2}>
