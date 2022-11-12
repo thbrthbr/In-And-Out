@@ -26,8 +26,10 @@ export default function Header() {
   function loginHandler() {
     setLogState(true);
   }
+
   function logoutHandler() {
     setLogState(false);
+    sessionStorage.clear();
   }
 
   const [anchorElUser, setAnchorElUser] = useState(null);
