@@ -188,7 +188,7 @@ export default function ProfileChange() {
   const { data, isLoading } = useQuery(["getProfileData"], getUserData, {
     onSuccess: (data) => {
       console.log(data);
-      // setNickname(data["nickName"]);
+      setNickname(data["nickName"]);
       setPhoneNumber(data["phone"]);
       setBirthdate(data["birth"]);
       // setResidence(data["address"]);
