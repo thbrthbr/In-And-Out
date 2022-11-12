@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { recoverInitiateSchema } from "../../schema/form_validation";
@@ -33,7 +33,7 @@ export default function RecoverInitiate() {
 
   const sendToServer = async (data) => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_API_URL}/api/password/email/phone/sending?id=${uuid}`,
         data,
         { withCredentials: true }
@@ -62,8 +62,6 @@ export default function RecoverInitiate() {
     };
 
     sendToServer(passwordData);
-
-    // console.log(params);
   };
 
   return (

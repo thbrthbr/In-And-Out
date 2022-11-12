@@ -11,7 +11,7 @@ export default function SocialLoginCheck() {
     sendToServer();
   }, []);
 
-  const { logState, setLogState } = useStore2();
+  const { setLogState } = useStore2();
 
   const useQuery = () => new URLSearchParams(useLocation().search);
   const query = useQuery();
@@ -20,7 +20,7 @@ export default function SocialLoginCheck() {
   const navigate = useNavigate();
   const sendToServer = async () => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_API_URL}/api/social_check/sending?id=${uuid}`,
         { withCredentials: true }
       );

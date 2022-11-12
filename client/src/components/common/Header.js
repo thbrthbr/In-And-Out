@@ -40,7 +40,7 @@ export default function Header() {
 
   const requestLogout = async () => {
     try {
-      const res = await axios.post("/api/signout");
+      await axios.post("/api/signout");
       setLogState(false);
       setTimeout(() => {
         navigate("/");

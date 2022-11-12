@@ -1,5 +1,3 @@
-import { withTheme } from "styled-components";
-
 const doughnutOption = {
   responsive: false,
   tooltips: {

@@ -20,18 +20,6 @@ import {
 
 export default function Signout() {
   const navigate = useNavigate();
-  const {
-    id,
-    setId,
-    setPassword,
-    setNickname,
-    setPhoneNumber,
-    setBirthdate,
-    setResidence,
-    setGender,
-  } = loginStore();
-
-  const { setLogState } = useStore2();
 
   const {
     register,
@@ -40,14 +28,6 @@ export default function Signout() {
   } = useForm({
     resolver: yupResolver(recoverInitiateSchema),
   });
-
-  async function signout() {
-    await fetch(`http://localhost:4000/users/${id}`, {
-      method: "DELETE",
-    });
-
-    alert("회원 탈퇴 완료");
-  }
 
   const sendToServer = async (passwordData) => {
     try {
@@ -83,31 +63,6 @@ export default function Signout() {
 
     sendToServer(passwordData);
   };
-  // const onSubmit = async (e) => {
-  //   const response = await fetch(`http://localhost:4000/users`);
-  //   if (response.ok) {
-  //     const users = await response.json();
-  //     const user = users.find((user) => user.id === id);
-  //     if (user.password !== e["pw"]) {
-  //       alert("비밀번호가 맞지 않습니다.");
-  //       throw new Error("비밀번호가 맞지 않습니다.");
-  //     }
-  //   } else {
-  //     throw new Error("서버 통신이 원할하지 않습니다.");
-  //   }
-  //   await signout();
-  //   setLogState(false);
-  //   setId("");
-  //   setNickname("");
-  //   setPhoneNumber("");
-  //   setBirthdate("");
-  //   setResidence("");
-  //   setGender("");
-  //   setPassword("");
-
-  //   sessionStorage.clear();
-  //   navigate("/");
-  // };
 
   return (
     <Box

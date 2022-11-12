@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { recoverInitiateSchema } from "../../schema/form_validation";
-import { loginStore } from "../../store/store.js";
 
 import {
   Button,
@@ -17,9 +16,6 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function PasswordChange() {
-  const { id, nickname, phoneNumber, birthdate, residence, gender } =
-    loginStore();
-
   const {
     register,
     handleSubmit,
@@ -27,29 +23,6 @@ export default function PasswordChange() {
   } = useForm({
     resolver: yupResolver(recoverInitiateSchema),
   });
-
-  // async function put(e) {
-  //   const response = await fetch(`http://localhost:4000/users/${id}`, {
-  //     method: "PUT",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       password: e,
-  //       nickname: nickname,
-  //       phoneNumber: phoneNumber,
-  //       birthdate: birthdate,
-  //       residence: residence,
-  //       gender: gender,
-  //     }),
-  //   });
-
-  //   console.log(response);
-
-  //   if (response.ok) {
-  //     alert("수정완료");
-  //   } else {
-  //     alert("오류");
-  //   }
-  // }
 
   const handlePasswordChange = async (passwordData) => {
     try {
@@ -75,28 +48,12 @@ export default function PasswordChange() {
   };
 
   const onSubmit = async (e) => {
-    console.log(e);
     const obj = {};
 
     obj.password = e.oldPw;
     obj.newPassword = e.passwordConfirm;
 
     handlePasswordChange(obj);
-    // e.preventDefault();
-    // const response = await fetch(`http://localhost:4000/users`);
-
-    // if (response.ok) {
-    //   const users = await response.json();
-    //   const user = users.find((user) => user.id === id);
-    //   if (user.password !== e["oldPw"]) {
-    //     alert("기존 비밀번호와 일치하지 않습니다.");
-    //     throw new Error("아이디 또는 비밀번호가 일치하지 않습니다.");
-    //   }
-    // } else {
-    //   throw new Error("서버 통신이 원할하지 않습니다.");
-    // }
-    // await put(e["pw"]);
-    // window.location.reload();
   };
 
   return (

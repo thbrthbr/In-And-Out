@@ -246,13 +246,11 @@ export default function Inout() {
     if (id === undefined) {
       id = row.key;
     }
-    // console.log("id", id);
     return id;
   }
 
   function createNewRow() {
     const newIncomeData = {
-      // incomeId: "",
       incomeDt: "",
       incomeItem: "",
       incomeAmount: "",
@@ -262,7 +260,6 @@ export default function Inout() {
     };
 
     const newExpenseData = {
-      // expenseId: "",
       expenseDt: "",
       expenseItem: "",
       expenseCash: "",
@@ -279,45 +276,8 @@ export default function Inout() {
 
   const saveDataMutation = useMutation(
     async (rowData) => {
-      // const data = rowData
-      //   .filter((item) => {
-      //     return tabValue === TabSelected.INCOME
-      //       ? item.incomeId === undefined
-      //       : item.expenseId === undefined;
-      //   })
-      //   .map((ele) => {
-      //     return tabValue === TabSelected.INCOME
-      //       ? { ...ele, incomeDt: ele.date }
-      //       : { ...ele, expenseDt: ele.date };
-      //   });
-
-      // switch (tabValue) {
-      //   case TabSelected.INCOME:
-      //     data.forEach(
-      //       (item) =>
-      //         (item.detailIncomeCategoryId = incomeCategoryList.find(
-      //           (category) =>
-      //             category.detailIncomeCategoryName === item.category
-      //         ).detailIncomeCategoryId)
-      //     );
-      //     break;
-      //   case TabSelected.EXPENSE:
-      //     data.forEach(
-      //       (item) =>
-      //         (item.detailExpenseCategoryId = expenseCategoryList.find(
-      //           (category) =>
-      //             category.detailExpenseCategoryName === item.category
-      //         ).detailExpenseCategoryId)
-      //     );
-      //     break;
-      //   default:
-      //     break;
-      // }
-
-      // const data = [rowData]; //tabValue === TabSelected.INCOME ? { [rowData } : { rowData };
       let diff = rowData.filter((ele) => !prevRows.includes(ele));
-      console.log(diff);
-      console.log(TabSelected.INCOME);
+
       diff = diff.map((ele) =>
         tabValue === TabSelected.INCOME
           ? { ...ele, incomeDt: ele.date }
@@ -345,9 +305,7 @@ export default function Inout() {
         default:
           break;
       }
-      console.log(rowData);
-      // console.log(data);
-      console.log(diff);
+
       const api =
         tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL;
 
@@ -405,7 +363,6 @@ export default function Inout() {
         ? acc.push({ incomeId: cur.incomeId })
         : acc.push({ expenseId: cur.expenseId });
       return acc;
-      // return TabSelected.INCOME ? item.incomeId : item.expenseId;
     }, []);
     deleteDataMutation.mutate(itemIds);
   }

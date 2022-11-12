@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -38,7 +38,6 @@ export default function ProfileChange() {
   const { profileImage, setProfileImage } = useStore();
   const {
     id,
-    password,
     nickname,
     setNickname,
     phoneNumber,
@@ -53,7 +52,6 @@ export default function ProfileChange() {
 
   const fileInput = useRef();
   const [openPostcode, setOpenPostcode] = useState(false);
-  const [address, setAddress] = useState();
   const queryClient = useQueryClient();
 
   const handleButtonClick = (e) => {
@@ -68,8 +66,6 @@ export default function ProfileChange() {
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       setProfileImage(reader.result);
-      // console.log(reader.result);
-      // ImagePut(reader.result);
     };
   };
 
@@ -90,78 +86,7 @@ export default function ProfileChange() {
     setGender(event.currentTarget.value);
   };
 
-  // async function ImagePut(e) {
-  //   const response = await fetch(`http://localhost:4000/users/${id}`, {
-  //     method: "PUT",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       password: password,
-  //       nickname: nickname,
-  //       phoneNumber: phoneNumber,
-  //       birthdate: birthdate,
-  //       residence: residence,
-  //       gender: gender,
-  //       profileImage: e == null ? profileImage : e,
-  //     }),
-  //   });
-
-  //   // console.log(response);
-
-  //   if (response.ok) {
-  //     alert("수정완료");
-  //   } else {
-  //     alert("오류");
-  //   }
-  // }
-
-  // async function put(e) {
-  //   console.log(e);
-  //   const response = await fetch(`http://localhost:4000/users/${id}`, {
-  //     method: "PUT",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       password: password,
-  //       nickname: e["name"],
-  //       phoneNumber: e["phone"],
-  //       birthdate: e["birthday"],
-  //       residence: e["residence"],
-  //       gender: e["gender"],
-  //       profileImage: profileImage,
-  //     }),
-  //   });
-
-  //   console.log(response);
-
-  //   if (response.ok) {
-  //     setNickname(e["name"]);
-  //     setPhoneNumber(e["phone"]);
-  //     setBirthdate(e["birthday"]);
-  //     setResidence(e["residence"]);
-  //     setGender(e["gender"] === "남" ? "male" : "female");
-  //     alert("수정완료");
-  //   } else {
-  //     alert("오류");
-  //   }
-  // }
-
   const onSubmit = async (e) => {
-    // put(e);
-    // password,
-    // console.log(e["name"]);
-    // console.log(e["phone"]);
-    // console.log(e["birthday"]);
-    // console.log(e["residence"]);
-    // console.log(e["gender"]);
-    // console.log(profileImage);
-    // e.address = e.residence;
-    // e.birth = e.birthday;
-    // e.nickname = e.name;
-    // e.memberPhotoUrl = "";
-    // delete e.email;
-    // delete e.residence;
-    // delete e.birthday;
-    // delete e.name;
-    // console.log("d", e);
     saveDataMutation.mutate(e);
   };
 
@@ -170,8 +95,7 @@ export default function ProfileChange() {
   };
 
   const handleAddressSelect = (data) => {
-    // console.log(data.address);
-    setAddress(data.address);
+    setResidence(data.address);
     setOpenPostcode(false);
   };
 
@@ -186,7 +110,7 @@ export default function ProfileChange() {
     return res.data;
   };
 
-  const { data, isLoading } = useQuery(
+  const { isLoading } = useQuery(
     ["getProfileData"],
     getUserData,
     {
@@ -196,15 +120,11 @@ export default function ProfileChange() {
         setPhoneNumber(data["phone"]);
         setBirthdate(data["birth"]);
         setResidence(data["address"]);
-        // setAddress(data["address"]);
+
         setGender(data["gender"]);
         setProfileImage(data["s3ImageUrl"]);
       },
-      onError: (data) => {
-        // toast.warn("회원 정보를 가져오는데 실패하였습니다.", {
-        //   position: toast.POSITION.TOP_CENTER,
-        // });
-      },
+      onError: () => {},
     },
     { staleTime: 500 }
   );

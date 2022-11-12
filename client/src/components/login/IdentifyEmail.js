@@ -1,11 +1,11 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { identifyEmailSchema } from "../../schema/form_validation";
 
 import axios from "axios";
 
-import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useMutation } from "react-query";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -30,10 +30,8 @@ export default function IdentifyEmail() {
   });
 
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const onSubmit = (data) => {
-    // console.log(data.email);
     emailDataMutation.mutate(data.email);
   };
 
@@ -104,7 +102,6 @@ export default function IdentifyEmail() {
             variant="contained"
             sx={{ mt: 3, mb: 2, width: "100%" }}
             size="large"
-            // onClick={() => }
           >
             다음
           </Button>
