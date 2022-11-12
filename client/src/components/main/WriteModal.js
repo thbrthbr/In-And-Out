@@ -16,7 +16,7 @@ const Modal = styled.div`
 const ModalBody = styled.div`
   position: absolute;
   width: 800px;
-  height: 800px;
+  height: 570px;
   padding: 40px;
   text-align: center;
   background-color: gray;
@@ -27,18 +27,17 @@ const ModalBody = styled.div`
 const ModalCloseBtn = styled.div`
   position: absolute;
   top: 15px;
-  right: 15px;
+  right: 5px;
   border: none;
   color: white;
   font-size: 50px;
 
-  &:hover {
-    cursor: pointer;
-  }
+  cursor: pointer;
 `;
 
 function DiaryModal(props) {
-  const { edit, setEdit, setCalendarImage } = calenderStore();
+  const { edit, setEdit, setText, setCalendarImage, setSendingImage } =
+    calenderStore();
 
   function closeModal() {
     if (edit === true) {
@@ -46,6 +45,8 @@ function DiaryModal(props) {
     }
     props.closeModal();
     setCalendarImage(null);
+    setSendingImage(null);
+    setText("");
   }
 
   return (

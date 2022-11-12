@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Icon } from "@iconify/react";
 import {
   format,
@@ -19,15 +19,49 @@ import styled from "styled-components";
 import { calenderStore } from "../../store/store.js";
 
 const InstanceTable = styled.div`
-  margin-top: 20px;
-  margin-left: 60px;
-  width: 100px;
-  height: 100px;
+  margin-top: 25px;
+  margin-left: 40px;
+  min-width: 200px;
+  min-height: 200px;
+  max-height: 300px;
+  border: 1px solid black;
+
+  background-color: white;
+  position: absolute;
+  overflow-y: scroll;
+  cursor: default;
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    height: 20%;
+    background: #c0c0c0;
+
+    border-radius: 10px;
+  }
+`;
+
+const InstanceTable2 = styled.div`
+  margin-top: -200px;
+  margin-left: 40px;
+  min-width: 200px;
+  min-height: 200px;
+
+  max-height: 300px;
   border: 1px solid black;
   background-color: white;
   position: absolute;
-  overflow: scroll;
+  overflow-y: scroll;
   cursor: default;
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    height: 20%;
+    background: #c0c0c0;
+
+    border-radius: 10px;
+  }
 `;
 
 const TableWrapper = styled.div`
@@ -43,6 +77,15 @@ const CloseBtn = styled.div`
   cursor: pointer;
 `;
 
+// const CloseBtn2 = styled.div`
+//   position: sticky;
+//   bottom: 0;
+//   margin-left: 5px;
+//   height: 30px;
+//   font-size: 25px;
+//   cursor: pointer;
+// `;
+
 // const IconWrapper = styled.div`
 //   weight: 100px;
 //   height: 20px;
@@ -57,7 +100,7 @@ const RenderHeader = (props) => {
 
   const handleTabChange = (event, newValue) => {
     setTabMonth(newValue);
-    console.log(currentMonth);
+    // console.log(currentMonth);
   };
 
   const prevMonth = () => {
@@ -66,7 +109,6 @@ const RenderHeader = (props) => {
       format(endOfMonth(subMonths(currentMonth, 1)), "yyyy-MM-dd")
     );
     setcurrentMonth(subMonths(currentMonth, 1));
-    console.log("돼라");
   };
   const nextMonth = () => {
     props.changeValue(
@@ -117,8 +159,11 @@ const RenderDays = () => {
   return <div className="days row">{days}</div>;
 };
 
-const RenderCells = ({ diaryData }) => {
+const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
   const {
+    showDiary,
+    setShowDiary,
+    setCalendarImage,
     showWrittenDiary,
     setShowWrittenDiary,
     diaryDate,
@@ -130,19 +175,28 @@ const RenderCells = ({ diaryData }) => {
     setCurrentMonth,
     showNewDiary,
     setShowNewDiary,
+    specificDate,
     setSpecificDate,
     showInstanceTable,
     setShowInstanceTable,
+    dateOrigin,
+    setDateOrigin,
+    setText,
+    setDiaryImage,
+    setDiaryId,
+    position,
+    setPosition,
   } = calenderStore();
 
-  const onDateClick = (day) => {
-    console.log(1, day);
-    setSelectedDate(day);
-  };
+  // const onDateClick = (day) => {
+  //   console.log(1, day);
+  //   setSelectedDate(day);
+  // };
 
   // const tempDiaryData = diaryData.filter((data) => data.date === diaryDate)[0];
 
-  const tempDiaryData2 = diaryData;
+  const tempDiaryData = diaryDatas;
+  const tempDiaryData2 = calendarData;
 
   let expenseDT = [];
 
@@ -162,7 +216,7 @@ const RenderCells = ({ diaryData }) => {
     });
   }
 
-  console.log(tempDiaryData2.calendarIncomeDtoList.length);
+  // console.log(tempDiaryData2.calendarIncomeDtoList.length);
 
   if (tempDiaryData2.calendarIncomeDtoList.length) {
     tempDiaryData2.calendarIncomeDtoList.map((data) => {
@@ -172,9 +226,9 @@ const RenderCells = ({ diaryData }) => {
     });
   }
 
-  console.log(tempDiaryData2);
-  console.log(expenseDT);
-  console.log(incomeDT);
+  // console.log(tempDiaryData2);
+  // console.log(expenseDT);
+  // console.log(incomeDT);
 
   let dateArr = expenseDT.concat(incomeDT);
   let set = new Set(dateArr);
@@ -192,12 +246,17 @@ const RenderCells = ({ diaryData }) => {
   let day = startDate;
   let formattedDate = "";
 
+  const fixPosition = () => {
+    setPosition(Y);
+  };
+
   // console.log(startDate.format("MM/dd/yy"));
 
   while (day <= endDate) {
     for (let i = 0; i < 7; i++) {
       formattedDate = format(day, "d");
-      const cloneDay = day;
+      // console.log(day.format("yyyy-MM-dd"));
+      const cloneDay = day.format("yyyy-MM-dd");
       const formattedDataForDiary = day.format("MM/dd/yy");
       days.push(
         <div
@@ -218,24 +277,20 @@ const RenderCells = ({ diaryData }) => {
             justifyContent: "space-between",
             cursor: "pointer",
           }}
-          id={formattedDataForDiary}
-          // onClick={(e) => {
-          //   setSpecificDate(formattedDataForDiary);
-          //   let check = 0;
-          //   {
-          //     diaryData.map((data) => {
-          //       if (formattedDataForDiary === data.date) {
-          //         setShowWrittenDiary(!showWrittenDiary);
-          //         setDiaryDate(e.target.id);
-          //         check++;
-          //       }
-          //     });
-          //   }
-          //   if (check == 0) {
-          //     setDiaryDate(e.target.id);
-          //     setShowNewDiary(!showNewDiary);
-          //   }
-          // }}
+          id={cloneDay}
+          onClick={(e) => {
+            // diaryDatas.map((data) => {
+            //   if (data.diaryDt === e.target.id) {
+            //     setCalendarImage(data.s3ImageUrl);
+            //     setText(data.text);
+            //   }
+            // });
+
+            setSpecificDate(formattedDataForDiary);
+            setDiaryDate(formattedDataForDiary);
+            setDateOrigin(e.target.id);
+            setShowDiary(!showDiary);
+          }}
         >
           <span
             className={
@@ -243,6 +298,7 @@ const RenderCells = ({ diaryData }) => {
                 ? "text not-valid"
                 : ""
             }
+            key={cloneDay}
           >
             {formattedDate}
           </span>
@@ -256,19 +312,36 @@ const RenderCells = ({ diaryData }) => {
             }}
             id={formattedDataForDiary}
           >
-            {/* {diaryData.map((data) => {
-              if (formattedDataForDiary === data.date) {
-                return (
-                  <Icon
-                    icon="arcticons:diary"
-                    id={formattedDataForDiary}
-                    key={data.date}
-                  ></Icon>
-                );
-              } else {
-                return <div style={{ display: "none" }} key={data.date}></div>;
-              }
-            })} */}
+            {tempDiaryData.length > 0 &&
+              tempDiaryData.map((data) => {
+                if (formattedDataForDiary === formatter(data.diaryDt)) {
+                  if (data.s3ImageUrl === "") {
+                    return (
+                      <Icon
+                        icon="arcticons:diary"
+                        id={formattedDataForDiary}
+                        key={formatter(data.diaryDt)}
+                      ></Icon>
+                    );
+                  } else {
+                    return (
+                      <Icon
+                        style={{ color: "orange" }}
+                        icon="arcticons:diary"
+                        id={formattedDataForDiary}
+                        key={formatter(data.diaryDt)}
+                      ></Icon>
+                    );
+                  }
+                } else {
+                  return (
+                    <div
+                      style={{ display: "none" }}
+                      key={formatter(data.diaryDt)}
+                    ></div>
+                  );
+                }
+              })}
             {dateArr.length > 0 &&
               dateArr.map((data) => {
                 if (data == formattedDataForDiary) {
@@ -279,32 +352,42 @@ const RenderCells = ({ diaryData }) => {
                         id={formattedDataForDiary}
                         key={data.date}
                         onClick={(e) => {
+                          // console.log(diaryData);
                           e.stopPropagation();
+                          fixPosition();
                           setDetailDate(e.target.id);
                           setShowInstanceTable(!showInstanceTable);
                           setDiaryDate(formattedDataForDiary);
-                          console.log(showInstanceTable);
+                          // console.log(showInstanceTable);
                         }}
                       ></Icon>
-
-                      {/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */}
                       {showInstanceTable &&
-                        formattedDataForDiary === diaryDate && (
-                          <InstanceTable
+                        formattedDataForDiary === diaryDate &&
+                        (position > 300 ? (
+                          <InstanceTable2
                             // key={data.date}
                             onClick={(e) => {
                               e.stopPropagation();
                             }}
                           >
-                            <TableWrapper>
-                              <CloseBtn
-                                onClick={(e) => {
-                                  setShowInstanceTable(!showInstanceTable);
-                                }}
-                              >
-                                &#215;
-                              </CloseBtn>
-                              <h3>수입</h3>
+                            <CloseBtn
+                              onClick={(e) => {
+                                setShowInstanceTable(!showInstanceTable);
+                              }}
+                            >
+                              &#215;
+                            </CloseBtn>
+                            <TableWrapper
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <h3 style={{ margin: "0px", padding: "0px" }}>
+                                수입
+                              </h3>
                               <div>
                                 {tempDiaryData2.calendarIncomeDtoList.map(
                                   (income) => {
@@ -312,13 +395,16 @@ const RenderCells = ({ diaryData }) => {
                                       return (
                                         <div>
                                           <span>{income.item}</span>
+                                          <span>&nbsp; : &nbsp;</span>
                                           <span>{income.amount}</span>
                                         </div>
                                       );
                                   }
                                 )}
                               </div>
-                              <h3>지출</h3>
+                              <h3 style={{ margin: "0px", padding: "0px" }}>
+                                지출
+                              </h3>
                               <div>
                                 {tempDiaryData2.calendarExpenseDtoList.map(
                                   (expense) => {
@@ -328,6 +414,67 @@ const RenderCells = ({ diaryData }) => {
                                       return (
                                         <div>
                                           <span>{expense.item}</span>
+                                          <span>&nbsp; : &nbsp;</span>
+                                          <span>{expense.amount}</span>
+                                        </div>
+                                      );
+                                  }
+                                )}
+                              </div>
+                            </TableWrapper>
+                          </InstanceTable2>
+                        ) : (
+                          <InstanceTable
+                            // key={data.date}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            <CloseBtn
+                              onClick={(e) => {
+                                setShowInstanceTable(!showInstanceTable);
+                              }}
+                            >
+                              &#215;
+                            </CloseBtn>
+                            <TableWrapper
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <h3 style={{ margin: "0px", padding: "0px" }}>
+                                수입
+                              </h3>
+                              <div>
+                                {tempDiaryData2.calendarIncomeDtoList.map(
+                                  (income) => {
+                                    if (formatter(income.incomeDt) == diaryDate)
+                                      return (
+                                        <div>
+                                          <span>{income.item}</span>
+                                          <span>&nbsp; : &nbsp;</span>
+                                          <span>{income.amount}</span>
+                                        </div>
+                                      );
+                                  }
+                                )}
+                              </div>
+                              <h3 style={{ margin: "0px", padding: "0px" }}>
+                                지출
+                              </h3>
+                              <div>
+                                {tempDiaryData2.calendarExpenseDtoList.map(
+                                  (expense) => {
+                                    if (
+                                      formatter(expense.expenseDt) == diaryDate
+                                    )
+                                      return (
+                                        <div>
+                                          <span>{expense.item}</span>
+                                          <span>&nbsp; : &nbsp;</span>
                                           <span>{expense.amount}</span>
                                         </div>
                                       );
@@ -336,7 +483,7 @@ const RenderCells = ({ diaryData }) => {
                               </div>
                             </TableWrapper>
                           </InstanceTable>
-                        )}
+                        ))}
                     </>
                   );
                 } else {
@@ -345,74 +492,6 @@ const RenderCells = ({ diaryData }) => {
                   );
                 }
               })}
-
-            {/* {diaryData.map((data) => {
-              if (
-                formattedDataForDiary === data.date &&
-                (data.dailyExpenseList.length || data.dailyIncomeList.length)
-              ) {
-                return (
-                  <>
-                    <Icon
-                      icon="cil:magnifying-glass"
-                      id={formattedDataForDiary}
-                      key={data.date}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDetailDate(e.target.id);
-                        setShowInstanceTable(!showInstanceTable);
-                        setDiaryDate(formattedDataForDiary);
-                        console.log(showInstanceTable);
-                      }}
-                    ></Icon>
-                    {showInstanceTable && formattedDataForDiary === diaryDate && (
-                      <InstanceTable
-                        // key={data.date}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      >
-                        <TableWrapper>
-                          <CloseBtn
-                            onClick={(e) => {
-                              setShowInstanceTable(!showInstanceTable);
-                            }}
-                          >
-                            &#215;
-                          </CloseBtn>
-                          <h3>수입</h3>
-                          <div>
-                            {tempDiaryData.dailyIncomeList.length &&
-                              tempDiaryData.dailyIncomeList.map((income) => {
-                                return (
-                                  <div>
-                                    <span>{income.income_item}</span>
-                                    <span>{income.income_amount}</span>
-                                  </div>
-                                );
-                              })}
-                          </div>
-                          <h3>지출</h3>
-                          <div>
-                            {tempDiaryData.dailyExpenseList.length &&
-                              tempDiaryData.dailyExpenseList.map((expense) => {
-                                return (
-                                  <div>
-                                    <span>{expense.expense_item}</span>
-                                    <span>{expense.expense_amount}</span>
-                                  </div>
-                                );
-                              })}
-                          </div>
-                        </TableWrapper>
-                      </InstanceTable>
-                    )}
-                  </>
-                );
-              } else {
-                return <div style={{ display: "none" }} key={data.date}></div>;
-              }
-            })} */}
           </div>
         </div>
       );
@@ -428,12 +507,23 @@ const RenderCells = ({ diaryData }) => {
   return <div className="body">{rows}</div>;
 };
 
-export const FullCalendar = ({ changeValue, calendarData }) => {
+export const FullCalendar = ({
+  diaryDatas,
+  changeValue,
+  calendarData,
+  X,
+  Y,
+}) => {
   return (
     <div className="calendar">
       <RenderHeader changeValue={changeValue} />
       <RenderDays />
-      <RenderCells diaryData={calendarData} />
+      <RenderCells
+        X={X}
+        Y={Y}
+        diaryDatas={diaryDatas}
+        calendarData={calendarData}
+      />
     </div>
   );
 };
