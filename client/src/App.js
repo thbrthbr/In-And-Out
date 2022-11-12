@@ -32,6 +32,8 @@ import { QueryClientProvider, QueryClient } from "react-query";
 import PublicRoute from "./components/route/publicRoute";
 import PrivateRoute from "./components/route/privateRoute";
 
+import SocialLoginCheck from "./components/login/SocialLoginCheck";
+
 // import { createStore } from "redux";
 
 // import { Provider, useSelector, useDispatch, connect } from "react-redux";
@@ -101,6 +103,14 @@ function App() {
                   <PublicRoute>
                     <SignupCheck />
                   </PublicRoute>
+                }
+              ></Route>
+              <Route
+                path="/social_check/sending"
+                element={
+                  <PrivateRoute>
+                    <SocialLoginCheck />
+                  </PrivateRoute>
                 }
               ></Route>
               <Route
