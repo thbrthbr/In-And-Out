@@ -108,9 +108,9 @@ function App() {
               <Route
                 path="/social_check/sending"
                 element={
-                  <PrivateRoute>
+                  <PublicRoute>
                     <SocialLoginCheck />
-                  </PrivateRoute>
+                  </PublicRoute>
                 }
               ></Route>
               <Route

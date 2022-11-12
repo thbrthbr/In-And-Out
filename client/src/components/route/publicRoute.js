@@ -4,7 +4,7 @@ import { useStore2 } from "../../store/store.js";
 
 const PublicRoute = ({ children }) => {
   const { logState, setLogState } = useStore2();
-  return logState ? <Navigate to="/" /> : children;
+  return logState ? <Navigate to="/calendar" /> : children;
 };
 
 export default PublicRoute;

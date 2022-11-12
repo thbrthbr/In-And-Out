@@ -32,7 +32,7 @@ export default function SocialLoginCheck() {
       setTimeout(() => {
         setLogState(true);
         navigate("/calendar");
-      }, 3000);
+      }, 2000);
     } catch (err) {
       console.log(err);
       toast.warn("로그인이 실패했습니다!", {
