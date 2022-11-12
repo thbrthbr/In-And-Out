@@ -136,6 +136,7 @@ let currentMonth = new Date();
 
 let incomeCategoryList = [];
 let expenseCategoryList = [];
+let prevRows = [];
 
 export default function Inout() {
   const [rows, setRows] = useState([]); // 나중에 빈배열로 처리
@@ -210,6 +211,7 @@ export default function Inout() {
           return item;
         });
 
+        prevRows = incomeData;
         setRows(incomeData);
         break;
       case TabSelected.EXPENSE:
@@ -231,6 +233,7 @@ export default function Inout() {
           return item;
         });
 
+        prevRows = expenseData;
         setRows(expenseData);
         break;
       default:
@@ -239,28 +242,34 @@ export default function Inout() {
   };
 
   function rowKeyGetter(row) {
-    const id = tabValue === TabSelected.INCOME ? row.incomeId : row.expenseId;
+    let id = tabValue === TabSelected.INCOME ? row.incomeId : row.expenseId;
+    if (id === undefined) {
+      id = row.key;
+    }
+    // console.log("id", id);
     return id;
   }
 
   function createNewRow() {
     const newIncomeData = {
-      incomeId: "",
+      // incomeId: "",
       incomeDt: "",
       incomeItem: "",
       incomeAmount: "",
       detailIncomeCategoryId: "",
       incomeMemo: "",
+      key: Math.floor(Math.random() * 1000),
     };
 
     const newExpenseData = {
-      expenseId: "",
+      // expenseId: "",
       expenseDt: "",
       expenseItem: "",
       expenseCash: "",
       expenseCard: "",
       detailExpenseCategoryId: "",
       expenseMemo: "",
+      key: Math.floor(Math.random() * 1000),
     };
     let newData =
       tabValue === TabSelected.INCOME ? newIncomeData : newExpenseData;
@@ -270,21 +279,52 @@ export default function Inout() {
 
   const saveDataMutation = useMutation(
     async (rowData) => {
-      const data = rowData
-        .filter((item) => {
-          return tabValue === TabSelected.INCOME
-            ? item.incomeId === ""
-            : item.expenseId === "";
-        })
-        .map((ele) => {
-          return tabValue === TabSelected.INCOME
-            ? { ...ele, incomeDt: ele.date }
-            : { ...ele, expenseDt: ele.date };
-        });
+      // const data = rowData
+      //   .filter((item) => {
+      //     return tabValue === TabSelected.INCOME
+      //       ? item.incomeId === undefined
+      //       : item.expenseId === undefined;
+      //   })
+      //   .map((ele) => {
+      //     return tabValue === TabSelected.INCOME
+      //       ? { ...ele, incomeDt: ele.date }
+      //       : { ...ele, expenseDt: ele.date };
+      //   });
 
+      // switch (tabValue) {
+      //   case TabSelected.INCOME:
+      //     data.forEach(
+      //       (item) =>
+      //         (item.detailIncomeCategoryId = incomeCategoryList.find(
+      //           (category) =>
+      //             category.detailIncomeCategoryName === item.category
+      //         ).detailIncomeCategoryId)
+      //     );
+      //     break;
+      //   case TabSelected.EXPENSE:
+      //     data.forEach(
+      //       (item) =>
+      //         (item.detailExpenseCategoryId = expenseCategoryList.find(
+      //           (category) =>
+      //             category.detailExpenseCategoryName === item.category
+      //         ).detailExpenseCategoryId)
+      //     );
+      //     break;
+      //   default:
+      //     break;
+      // }
+
+      // const data = [rowData]; //tabValue === TabSelected.INCOME ? { [rowData } : { rowData };
+      let diff = rowData.filter((ele) => !prevRows.includes(ele));
+      console.log(diff);
+      diff = diff.map((ele) =>
+        TabSelected.INCOME
+          ? { ...ele, incomeDt: ele.date }
+          : { ...ele, expenseDt: ele.date }
+      );
       switch (tabValue) {
         case TabSelected.INCOME:
-          data.forEach(
+          diff.forEach(
             (item) =>
               (item.detailIncomeCategoryId = incomeCategoryList.find(
                 (category) =>
@@ -293,7 +333,7 @@ export default function Inout() {
           );
           break;
         case TabSelected.EXPENSE:
-          data.forEach(
+          diff.forEach(
             (item) =>
               (item.detailExpenseCategoryId = expenseCategoryList.find(
                 (category) =>
@@ -304,24 +344,22 @@ export default function Inout() {
         default:
           break;
       }
-
-      // const data = [rowData]; //tabValue === TabSelected.INCOME ? { [rowData } : { rowData };
-
+      console.log(rowData);
+      // console.log(data);
+      console.log(diff);
       const api =
         tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL;
-      try {
-        const res = await axios.post(api, data, {
-          headers: { "Content-Type": "application/json" },
-        });
-        return res.data;
-      } catch (err) {
-        console.log(err);
-      }
+
+      const res = await axios.post(api, diff, {
+        withCredentials: true,
+      });
+      return res.data;
     },
     {
       onSuccess: () => {
         queryClient.invalidateQueries("getInoutData");
       },
+      onError: () => {},
     }
   );
 
@@ -462,7 +500,11 @@ export default function Inout() {
           onSelectedRowsChange={setSelectedRows}
         />
       </TabPanel>
-      <Button variant="text" size="large" onClick={createNewRow}>
+      <Button
+        variant="text"
+        size="large"
+        onClick={() => setTimeout(createNewRow, 500)}
+      >
         +
       </Button>
       <Box
