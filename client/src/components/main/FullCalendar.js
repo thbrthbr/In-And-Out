@@ -25,7 +25,6 @@ const InstanceTable = styled.div`
   min-height: 200px;
   max-height: 300px;
   border: 1px solid black;
-
   background-color: white;
   position: absolute;
   overflow-y: scroll;
@@ -36,7 +35,6 @@ const InstanceTable = styled.div`
   &::-webkit-scrollbar-thumb {
     height: 20%;
     background: #c0c0c0;
-
     border-radius: 10px;
   }
 `;
@@ -46,7 +44,6 @@ const InstanceTable2 = styled.div`
   margin-left: 40px;
   min-width: 200px;
   min-height: 200px;
-
   max-height: 300px;
   border: 1px solid black;
   background-color: white;
@@ -59,7 +56,6 @@ const InstanceTable2 = styled.div`
   &::-webkit-scrollbar-thumb {
     height: 20%;
     background: #c0c0c0;
-
     border-radius: 10px;
   }
 `;
@@ -76,23 +72,6 @@ const CloseBtn = styled.div`
   font-size: 25px;
   cursor: pointer;
 `;
-
-// const CloseBtn2 = styled.div`
-//   position: sticky;
-//   bottom: 0;
-//   margin-left: 5px;
-//   height: 30px;
-//   font-size: 25px;
-//   cursor: pointer;
-// `;
-
-// const IconWrapper = styled.div`
-//   weight: 100px;
-//   height: 20px;
-//   background-color: yellow;
-// `;
-
-// const currentMonth = new Date();
 
 const RenderHeader = (props) => {
   const { currentMonth, setcurrentMonth, tabMonth, setTabMonth } =
@@ -119,26 +98,29 @@ const RenderHeader = (props) => {
   };
 
   return (
-    <div className="header row">
-      <div className="col col-first">
-        <span className="text">
-          <span className="text month">{format(currentMonth, "M")}월</span>
-          {format(currentMonth, "yyyy")}
-        </span>
-      </div>
-      <div className="col col-end">
-        <Icon
-          icon="bi:arrow-left-circle-fill"
-          value={tabMonth}
-          onChange={handleTabChange}
-          onClick={prevMonth}
-        />
-        <Icon
-          icon="bi:arrow-right-circle-fill"
-          value={tabMonth}
-          onChange={handleTabChange}
-          onClick={nextMonth}
-        />
+    <div>
+      <div style={{ width: "20px", height: "15px" }}></div>
+      <div className="header row">
+        <div className="col col-first">
+          <span className="text">
+            <span className="text month">{format(currentMonth, "M")}월</span>
+            {format(currentMonth, "yyyy")}
+          </span>
+        </div>
+        <div className="col col-end">
+          <Icon
+            icon="bi:arrow-left-circle-fill"
+            value={tabMonth}
+            onChange={handleTabChange}
+            onClick={prevMonth}
+          />
+          <Icon
+            icon="bi:arrow-right-circle-fill"
+            value={tabMonth}
+            onChange={handleTabChange}
+            onClick={nextMonth}
+          />
+        </div>
       </div>
     </div>
   );
@@ -279,17 +261,15 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
           }}
           id={cloneDay}
           onClick={(e) => {
-            // diaryDatas.map((data) => {
-            //   if (data.diaryDt === e.target.id) {
-            //     setCalendarImage(data.s3ImageUrl);
-            //     setText(data.text);
-            //   }
-            // });
-
-            setSpecificDate(formattedDataForDiary);
-            setDiaryDate(formattedDataForDiary);
-            setDateOrigin(e.target.id);
-            setShowDiary(!showDiary);
+            if (
+              cloneDay[5].toString() + cloneDay[6].toString() ==
+              format(currentMonth, "MM")
+            ) {
+              setSpecificDate(formattedDataForDiary);
+              setDiaryDate(formattedDataForDiary);
+              setDateOrigin(e.target.id);
+              setShowDiary(!showDiary);
+            }
           }}
         >
           <span
@@ -354,6 +334,7 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                         onClick={(e) => {
                           // console.log(diaryData);
                           e.stopPropagation();
+                          console.log(Y);
                           fixPosition();
                           setDetailDate(e.target.id);
                           setShowInstanceTable(!showInstanceTable);
