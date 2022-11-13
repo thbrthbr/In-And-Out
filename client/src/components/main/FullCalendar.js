@@ -24,10 +24,13 @@ const InstanceTable = styled.div`
   min-width: 200px;
   min-height: 200px;
   max-height: 300px;
+  max-width: 245px;
   border: 1px solid black;
   background-color: white;
   position: absolute;
   overflow-y: scroll;
+  overflow-x: hidden;
+
   cursor: default;
   &::-webkit-scrollbar {
     width: 5px;
@@ -45,10 +48,12 @@ const InstanceTable2 = styled.div`
   min-width: 200px;
   min-height: 200px;
   max-height: 300px;
+  max-width: 245px;
   border: 1px solid black;
   background-color: white;
   position: absolute;
   overflow-y: scroll;
+  overflow-x: hidden;
   cursor: default;
   &::-webkit-scrollbar {
     width: 5px;
@@ -367,7 +372,7 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                               }}
                             >
                               <h3 style={{ margin: "0px", padding: "0px" }}>
-                                수입
+                                &lt;수입&gt;
                               </h3>
                               <div>
                                 {tempDiaryData2.calendarIncomeDtoList.map(
@@ -384,7 +389,7 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                                 )}
                               </div>
                               <h3 style={{ margin: "0px", padding: "0px" }}>
-                                지출
+                                &lt;지출&gt;
                               </h3>
                               <div>
                                 {tempDiaryData2.calendarExpenseDtoList.map(
@@ -427,7 +432,7 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                               }}
                             >
                               <h3 style={{ margin: "0px", padding: "0px" }}>
-                                수입
+                                &lt;수입&gt;
                               </h3>
                               <div>
                                 {tempDiaryData2.calendarIncomeDtoList.map(
@@ -444,7 +449,7 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                                 )}
                               </div>
                               <h3 style={{ margin: "0px", padding: "0px" }}>
-                                지출
+                                &lt;지출&gt;
                               </h3>
                               <div>
                                 {tempDiaryData2.calendarExpenseDtoList.map(

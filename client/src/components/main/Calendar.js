@@ -95,6 +95,7 @@ export default function Calendar() {
         `${process.env.REACT_APP_API_URL}/api/diary?endDt=${eddt}&startDt=${stdt}`,
         {
           headers: { "Content-Type": "application/json" },
+          withCredentials: true,
         }
       );
       res2.data.map((data) => {
@@ -114,6 +115,7 @@ export default function Calendar() {
           url: `${process.env.REACT_APP_API_URL}/api/diary`,
           data: data,
           headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
         });
         return res.data;
       } catch (err) {
@@ -135,6 +137,7 @@ export default function Calendar() {
           url: `${process.env.REACT_APP_API_URL}/api/diary`,
           data: data,
           headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
         });
         return res.data;
       } catch (err) {
@@ -156,6 +159,7 @@ export default function Calendar() {
           url: `${process.env.REACT_APP_API_URL}/api/diary`,
           data: data,
           headers: { "Content-Type": "application/json" },
+          withCredentials: true,
         });
         return res.data;
       } catch (err) {
