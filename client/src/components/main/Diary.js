@@ -215,8 +215,6 @@ export default function Diary({
   const {
     diaryDate,
     setDiaryDate,
-    detailDate,
-    setDetailDate,
     edit,
     setEdit,
     specificDate,
@@ -227,15 +225,12 @@ export default function Diary({
     setDateOrigin,
     text,
     setText,
-    diaryImage,
     diaryId,
     setDiaryId,
     sendingImage,
     setSendingImage,
     currentMonth,
-    setcurrentMonth,
     showDiary,
-    setTempText,
   } = calenderStore();
 
   const handleSetValue = (e) => {
@@ -308,7 +303,6 @@ export default function Diary({
         "input",
         new Blob([JSON.stringify(input)], { type: "application/json" })
       );
-
       if (sendingImage === null) {
         let nullTaker = new File([110, 117, 108, 108], "null");
         body2.append("file", nullTaker);
@@ -317,7 +311,6 @@ export default function Diary({
       }
       setSendingImage(null);
       closeModal();
-
       saveDataMutation.mutate(body2);
       setCalendarImage(null);
       setText("");
@@ -328,7 +321,6 @@ export default function Diary({
         diaryDt: dateOrigin,
         text: text,
       };
-
       body2.append(
         "input",
         new Blob([JSON.stringify(input)], { type: "application/json" })
@@ -355,9 +347,7 @@ export default function Diary({
   }
 
   let basicImg = null;
-
   let basicText = "";
-
   let basicDiaryId = 0;
 
   const basicSetting = (a, b, c) => {
@@ -413,11 +403,11 @@ export default function Diary({
                         let partition = "";
                         for (let i = 0; i < income.item.length; i++) {
                           partition += income.item[i];
-                          if (partition.length == 26) {
+                          if (partition.length === 26) {
                             temp1.push(partition);
                             partition = "";
                           }
-                          if (i == income.item.length - 1) {
+                          if (i === income.item.length - 1) {
                             temp1.push(partition);
                             partition = "";
                           }
@@ -429,11 +419,11 @@ export default function Diary({
                         let partition = "";
                         for (let i = 0; i < income.amount.length; i++) {
                           partition += income.amount[i];
-                          if (partition.length == 26) {
+                          if (partition.length === 26) {
                             temp2.push(partition);
                             partition = "";
                           }
-                          if (i == income.amount.length - 1) {
+                          if (i === income.amount.length - 1) {
                             temp2.push(partition);
                             partition = "";
                           }
@@ -501,7 +491,6 @@ export default function Diary({
               <div>&lt;지출&gt;</div>
               {calendarData.calendarExpenseDtoList.length > 0 ? (
                 calendarData.calendarExpenseDtoList.map((expense) => {
-                  console.log(expense.item);
                   check2++;
                   if (formatter(expense.expenseDt) === diaryDate) {
                     num2++;
@@ -533,7 +522,7 @@ export default function Diary({
                         let partition = "";
                         for (let i = 0; i < expense.item.length; i++) {
                           partition += expense.item[i];
-                          if (partition.length == 26) {
+                          if (partition.length === 26) {
                             temp1.push(partition);
                             partition = "";
                           }
@@ -549,11 +538,11 @@ export default function Diary({
                         let partition = "";
                         for (let i = 0; i < expense.amount.length; i++) {
                           partition += expense.amount[i];
-                          if (partition.length == 26) {
+                          if (partition.length === 26) {
                             temp2.push(partition);
                             partition = "";
                           }
-                          if (i == expense.amount.length - 1) {
+                          if (i === expense.amount.length - 1) {
                             temp2.push(partition);
                             partition = "";
                           }
@@ -606,7 +595,7 @@ export default function Diary({
                     }
                     if (
                       check2 === calendarData.calendarExpenseDtoList.length &&
-                      flag2 == 0
+                      flag2 === 0
                     ) {
                       flag2 = 1;
                       return <div style={{ height: "300px" }}></div>;

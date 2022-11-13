@@ -7,18 +7,11 @@ import { Icon } from "@iconify/react";
 import DiaryModal from "./WriteModal";
 import Diary from "./Diary";
 import { startOfMonth, endOfMonth, format } from "date-fns";
-
 import { calenderStore } from "../../store/store.js";
-
 import axios from "axios";
-
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import PacmanLoader from "react-spinners/PacmanLoader";
-
-import useMouse from "@react-hook/mouse-position";
-
-// const DIARY_API_URL = "http://localhost:5000/calendar";
-// api 연결 작업하면서 요청 api를 2개(다이어리데이터 + 수입지출쪽 데이터)로 수정
+// import useMouse from "@react-hook/mouse-position";
 
 const Container = styled.div`
   flex: 1.75;
@@ -28,28 +21,40 @@ const Container = styled.div`
 
 let month = new Date();
 
-export default function Calendar() {
-  const mouseMoveArea = React.useRef(null);
-  const mouse = useMouse(mouseMoveArea, {
-    enterDelay: 100,
-    leaveDelay: 100,
+const useMouseMovement = () => {
+  const [mousePosition, setMousePosition] = useState({
+    x: null,
+    y: null,
   });
+  useEffect(() => {
+    function handle(e) {
+      setMousePosition({
+        x: e.pageX,
+        y: e.pageY,
+      });
+    }
+    document.addEventListener("mousemove", handle);
+    return () => document.removeEventListener("mousemove", handle);
+  });
+
+  return mousePosition;
+};
+
+export default function Calendar() {
+  const { x, y } = useMouseMovement();
+
+  // const mouseMoveArea = useRef();
+  // const mouse = useMouse(mouseMoveArea, {
+  //   enterDelay: 100,
+  //   leaveDelay: 100,
+  // });
 
   const {
     showDiary,
     setShowDiary,
-    showWrittenDiary,
-    setShowWrittenDiary,
-    showNewDiary,
-    setShowNewDiary,
     setShowInstanceTable,
-    tabMonth,
     setcurrentMonth,
-    setDiaryDate,
-    setSpecificDate,
-    dateList,
-    setDateList,
-    currentMonth,
+    setPosition,
   } = calenderStore();
 
   const queryClient = useQueryClient();
@@ -64,8 +69,6 @@ export default function Calendar() {
 
   let eddt = format(endOfMonth(month), "yyyy-MM-dd");
 
-  // console.log(stdt);
-
   const changeValue = (a, b) => {
     stdt = a;
     eddt = b;
@@ -76,23 +79,6 @@ export default function Calendar() {
     stdt = a;
     eddt = b;
     setcurrentMonth(date);
-
-    // setSpecificDate(date.format("MM/dd/yy"));
-    // setDiaryDate(date.format("MM/dd/yy"));
-    // let checker = 0;
-    // data[1].map((data) => {
-    //   if (date.format("MM/dd/yy") === formatter(data.diaryDt)) {
-    //     checker++;
-    //     console.log(checker);
-    //   }
-    // });
-    // if (checker == 0) {
-    //   setShowWrittenDiary(false);
-    //   setShowNewDiary(true);
-    // } else {
-    //   setShowWrittenDiary(true);
-    //   setShowNewDiary(false);
-    // }
     refetch();
   };
 
@@ -114,12 +100,6 @@ export default function Calendar() {
       res2.data.map((data) => {
         dateArr.push(formatter(data.diaryDt));
       });
-
-      // //여기에 이런식으로 한 번에 api 두 개 요청
-      // console.log(res.data);
-      // console.log(res2.data);
-      // console.log(dateArr);
-      // console.log(res.data.calendarExpenseDtoList[0].expenseDt);
       return [res.data, res2.data, dateArr];
     } catch (err) {
       console.log(err);
@@ -129,16 +109,6 @@ export default function Calendar() {
   const saveDataMutation = useMutation(
     async (data) => {
       try {
-        // const editted = await getData();
-        // console.log(editted);
-        // for (let i = 0; i < editted.length; i++) {
-        //   if (editted[i].date === data.date) {
-        //     alert("해당 날짜에는 이미 다이어리가 등록되어 있습니다.");
-        //     return;
-        //   }
-        // }
-        // console.log(data);
-        // console.log(data.get("input"));
         const res = await axios({
           method: "post",
           url: `${process.env.REACT_APP_API_URL}/api/diary`,
@@ -161,17 +131,11 @@ export default function Calendar() {
     async (data) => {
       try {
         const res = await axios({
-          //이거 patch로 해야할거같음
           method: "put",
           url: `${process.env.REACT_APP_API_URL}/api/diary`,
           data: data,
           headers: { "Content-Type": "multipart/form-data" },
         });
-
-        // const res = await axios.put(`${DIARY_API_URL}/${data[1]}`, data[0], {
-        //   headers: { "Content-Type": "application/json" },
-        // });
-        // refetch();
         return res.data;
       } catch (err) {
         console.log(err);
@@ -184,28 +148,9 @@ export default function Calendar() {
     }
   );
 
-  // const deleteDataMutation = useMutation(
-  //   async (data) => {
-  //     try {
-  //       const res = await axios.delete(`${DIARY_API_URL}/${data[1]}`, data[0], {
-  //         headers: { "Content-Type": "application/json" },
-  //       });
-  //       return res.data;
-  //     } catch (err) {
-  //       // console.log(err);
-  //     }
-  //   },
-  //   {
-  //     onSuccess: () => {
-  //       queryClient.invalidateQueries("getCalendarData");
-  //     },
-  //   }
-  // );
-
   const deleteDataMutation = useMutation(
     async (data) => {
       try {
-        // console.log(data);
         const res = await axios({
           method: "delete",
           url: `${process.env.REACT_APP_API_URL}/api/diary`,
@@ -226,10 +171,10 @@ export default function Calendar() {
 
   useEffect(() => {
     setcurrentMonth(new Date());
+    // setPosition(mouse.y);
     refetch();
   }, []);
 
-  //tabMonth 추가하기
   const { data, isLoading, refetch } = useQuery(["getCalendarData"], getData, {
     staleTime: Infinity,
   });
@@ -239,34 +184,17 @@ export default function Calendar() {
 
   return (
     <Container
-      ref={mouseMoveArea}
       onClick={() => {
         setShowInstanceTable(false);
       }}
     >
       <FullCalendar
-        X={mouse.x}
-        Y={mouse.y}
-        ref={mouseMoveArea}
+        Y={y}
         dateList={data[2]}
         changeValue={changeValue}
         diaryDatas={data[1]}
         calendarData={data[0]}
       />
-      {/* <Icon
-        icon="heroicons:pencil-square"
-        style={{
-          position: "fixed",
-          width: "3rem",
-          height: "3rem",
-          cursor: "pointer",
-          bottom: "70px",
-          right: "200px",
-          backgroundColor: "lightgray",
-          borderRadius: "50%",
-        }}
-        onClick={() => setShowNewDiary(!showNewDiary)}
-      ></Icon> */}
       {showDiary && (
         <DiaryModal closeModal={() => setShowDiary(!showDiary)}>
           <Diary
@@ -281,32 +209,6 @@ export default function Calendar() {
           ></Diary>
         </DiaryModal>
       )}
-      {/* {showNewDiary && (
-        <DiaryModal closeModal={() => setShowNewDiary(!showNewDiary)}>
-          <Diary
-            dateList={data[2]}
-            changeValue2={changeValue2}
-            diaryDatas={data[1]}
-            calendarData={data[0]}
-            saveDataMutation={saveDataMutation}
-            closeModal={() => setShowNewDiary(!showNewDiary)}
-          ></Diary>
-        </DiaryModal>
-      )}
-      {showWrittenDiary && (
-        <DiaryModal closeModal={() => setShowWrittenDiary(!showWrittenDiary)}>
-          <Diary
-            changeValue2={changeValue2}
-            diaryDatas={data[1]}
-            dateList={data[2]}
-            calendarData={data[0]}
-            saveDataMutation={saveDataMutation}
-            saveEditDataMutation={saveEditDataMutation}
-            deleteDataMutation={deleteDataMutation}
-            closeModal={() => setShowWrittenDiary(!showWrittenDiary)}
-          ></Diary>
-        </DiaryModal>
-      )} */}
     </Container>
   );
 }
