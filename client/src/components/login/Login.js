@@ -179,8 +179,8 @@ export default function Login() {
                 width: "10%",
               }}
               size="large"
-              href="http://3.34.206.181:8080/oauth2/authorization/google"
-              target="_blank"
+              href={`${process.env.REACT_APP_API_URL}/oauth2/authorization/google`}
+              target="_self"
               rel="noopener noreferrer"
             >
               <img
@@ -195,8 +195,8 @@ export default function Login() {
                 width: "10%",
               }}
               size="large"
-              href="http://3.34.206.181:8080/oauth2/authorization/naver"
-              target="_blank"
+              href={`${process.env.REACT_APP_API_URL}/oauth2/authorization/naver`}
+              target="_self"
               rel="noopener noreferrer"
             >
               <img
