@@ -68,7 +68,7 @@ const incomeColumns = [
   {
     key: "incomeMemo",
     name: "메모",
-    width: 500,
+    width: 580,
     editor: textEditor,
   },
 ];
