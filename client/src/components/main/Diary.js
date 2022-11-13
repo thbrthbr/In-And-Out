@@ -381,7 +381,7 @@ export default function Diary({
                     isChecker = 1;
                     if (
                       check === calendarData.calendarIncomeDtoList.length &&
-                      num < 9
+                      num < 10
                     ) {
                       return (
                         <>
@@ -391,7 +391,7 @@ export default function Diary({
                             <span>{income.amount}</span>
                           </div>
                           <div
-                            style={{ height: `calc(300px - ${num}*30px)` }}
+                            style={{ height: `calc(400px - ${num}*40px)` }}
                           ></div>
                         </>
                       );
@@ -465,11 +465,11 @@ export default function Diary({
                       flag = 1;
                       if (
                         check === calendarData.calendarIncomeDtoList.length &&
-                        num < 9
+                        num < 10
                       ) {
                         return (
                           <div
-                            style={{ height: `calc(300px - ${num}*30px)` }}
+                            style={{ height: `calc(400px - ${num}*40px)` }}
                           ></div>
                         );
                       }
@@ -479,12 +479,12 @@ export default function Diary({
                       flag == 0
                     ) {
                       flag = 1;
-                      return <div style={{ height: "300px" }}></div>;
+                      return <div style={{ height: "400px" }}></div>;
                     }
                   }
                 })
               ) : (
-                <div style={{ height: "300px" }}></div>
+                <div style={{ height: "400px" }}></div>
               )}
             </div>
             <div>
@@ -507,7 +507,7 @@ export default function Diary({
                             <span>{expense.amount}</span>
                           </div>
                           <div
-                            style={{ height: `calc(300px - ${num}*30px)` }}
+                            style={{ height: `calc(400px - ${num}*40px)` }}
                           ></div>
                         </>
                       );
@@ -584,11 +584,11 @@ export default function Diary({
                       flag2 = 1;
                       if (
                         check2 === calendarData.calendarExpenseDtoList.length &&
-                        num2 < 9
+                        num2 < 10
                       ) {
                         return (
                           <div
-                            style={{ height: `calc(300px - ${num2}*20px)` }}
+                            style={{ height: `calc(400px - ${num2}*40px)` }}
                           ></div>
                         );
                       }
@@ -598,12 +598,12 @@ export default function Diary({
                       flag2 === 0
                     ) {
                       flag2 = 1;
-                      return <div style={{ height: "300px" }}></div>;
+                      return <div style={{ height: "400px" }}></div>;
                     }
                   }
                 })
               ) : (
-                <div style={{ height: "300px" }}></div>
+                <div style={{ height: "400px" }}></div>
               )}
             </div>
           </Pyo>
