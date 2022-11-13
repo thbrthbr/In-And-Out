@@ -20,9 +20,11 @@ const doughnutOption = {
   },
   plugins: {
     datalabels: {
-      formatter: (value) => {
+      formatter: (value, ctx) => {
         if (value < 1) return "";
-        return `${value} %`;
+        return `${
+          ctx.chart.data.labels[ctx.dataIndex].split("-")[0]
+        } \n    ${value} %`;
       },
     },
     legend: {
@@ -45,9 +47,11 @@ const barOption = {
   },
   plugins: {
     datalabels: {
-      formatter: (value) => {
+      formatter: (value, ctx) => {
         if (value < 1) return "";
-        return `${value} %`;
+        return `${
+          ctx.chart.data.labels[ctx.dataIndex].split("-")[0]
+        } \n  ${value} %`;
       },
     },
     legend: {
