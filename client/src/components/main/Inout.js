@@ -316,9 +316,22 @@ export default function Inout() {
     },
     {
       onSuccess: () => {
+        toast.success("저장이 성공적으로 완료 되었습니다!", {
+          position: toast.POSITION.TOP_CENTER,
+        });
         queryClient.invalidateQueries("getInoutData");
       },
-      onError: () => {},
+      onError: (err) => {
+        if (err instanceof TypeError) {
+          toast.warn("누락된 항목이 있어 저장에 실패 하였습니다!", {
+            position: toast.POSITION.TOP_CENTER,
+          });
+        } else {
+          toast.warn("저장에 실패 하였습니다!", {
+            position: toast.POSITION.TOP_CENTER,
+          });
+        }
+      },
     }
   );
 
