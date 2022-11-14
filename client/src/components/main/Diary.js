@@ -616,7 +616,6 @@ export default function Diary({
                       console.log(temp2);
                       return (
                         <div>
-                          2
                           {temp1.map((data) => {
                             return (
                               <>
