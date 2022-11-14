@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 import "react-data-grid/lib/styles.css";
 import DataGrid, { SelectColumn, textEditor } from "react-data-grid";
@@ -7,7 +7,14 @@ import DateEditor from "../../editor/DateEditor";
 
 import axios from "axios";
 
-import { startOfMonth, endOfMonth, addMonths, subMonths } from "date-fns";
+import {
+  startOfMonth,
+  endOfMonth,
+  addMonths,
+  subMonths,
+  getMonth,
+  getYear,
+} from "date-fns";
 
 import DateHeader from "../common/DateHeader";
 
@@ -68,7 +75,7 @@ const incomeColumns = [
   {
     key: "incomeMemo",
     name: "메모",
-    width: 500,
+    width: 580,
     editor: textEditor,
   },
 ];
@@ -150,6 +157,8 @@ export default function Inout() {
     setTabValue(newValue);
   };
 
+  const gridRef = useRef(null);
+
   const formatDate = (date) => {
     return `${date.getFullYear()}-${(date.getMonth() + 1)
       .toString()
@@ -208,6 +217,8 @@ export default function Inout() {
             (category) =>
               category.detailIncomeCategoryId === item.detailIncomeCategoryId
           ).detailIncomeCategoryName;
+          item.year = getYear(new Date(item.date));
+          item.month = getMonth(new Date(item.date));
           return item;
         });
 
@@ -230,6 +241,8 @@ export default function Inout() {
             (category) =>
               category.detailExpenseCategoryId === item.detailExpenseCategoryId
           ).detailExpenseCategoryName;
+          item.year = getYear(new Date(item.date));
+          item.month = getMonth(new Date(item.date));
           return item;
         });
 
@@ -246,78 +259,49 @@ export default function Inout() {
     if (id === undefined) {
       id = row.key;
     }
-    // console.log("id", id);
     return id;
   }
 
   function createNewRow() {
     const newIncomeData = {
-      // incomeId: "",
       incomeDt: "",
       incomeItem: "",
-      incomeAmount: "",
+      incomeAmount: "0",
       detailIncomeCategoryId: "",
       incomeMemo: "",
+      month: getMonth(currentMonth),
+      year: getYear(currentMonth),
       key: Math.floor(Math.random() * 1000),
     };
 
     const newExpenseData = {
-      // expenseId: "",
       expenseDt: "",
       expenseItem: "",
-      expenseCash: "",
-      expenseCard: "",
+      expenseCash: "0",
+      expenseCard: "0",
       detailExpenseCategoryId: "",
       expenseMemo: "",
+      month: getMonth(currentMonth),
+      year: getYear(currentMonth),
       key: Math.floor(Math.random() * 1000),
     };
     let newData =
       tabValue === TabSelected.INCOME ? newIncomeData : newExpenseData;
 
     setRows([...rows, newData]);
+    scrollToBottom();
   }
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      gridRef.current.scrollToRow(rows.length);
+    }, 50);
+  };
 
   const saveDataMutation = useMutation(
     async (rowData) => {
-      // const data = rowData
-      //   .filter((item) => {
-      //     return tabValue === TabSelected.INCOME
-      //       ? item.incomeId === undefined
-      //       : item.expenseId === undefined;
-      //   })
-      //   .map((ele) => {
-      //     return tabValue === TabSelected.INCOME
-      //       ? { ...ele, incomeDt: ele.date }
-      //       : { ...ele, expenseDt: ele.date };
-      //   });
-
-      // switch (tabValue) {
-      //   case TabSelected.INCOME:
-      //     data.forEach(
-      //       (item) =>
-      //         (item.detailIncomeCategoryId = incomeCategoryList.find(
-      //           (category) =>
-      //             category.detailIncomeCategoryName === item.category
-      //         ).detailIncomeCategoryId)
-      //     );
-      //     break;
-      //   case TabSelected.EXPENSE:
-      //     data.forEach(
-      //       (item) =>
-      //         (item.detailExpenseCategoryId = expenseCategoryList.find(
-      //           (category) =>
-      //             category.detailExpenseCategoryName === item.category
-      //         ).detailExpenseCategoryId)
-      //     );
-      //     break;
-      //   default:
-      //     break;
-      // }
-
-      // const data = [rowData]; //tabValue === TabSelected.INCOME ? { [rowData } : { rowData };
       let diff = rowData.filter((ele) => !prevRows.includes(ele));
-      console.log(diff);
-      console.log(TabSelected.INCOME);
+
       diff = diff.map((ele) =>
         tabValue === TabSelected.INCOME
           ? { ...ele, incomeDt: ele.date }
@@ -345,9 +329,7 @@ export default function Inout() {
         default:
           break;
       }
-      console.log(rowData);
-      // console.log(data);
-      console.log(diff);
+
       const api =
         tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL;
 
@@ -358,9 +340,22 @@ export default function Inout() {
     },
     {
       onSuccess: () => {
+        toast.success("저장이 성공적으로 완료 되었습니다!", {
+          position: toast.POSITION.TOP_CENTER,
+        });
         queryClient.invalidateQueries("getInoutData");
       },
-      onError: () => {},
+      onError: (err) => {
+        if (err instanceof TypeError) {
+          toast.warn("누락된 항목이 있어 저장에 실패 하였습니다!", {
+            position: toast.POSITION.TOP_CENTER,
+          });
+        } else {
+          toast.warn("저장에 실패 하였습니다!", {
+            position: toast.POSITION.TOP_CENTER,
+          });
+        }
+      },
     }
   );
 
@@ -370,13 +365,10 @@ export default function Inout() {
       const api =
         tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL;
       try {
-        const res = await axios.delete(
-          api,
-          { data: itemIds },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        const res = await axios.delete(api, {
+          data: itemIds,
+          withCredentials: true,
+        });
         return res.data;
       } catch (err) {
         console.log(err);
@@ -405,7 +397,6 @@ export default function Inout() {
         ? acc.push({ incomeId: cur.incomeId })
         : acc.push({ expenseId: cur.expenseId });
       return acc;
-      // return TabSelected.INCOME ? item.incomeId : item.expenseId;
     }, []);
     deleteDataMutation.mutate(itemIds);
   }
@@ -466,6 +457,8 @@ export default function Inout() {
           next={nextMonth}
         />
         <DataGrid
+          style={{ height: 500 }}
+          ref={gridRef}
           columns={incomeColumns}
           rows={rows}
           rowGetter={(i) => rows[i]}
@@ -488,6 +481,8 @@ export default function Inout() {
           next={nextMonth}
         />
         <DataGrid
+          style={{ height: 500 }}
+          ref={gridRef}
           columns={expenseColumns}
           rows={rows}
           rowGetter={(i) => rows[i]}

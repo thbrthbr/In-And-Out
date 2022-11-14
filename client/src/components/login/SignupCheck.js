@@ -16,7 +16,7 @@ export default function SignupCheck() {
   const navigate = useNavigate();
   const sendToServer = async () => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_API_URL}/api/signup/sending?id=${uuid}`,
         { withCredentials: true }
       );

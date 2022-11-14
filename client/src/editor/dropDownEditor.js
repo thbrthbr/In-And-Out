@@ -1,9 +1,7 @@
 import { useCategoryDropDownItemStore } from "../store/store.js";
-// const titles = ["", "교통비", "전화비", "식비"];
 
 export default function DropDownEditor({ row, onRowChange }) {
-  const { categoryItemList, setCategoryItemList } =
-    useCategoryDropDownItemStore();
+  const { categoryItemList } = useCategoryDropDownItemStore();
 
   return (
     <select

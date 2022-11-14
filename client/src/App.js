@@ -1,6 +1,4 @@
-// import logo from "./logo.svg";
 import "./App.css";
-import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./components/login/Login";
@@ -8,23 +6,13 @@ import Signin from "./components/login/Signin";
 import IdentifyEmail from "./components/login/IdentifyEmail";
 import IdentifyPhone from "./components/login/IdentifyPhone";
 import RecoverInitiate from "./components/login/RecoverInitiate";
-
 import Calendar from "./components/main/Calendar";
-
-// import ProfileChange from "./components/setting/ProfileChange";
-// import PasswordChange from "./components/setting/PasswordChange";
-// import Signout from "./components/setting/Signout";
-
 import styled from "styled-components";
-
 import Inout from "./components/main/Inout";
 import Report from "./components/main/Report";
 import Error from "./components/Error";
-
 import Layout from "./components/common/Layout";
-
 import Screen from "./components/common/Screen";
-
 import SignupCheck from "./components/login/SignupCheck";
 
 import { QueryClientProvider, QueryClient } from "react-query";
@@ -34,19 +22,6 @@ import PrivateRoute from "./components/route/privateRoute";
 
 import SocialLoginCheck from "./components/login/SocialLoginCheck";
 
-// import { createStore } from "redux";
-
-// import { Provider, useSelector, useDispatch, connect } from "react-redux";
-
-// function reducer(currentState, action) {
-//   if (currentState === undefined) {
-//     return {};
-//   }
-//   const newState = { ...currentState };
-
-//   return newState;
-// }
-// const store = createStore(reducer);
 const queryClient = new QueryClient();
 
 function App() {
@@ -108,9 +83,9 @@ function App() {
               <Route
                 path="/social_check/sending"
                 element={
-                  <PrivateRoute>
+                  <PublicRoute>
                     <SocialLoginCheck />
-                  </PrivateRoute>
+                  </PublicRoute>
                 }
               ></Route>
               <Route
@@ -129,7 +104,6 @@ function App() {
                   </PrivateRoute>
                 }
               ></Route>
-              {/* <Route path="/report/yearly" element={<Report />}></Route> */}
               <Route
                 path="/inout"
                 element={
@@ -138,7 +112,6 @@ function App() {
                   </PrivateRoute>
                 }
               ></Route>
-              {/* <Route path="/inout/expense" element={<Inout />}></Route> */}
               <Route
                 path="/profile_change"
                 element={

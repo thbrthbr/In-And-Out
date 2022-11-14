@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -17,12 +17,8 @@ import {
   Typography,
 } from "@mui/material/";
 
-import {
-  useStore2,
-  useStore3,
-  loginStore,
-  backUpStore,
-} from "../../store/store.js";
+import { useStore2, useStore3, loginStore } from "../../store/store.js";
+import { useSnsLogStateStore } from "../../store/store.js";
 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -53,20 +49,6 @@ export default function Login() {
   } = loginStore();
 
   const onSubmit = async (e) => {
-    // e.preventDefault();
-    // const result = await tempFunc(e["email"], e["pw"]);
-    // console.log(result);
-    // if (result) {
-    //   setId(e["email"]);
-    //   setPassword(e["pw"]);
-    //   setNickname(result.nickname);
-    //   setBU_Nickname(result.nickname);
-    //   setPhoneNumber(result.phoneNumber);
-    //   setBirthdate(result.birthdate);
-    //   setResidence(result.residence);
-    //   setGender(result.gender);
-    //   setLogState(true);
-    // }
     try {
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/signin`,
@@ -78,8 +60,6 @@ export default function Login() {
           withCredentials: true,
         }
       );
-      console.log(res);
-      // console.log(document.cookie);
 
       setLogState(true);
       setTimeout(() => {
@@ -93,41 +73,6 @@ export default function Login() {
       });
     }
   };
-
-  function loginHandler() {
-    setLogState(true);
-    console.log(localStorage.getItem("login-stuff"));
-  }
-  function logoutHandler() {
-    setLogState(false);
-    sessionStorage.clear();
-    setId("");
-    setNickname("");
-    setPhoneNumber("");
-    setBirthdate("");
-    setResidence("");
-    setGender("");
-    console.log(id);
-  }
-
-  const test = async () => {
-    const res = await axios.post(
-      "/api/signin",
-      {
-        email: "yellowghost@hanmail.com",
-        password: "yel123!@",
-      },
-      {
-        headers: {
-          "Content-Type": `application/json`,
-          "Access-Control-Allow-Origin": "*",
-          withCredentials: true,
-        },
-      }
-    );
-    console.log(res);
-  };
-  // test();
 
   return (
     <div style={{ width: "100%" }}>
@@ -235,10 +180,9 @@ export default function Login() {
                 width: "10%",
               }}
               size="large"
-              href="http://3.34.206.181:8080/oauth2/authorization/google"
-              target="_blank"
+              href={`${process.env.REACT_APP_API_URL}/oauth2/authorization/google`}
+              target="_self"
               rel="noopener noreferrer"
-              // onClick={() => navigate("/signin")}
             >
               <img
                 width="280px"
@@ -252,10 +196,9 @@ export default function Login() {
                 width: "10%",
               }}
               size="large"
-              href="http://3.34.206.181:8080/oauth2/authorization/naver"
-              target="_blank"
+              href={`${process.env.REACT_APP_API_URL}/oauth2/authorization/naver`}
+              target="_self"
               rel="noopener noreferrer"
-              // onClick={() => navigate("/identify_email")}
             >
               <img
                 width="280px"

@@ -19,16 +19,14 @@ import Stack from "@mui/material/Stack";
 import TabPanel from "./TabPanel";
 import RadioButton from "./RadioButton";
 import DatePicker from "react-datepicker";
+import { ko } from "date-fns/esm/locale";
 
 import {
   addMonths,
   subMonths,
-  addYears,
   subYears,
   startOfMonth,
   endOfMonth,
-  startOfYear,
-  endOfYear,
   format,
 } from "date-fns";
 
@@ -138,7 +136,6 @@ const TabSelected = Object.freeze({
 });
 
 let currentMonth = new Date();
-let currentYear = new Date();
 
 let categoryRows = [];
 
@@ -183,10 +180,8 @@ export default function Report() {
     }
 
     try {
-      // const res = await axios.get(url, { withCredentials: true });
-
       const obj = {
-        yearlyExcelDtoList: [rows[0]],
+        yearlyExcelDtoList: rows,
       };
       await axios(url, {
         method: type === "year" ? "POST" : "GET",
@@ -227,15 +222,6 @@ export default function Report() {
     setParamAndRefetch();
   };
 
-  const prevYear = () => {
-    currentYear = subYears(currentYear, 1);
-    setParamAndRefetch();
-  };
-  const nextYear = () => {
-    currentYear = addYears(currentYear, 1);
-    setParamAndRefetch();
-  };
-
   const checkboxMap = {
     monthly(e) {
       setgraphTypeOption(e.target.value);
@@ -262,6 +248,7 @@ export default function Report() {
     const newData = [];
     const newLabel = [];
 
+    fetchedData.sort((a, b) => b.categorySum - a.categorySum);
     fetchedData.forEach((element, idx) => {
       newData[idx] = Math.round(element.categoryRatio);
       newLabel[idx] = `${element.category} - ${element.categorySum}`;
@@ -290,8 +277,8 @@ export default function Report() {
         const endMon = subMonths(startMonth, 1);
         const endDay = format(endOfMonth(endMon), "dd");
 
-        params.endDt = `${startYear}-${format(endMon, "MM")}-${endDay}`; //formatDate(startOfYear(currentYear));
-        params.startDt = `${endYear}-${format(startMon, "MM")}-${startDay}`; //formatDate(endOfYear(currentYear));
+        params.endDt = `${startYear}-${format(endMon, "MM")}-${endDay}`;
+        params.startDt = `${endYear}-${format(startMon, "MM")}-${startDay}`;
 
         break;
       default:
@@ -313,48 +300,6 @@ export default function Report() {
       console.log(err);
     }
   };
-
-  const renderTotalYearReportOnGraph = (data) => {
-    const yearlyIncomeData = data.incomeReportList.filter(
-      (item) => item.year === currentYear.getFullYear()
-    );
-    const yearlyIncomeMonthSums = data.incomeReportList.map(
-      (data) => data.monthlySum
-    );
-
-    const yearlyExpenseData = data.expenseReportList.filter(
-      (item) => item.year === currentYear.getFullYear()
-    );
-    const yearlyExpenseMonthSums = data.expenseReportList.map(
-      (data) => data.monthlySum
-    );
-
-    const yearlyTotalMonthSums = yearlyIncomeMonthSums.map(
-      (x, y) => x - yearlyExpenseMonthSums[y]
-    );
-
-    lineConfig.data.datasets[0].data = yearlyTotalMonthSums;
-  };
-
-  // const renderIncomeYearReportOnGraph = (data) => {
-  //   const yearlyIncomeData = data.incomeReportList.filter(
-  //     (item) => item.year === currentYear.getFullYear()
-  //   );
-  //   const yearlyIncomeMonthSums = yearlyIncomeData.map(
-  //     (data) => data.monthlySum
-  //   );
-  //   lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
-  // };
-
-  // const renderExpenseYearReportOnGraph = (data) => {
-  //   const yearlyExpenseData = data.expenseReportList.filter(
-  //     (item) => item.year === currentYear.getFullYear()
-  //   );
-  //   const yearlyExpenseMonthSums = yearlyExpenseData.map(
-  //     (data) => data.monthlySum
-  //   );
-  //   lineConfig.data.datasets[0].data = yearlyExpenseMonthSums;
-  // };
 
   const createMainRows = (categoryTitle) => {
     let obj = {};
@@ -388,22 +333,15 @@ export default function Report() {
     const tempRows = [];
 
     tempRows.push(createMainRows("수입지출합계"));
-
     tempRows.push(createMainRows("수입합계"));
-
-    const yearlyIncomeData = data.incomeReportList.filter(
-      (item) => item.year === currentYear.getFullYear()
-    );
 
     const yearlyIncomeReport = data.incomeReportList.map((data) =>
       data.incomeReport ? data.incomeReport : 0
     );
 
     yearlyIncomeReport.forEach((report, idx) => {
-      // console.log(report);
       if (report.length !== 0) {
         for (let i = 0; i < report.length; i++) {
-          //categories[report[i].category][idx + 1] = report[i].categorySum;
           if (!incomeCategories[report[i].category])
             incomeCategories[report[i].category] = new Array(14).fill(0);
           incomeCategories[report[i].category][idx + 1] = report[i].categorySum;
@@ -432,19 +370,13 @@ export default function Report() {
     tempRows.push(createMainRows("지출합계"));
     let expenseSumRowPos = tempRows.length - 1;
 
-    const yearlyExpenseData = data.expenseReportList.filter(
-      (item) => item.year === currentYear.getFullYear()
-    );
-
     const yearlyExpenseReport = data.expenseReportList.map((data) =>
       data.expenseReport ? data.expenseReport : 0
     );
 
     yearlyExpenseReport.forEach((report, idx) => {
-      // console.log(report);
       if (report.length !== 0) {
         for (let i = 0; i < report.length; i++) {
-          //categories[report[i].category][idx + 1] = report[i].categorySum;
           if (!expenseCategories[report[i].category])
             expenseCategories[report[i].category] = new Array(14).fill(0);
           expenseCategories[report[i].category][idx + 1] =
@@ -478,13 +410,11 @@ export default function Report() {
     }
     obj.category = "수입지출합계";
     tempRows[0] = obj;
-    // tempRows[1].map((row, idx) => console.log(row));
     console.log(tempRows);
     categoryRows = tempRows.slice();
     setRows(tempRows);
   };
 
-  // test();
   const setReportDataWith = (data) => {
     switch (tabValue) {
       case TabSelected.MONTH:
@@ -492,14 +422,11 @@ export default function Report() {
         console.log(newData, newLabel);
         doughnutConfig.data.labels = newLabel;
         doughnutConfig.data.datasets[0].data = newData;
+        console.log(newData);
         barConfig.data.labels = newLabel;
         barConfig.data.datasets[0].data = newData;
-        // lineConfig.data.labels = newLabel;
-        // lineConfig.data.datasets[0].data = newData;
         break;
       case TabSelected.YEAR:
-        // console.log(currentYear.getFullYear());
-
         const yearLabel = [];
         let month = startMonth;
         for (let i = 1; i <= 12; i++) {
@@ -513,60 +440,7 @@ export default function Report() {
 
         lineConfig.data.labels = yearLabel;
 
-        let categories = {
-          // 주수입: new Array(14).fill(0),
-        };
-
-        const yearlyIncomeData = data.incomeReportList.filter(
-          (item) => item.year === currentYear.getFullYear()
-        );
-        const yearlyIncomeMonthSums = yearlyIncomeData.map(
-          (data) => data.monthlySum
-        );
-        // lineConfig.data.datasets[0].data = yearlyIncomeMonthSums;
-        // renderIncomeYearReportOnGraph(data);
-        // yearlyOption === "chart" && renderTotalYearReportOnGraph(data);
-        // yearlyOption === "table" && renderTotalYearReportOnTable(data);
         renderTotalYearReportOnTableAndGraph(data);
-
-        // const yearlyIncomeReport = yearlyIncomeData.map((data) =>
-        //   data.incomeReport ? data.incomeReport : 0
-        // );
-
-        // yearlyIncomeReport.forEach((report, idx) => {
-        //   // console.log(report);
-        //   if (report.length !== 0) {
-        //     for (let i = 0; i < report.length; i++) {
-        //       //categories[report[i].category][idx + 1] = report[i].categorySum;
-        //       if (!categories[report[i].category])
-        //         categories[report[i].category] = new Array(14).fill(0);
-        //       categories[report[i].category][idx + 1] = report[i].categorySum;
-        //     }
-        //   }
-        // });
-        // console.log("categories", categories);
-
-        // const tempRows = [];
-        // for (let key in categories) {
-        //   let idx = 1;
-        //   let sum = 0;
-        //   const row = {};
-        //   for (let item of columns) {
-        //     if (item.key === "category") row[item.key] = key;
-        //     else if (item.key === "sum") row[item.key] = sum;
-        //     else {
-        //       row[item.key] = categories[key][idx++];
-        //       sum += row[item.key];
-        //     }
-        //   }
-        //   tempRows.push(row);
-        // }
-
-        // setRows(tempRows);
-
-        // console.log(yearlyIncomeReport);
-
-        // lineConfig.data.datasets[0].label = ""
 
         break;
       default:
@@ -672,7 +546,7 @@ export default function Report() {
       </Grid>
 
       <TabPanel value={tabValue} index={0}>
-        <Grid display="flex" justifyContent="flex-end" sx={{ mb: 5, mt: -10 }}>
+        <Grid display="flex" justifyContent="flex-end" sx={{ mb: 5, mt: -5 }}>
           <RadioButton
             legend={"차트"}
             buttonOptions={graphTypeOptions}
@@ -698,6 +572,25 @@ export default function Report() {
           next={nextMonth}
         />
         <ChartCanvas width={1000} height={500} ref={canvasRef} />
+        <Box
+          sx={{
+            mt: 10,
+            display: "flex",
+            width: "100%",
+            justifyContent: "flex-end",
+          }}
+        >
+          {costOption === "income" && (
+            <Button onClick={() => downloadToExcel("income")}>
+              엑셀 다운로드 (수입)
+            </Button>
+          )}
+          {costOption === "expense" && (
+            <Button onClick={() => downloadToExcel("expense")}>
+              엑셀 다운로드 (지출)
+            </Button>
+          )}
+        </Box>
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
@@ -717,6 +610,7 @@ export default function Report() {
           />
         </Grid>
         <DatePicker
+          locale={ko}
           selected={startMonth}
           onChange={(date) => setStartMonth(date)}
           dateFormat="MM/yyyy"
@@ -732,12 +626,6 @@ export default function Report() {
           <div>
             <DataGrid columns={columns} rows={rows} height={500} />
             <Stack direction="row" spacing={2}>
-              {/* <Button onClick={() => downloadToExcel("income")}>
-                엑셀 다운로드 (수입)
-              </Button>
-              <Button onClick={() => downloadToExcel("expense")}>
-                엑셀 다운로드 (지출)
-              </Button> */}
               <Button onClick={() => downloadToExcel("year")}>
                 엑셀 다운로드 (연간 보고서)
               </Button>

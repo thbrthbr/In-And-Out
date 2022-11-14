@@ -4,14 +4,15 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useStore2 } from "../../store/store.js";
+import { useStore2, useSnsLogStateStore } from "../../store/store.js";
 
 export default function SocialLoginCheck() {
   useEffect(() => {
     sendToServer();
   }, []);
 
-  const { logState, setLogState } = useStore2();
+  const { setLogState } = useStore2();
+  const { snsLogState, setSnsLogState } = useSnsLogStateStore();
 
   const useQuery = () => new URLSearchParams(useLocation().search);
   const query = useQuery();
@@ -20,7 +21,7 @@ export default function SocialLoginCheck() {
   const navigate = useNavigate();
   const sendToServer = async () => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_API_URL}/api/social_check/sending?id=${uuid}`,
         { withCredentials: true }
       );
@@ -31,8 +32,9 @@ export default function SocialLoginCheck() {
 
       setTimeout(() => {
         setLogState(true);
+        setSnsLogState(true);
         navigate("/calendar");
-      }, 3000);
+      }, 2000);
     } catch (err) {
       console.log(err);
       toast.warn("로그인이 실패했습니다!", {
