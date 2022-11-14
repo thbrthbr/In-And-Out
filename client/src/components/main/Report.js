@@ -545,7 +545,7 @@ export default function Report() {
       </Grid>
 
       <TabPanel value={tabValue} index={0}>
-        <Grid display="flex" justifyContent="flex-end" sx={{ mb: 5, mt: -10 }}>
+        <Grid display="flex" justifyContent="flex-end" sx={{ mb: 5, mt: -5 }}>
           <RadioButton
             legend={"차트"}
             buttonOptions={graphTypeOptions}
