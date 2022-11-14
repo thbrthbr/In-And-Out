@@ -153,6 +153,12 @@ const calenderStore = create((set, get) => ({
 
   position: 0,
   setPosition: (input) => set({ position: input }),
+
+  sumIncome: 0,
+  setSumIncome: (input) => set({ sumIncome: input }),
+
+  sumExpense: 0,
+  setSumExpense: (input) => set({ sumExpense: input }),
 }));
 
 export {

@@ -13,6 +13,8 @@ import axios from "axios";
 import {
   addMonths,
   subMonths,
+  addDays,
+  subDays,
   addYears,
   subYears,
   startOfMonth,
@@ -80,6 +82,11 @@ const Container = styled.div`
     text-align: center;
     flex: 1;
   }
+`;
+
+const DateMover = styled.div`
+  display: flex;
+  flex-direction: row;
 `;
 
 const FixButtons = styled.button`
@@ -290,10 +297,10 @@ export default function Diary({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (text === "") {
-      alert("내용을 입력해주세요");
-      return;
-    }
+    // if (text === "") {
+    //   alert("내용을 입력해주세요");
+    //   return;
+    // }
     const body2 = new FormData();
 
     if (edit !== true) {
@@ -340,6 +347,25 @@ export default function Diary({
     }
   };
 
+  const commaMaker = (input) => {
+    input = input.toString();
+    let counter = 0;
+    let string = [];
+    for (let i = input.length - 1; i >= 0; i--) {
+      string.unshift(input[i]);
+      counter++;
+      if (counter === 3) {
+        string.unshift(",");
+        counter = 0;
+      }
+    }
+    if (string[0] == ",") {
+      string.shift();
+    }
+    string = string.join("");
+    return string;
+  };
+
   function formatter(e) {
     let a = e;
     let string = a[5] + a[6] + "/" + a[8] + a[9] + "/" + a[2] + a[3];
@@ -366,127 +392,47 @@ export default function Diary({
   let flag2 = 0;
   let num2 = 0;
 
+  const nextDay = () => {
+    let nd = addDays(new Date(specificDate), 1);
+    if (format(new Date(specificDate), "MM") !== format(nd, "MM")) {
+      changeValue2(
+        format(startOfMonth(nd), "yyyy-MM-dd"),
+        format(endOfMonth(nd), "yyyy-MM-dd"),
+        nd
+      );
+      setDateOrigin(nd.format("yyyy-MM-dd"));
+      setSpecificDate(nd.format("MM/dd/yy"));
+      setDiaryDate(nd.format("MM/dd/yy"));
+    } else {
+      setDateOrigin(nd.format("yyyy-MM-dd"));
+      setSpecificDate(nd.format("MM/dd/yy"));
+      setDiaryDate(nd.format("MM/dd/yy"));
+    }
+  };
+
+  const prevDay = () => {
+    let pd = subDays(new Date(specificDate), 1);
+    if (format(new Date(specificDate), "MM") !== format(pd, "MM")) {
+      changeValue2(
+        format(startOfMonth(pd), "yyyy-MM-dd"),
+        format(endOfMonth(pd), "yyyy-MM-dd"),
+        pd
+      );
+      setDateOrigin(pd.format("yyyy-MM-dd"));
+      setSpecificDate(pd.format("MM/dd/yy"));
+      setDiaryDate(pd.format("MM/dd/yy"));
+    } else {
+      setDateOrigin(pd.format("yyyy-MM-dd"));
+      setSpecificDate(pd.format("MM/dd/yy"));
+      setDiaryDate(pd.format("MM/dd/yy"));
+    }
+  };
+
   return (
     <div>
       {showDiary && (
         <Container>
           <Pyo>
-            <div>
-              <div>&lt;수입&gt;</div>
-              {calendarData.calendarIncomeDtoList.length > 0 ? (
-                calendarData.calendarIncomeDtoList.map((income) => {
-                  check++;
-                  if (formatter(income.incomeDt) === diaryDate) {
-                    num++;
-                    isChecker = 1;
-                    if (
-                      check === calendarData.calendarIncomeDtoList.length &&
-                      num < 10
-                    ) {
-                      return (
-                        <>
-                          <div>
-                            <span>{income.item}</span>
-                            <span>&nbsp; : &nbsp;</span>
-                            <span>{income.amount}</span>
-                          </div>
-                          <div
-                            style={{ height: `calc(400px - ${num}*40px)` }}
-                          ></div>
-                        </>
-                      );
-                    }
-                    if (income.item.length > 26 || income.amount.length > 26) {
-                      let temp1 = [];
-                      let temp2 = [];
-                      if (income.item.length > 26) {
-                        let partition = "";
-                        for (let i = 0; i < income.item.length; i++) {
-                          partition += income.item[i];
-                          if (partition.length === 26) {
-                            temp1.push(partition);
-                            partition = "";
-                          }
-                          if (i === income.item.length - 1) {
-                            temp1.push(partition);
-                            partition = "";
-                          }
-                        }
-                      } else {
-                        temp1.push(income.item);
-                      }
-                      if (income.amount.length > 26) {
-                        let partition = "";
-                        for (let i = 0; i < income.amount.length; i++) {
-                          partition += income.amount[i];
-                          if (partition.length === 26) {
-                            temp2.push(partition);
-                            partition = "";
-                          }
-                          if (i === income.amount.length - 1) {
-                            temp2.push(partition);
-                            partition = "";
-                          }
-                        }
-                      } else {
-                        temp2.push(income.amount);
-                      }
-                      console.log(temp2);
-                      return (
-                        <div>
-                          {temp1.map((data) => {
-                            return (
-                              <>
-                                <span>{data}</span> <br></br>
-                              </>
-                            );
-                          })}
-                          <span>&nbsp; : &nbsp;</span>
-                          {temp2.map((data) => {
-                            return (
-                              <>
-                                <span>{data}</span> <br></br>
-                              </>
-                            );
-                          })}
-                        </div>
-                      );
-                    } else {
-                      return (
-                        <div>
-                          <span>{income.item}</span>
-                          <span>&nbsp; : &nbsp;</span>
-                          <span>{income.amount}</span>
-                        </div>
-                      );
-                    }
-                  } else {
-                    if (isChecker > 0) {
-                      flag = 1;
-                      if (
-                        check === calendarData.calendarIncomeDtoList.length &&
-                        num < 10
-                      ) {
-                        return (
-                          <div
-                            style={{ height: `calc(400px - ${num}*40px)` }}
-                          ></div>
-                        );
-                      }
-                    }
-                    if (
-                      check === calendarData.calendarIncomeDtoList.length &&
-                      flag == 0
-                    ) {
-                      flag = 1;
-                      return <div style={{ height: "400px" }}></div>;
-                    }
-                  }
-                })
-              ) : (
-                <div style={{ height: "400px" }}></div>
-              )}
-            </div>
             <div>
               <div>&lt;지출&gt;</div>
               {calendarData.calendarExpenseDtoList.length > 0 ? (
@@ -495,6 +441,7 @@ export default function Diary({
                   if (formatter(expense.expenseDt) === diaryDate) {
                     num2++;
                     isChecker2 = 1;
+                    let amount = commaMaker(expense.amount);
                     if (
                       check2 === calendarData.calendarExpenseDtoList.length &&
                       num2 < 9
@@ -504,7 +451,7 @@ export default function Diary({
                           <div>
                             <span>{expense.item}</span>
                             <span>&nbsp; : &nbsp;</span>
-                            <span>{expense.amount}</span>
+                            <span>{amount}</span>
                           </div>
                           <div
                             style={{ height: `calc(400px - ${num}*40px)` }}
@@ -512,10 +459,7 @@ export default function Diary({
                         </>
                       );
                     }
-                    if (
-                      expense.item.length > 26 ||
-                      expense.amount.length > 26
-                    ) {
+                    if (expense.item.length > 26 || amount.length > 26) {
                       let temp1 = [];
                       let temp2 = [];
                       if (expense.item.length > 26) {
@@ -534,23 +478,23 @@ export default function Diary({
                       } else {
                         temp1.push(expense.item);
                       }
-                      if (expense.amount.length > 26) {
+                      if (amount.length > 26) {
                         let partition = "";
-                        for (let i = 0; i < expense.amount.length; i++) {
-                          partition += expense.amount[i];
+                        for (let i = 0; i < amount.length; i++) {
+                          partition += amount[i];
                           if (partition.length === 26) {
                             temp2.push(partition);
                             partition = "";
                           }
-                          if (i === expense.amount.length - 1) {
+                          if (i === amount.length - 1) {
                             temp2.push(partition);
                             partition = "";
                           }
                         }
                       } else {
-                        temp2.push(expense.amount);
+                        // let amount = commaMaker(expense.amount);
+                        temp2.push(amount);
                       }
-                      console.log(temp2);
                       return (
                         <div>
                           {temp1.map((data) => {
@@ -571,11 +515,12 @@ export default function Diary({
                         </div>
                       );
                     } else {
+                      let amount = commaMaker(expense.amount);
                       return (
                         <div>
                           <span>{expense.item}</span>
                           <span>&nbsp; : &nbsp;</span>
-                          <span>{expense.amount}</span>
+                          <span>{amount}</span>
                         </div>
                       );
                     }
@@ -606,101 +551,245 @@ export default function Diary({
                 <div style={{ height: "400px" }}></div>
               )}
             </div>
+            <div>
+              <div>&lt;수입&gt;</div>
+              {calendarData.calendarIncomeDtoList.length > 0 ? (
+                calendarData.calendarIncomeDtoList.map((income) => {
+                  check++;
+                  if (formatter(income.incomeDt) === diaryDate) {
+                    num++;
+                    isChecker = 1;
+                    let amount = commaMaker(income.amount);
+                    if (
+                      check === calendarData.calendarIncomeDtoList.length &&
+                      num < 10
+                    ) {
+                      return (
+                        <>
+                          <div>
+                            <span>{income.item}</span>
+                            <span>&nbsp; : &nbsp;</span>
+                            <span>{amount}</span>
+                          </div>
+                          <div
+                            style={{ height: `calc(400px - ${num}*40px)` }}
+                          ></div>
+                        </>
+                      );
+                    }
+                    if (income.item.length > 26 || amount.length > 26) {
+                      let temp1 = [];
+                      let temp2 = [];
+                      if (income.item.length > 26) {
+                        let partition = "";
+                        for (let i = 0; i < income.item.length; i++) {
+                          partition += income.item[i];
+                          if (partition.length === 26) {
+                            temp1.push(partition);
+                            partition = "";
+                          }
+                          if (i === income.item.length - 1) {
+                            temp1.push(partition);
+                            partition = "";
+                          }
+                        }
+                      } else {
+                        temp1.push(income.item);
+                      }
+                      if (amount.length > 26) {
+                        let partition = "";
+                        for (let i = 0; i < amount.length; i++) {
+                          partition += amount[i];
+                          if (partition.length === 26) {
+                            temp2.push(partition);
+                            partition = "";
+                          }
+                          if (i === amount.length - 1) {
+                            temp2.push(partition);
+                            partition = "";
+                          }
+                        }
+                      } else {
+                        // let amount = commaMaker(income.amount);
+                        temp2.push(amount);
+                      }
+                      console.log(temp2);
+                      return (
+                        <div>
+                          {temp1.map((data) => {
+                            return (
+                              <>
+                                <span>{data}</span> <br></br>
+                              </>
+                            );
+                          })}
+                          <span>&nbsp; : &nbsp;</span>
+                          {temp2.map((data) => {
+                            return (
+                              <>
+                                <span>{data}</span> <br></br>
+                              </>
+                            );
+                          })}
+                        </div>
+                      );
+                    } else {
+                      let amount = commaMaker(income.amount);
+                      return (
+                        <div>
+                          <span>{income.item}</span>
+                          <span>&nbsp; : &nbsp;</span>
+                          <span>{amount}</span>
+                        </div>
+                      );
+                    }
+                  } else {
+                    if (isChecker > 0) {
+                      flag = 1;
+                      if (
+                        check === calendarData.calendarIncomeDtoList.length &&
+                        num < 10
+                      ) {
+                        return (
+                          <div
+                            style={{ height: `calc(400px - ${num}*40px)` }}
+                          ></div>
+                        );
+                      }
+                    }
+                    if (
+                      check === calendarData.calendarIncomeDtoList.length &&
+                      flag == 0
+                    ) {
+                      flag = 1;
+                      return <div style={{ height: "400px" }}></div>;
+                    }
+                  }
+                })
+              ) : (
+                <div style={{ height: "400px" }}></div>
+              )}
+            </div>
           </Pyo>
           <DiaryContext>
             {edit ? (
               specificDate
             ) : (
-              <DatePicker
-                locale={ko}
-                selected={new Date(specificDate)}
-                customInput={
-                  <Form.Control
-                    as="textarea"
-                    rows={1}
-                    style={{
-                      marginTop: "10px",
-                      paddingTop: "5px",
-                      width: "78px",
-                      fontFamily: "OTWelcomeRA",
-                      resize: "none",
-                      cursor: "pointer",
-                      border: "0.5px solid #C0C0C0",
-                      borderRadius: "50px",
-                    }}
-                    readOnly
-                  />
-                }
-                onChange={(date) => {
-                  if (date.format("MM") !== currentMonth.format("MM")) {
-                    if (
-                      parseInt(date.format("MM")) <
-                      parseInt(currentMonth.format("MM"))
-                    ) {
-                      changeValue2(
-                        format(
-                          startOfMonth(
-                            subMonths(
-                              currentMonth,
-                              parseInt(
-                                currentMonth.format("MM") -
+              <DateMover>
+                <DatePicker
+                  locale={ko}
+                  selected={new Date(specificDate)}
+                  customInput={
+                    <Form.Control
+                      as="textarea"
+                      rows={1}
+                      style={{
+                        marginTop: "10px",
+                        paddingTop: "5px",
+                        width: "78px",
+                        fontFamily: "OTWelcomeRA",
+                        resize: "none",
+                        cursor: "pointer",
+                        border: "0.5px solid #C0C0C0",
+                        borderRadius: "50px",
+                      }}
+                      readOnly
+                    />
+                  }
+                  onChange={(date) => {
+                    if (date.format("MM") !== currentMonth.format("MM")) {
+                      if (
+                        parseInt(date.format("MM")) <
+                        parseInt(currentMonth.format("MM"))
+                      ) {
+                        changeValue2(
+                          format(
+                            startOfMonth(
+                              subMonths(
+                                currentMonth,
+                                parseInt(
+                                  currentMonth.format("MM") -
+                                    parseInt(date.format("MM"))
+                                )
+                              )
+                            ),
+                            "yyyy-MM-dd"
+                          ),
+                          format(
+                            endOfMonth(
+                              subMonths(
+                                currentMonth,
+                                parseInt(currentMonth.format("MM")) -
                                   parseInt(date.format("MM"))
                               )
-                            )
+                            ),
+                            "yyyy-MM-dd"
                           ),
-                          "yyyy-MM-dd"
-                        ),
-                        format(
-                          endOfMonth(
-                            subMonths(
-                              currentMonth,
-                              parseInt(currentMonth.format("MM")) -
-                                parseInt(date.format("MM"))
-                            )
+                          date
+                        );
+                      } else if (
+                        parseInt(date.format("MM")) >
+                        parseInt(currentMonth.format("MM"))
+                      ) {
+                        changeValue2(
+                          format(
+                            startOfMonth(
+                              addMonths(
+                                currentMonth,
+                                parseInt(date.format("MM")) -
+                                  parseInt(currentMonth.format("MM"))
+                              )
+                            ),
+                            "yyyy-MM-dd"
                           ),
-                          "yyyy-MM-dd"
-                        ),
-                        date
-                      );
-                    } else if (
-                      parseInt(date.format("MM")) >
-                      parseInt(currentMonth.format("MM"))
-                    ) {
-                      changeValue2(
-                        format(
-                          startOfMonth(
-                            addMonths(
-                              currentMonth,
-                              parseInt(date.format("MM")) -
-                                parseInt(currentMonth.format("MM"))
-                            )
+                          format(
+                            endOfMonth(
+                              addMonths(
+                                currentMonth,
+                                parseInt(date.format("MM")) -
+                                  parseInt(currentMonth.format("MM"))
+                              )
+                            ),
+                            "yyyy-MM-dd"
                           ),
-                          "yyyy-MM-dd"
-                        ),
-                        format(
-                          endOfMonth(
-                            addMonths(
-                              currentMonth,
-                              parseInt(date.format("MM")) -
-                                parseInt(currentMonth.format("MM"))
-                            )
-                          ),
-                          "yyyy-MM-dd"
-                        ),
-                        date
-                      );
+                          date
+                        );
+                      }
+                      setDateOrigin(date.format("yyyy-MM-dd"));
+                      setSpecificDate(date.format("MM/dd/yy"));
+                      setDiaryDate(date.format("MM/dd/yy"));
+                    } else {
+                      setDateOrigin(date.format("yyyy-MM-dd"));
+                      setSpecificDate(date.format("MM/dd/yy"));
+                      setDiaryDate(date.format("MM/dd/yy"));
                     }
-
-                    setDateOrigin(date.format("yyyy-MM-dd"));
-                    setSpecificDate(date.format("MM/dd/yy"));
-                    setDiaryDate(date.format("MM/dd/yy"));
-                  } else {
-                    setDateOrigin(date.format("yyyy-MM-dd"));
-                    setSpecificDate(date.format("MM/dd/yy"));
-                    setDiaryDate(date.format("MM/dd/yy"));
-                  }
-                }}
-              />
+                  }}
+                />
+                <Icon
+                  icon="bi:arrow-left-circle-fill"
+                  style={{
+                    position: "absolute",
+                    marginTop: "13px",
+                    marginLeft: "180px",
+                    cursor: "pointer",
+                  }}
+                  // value={tabMonth}
+                  // onChange={handleTabChange}
+                  onClick={prevDay}
+                />
+                <Icon
+                  icon="bi:arrow-right-circle-fill"
+                  style={{
+                    position: "absolute",
+                    marginTop: "13px",
+                    marginLeft: "331px",
+                    cursor: "pointer",
+                  }}
+                  // value={tabMonth}
+                  // onChange={handleTabChange}
+                  onClick={nextDay}
+                />
+              </DateMover>
             )}
             {edit ? (
               <form encType="multipart/form-data" onSubmit={handleSubmit}>
