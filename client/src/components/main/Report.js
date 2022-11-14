@@ -19,6 +19,7 @@ import Stack from "@mui/material/Stack";
 import TabPanel from "./TabPanel";
 import RadioButton from "./RadioButton";
 import DatePicker from "react-datepicker";
+import { ko } from "date-fns/esm/locale";
 
 import {
   addMonths,
@@ -609,6 +610,7 @@ export default function Report() {
           />
         </Grid>
         <DatePicker
+          locale={ko}
           selected={startMonth}
           onChange={(date) => setStartMonth(date)}
           dateFormat="MM/yyyy"

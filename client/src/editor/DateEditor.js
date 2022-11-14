@@ -2,11 +2,13 @@ import React from "react";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
+import { ko } from "date-fns/esm/locale";
 
 export default function DateEditor({ row, onRowChange, current }) {
   const startDate = new Date(row.year, row.month, 1);
   return (
     <DatePicker
+      locale={ko}
       name="startDate"
       selected={startDate}
       portalId="root-portal"
