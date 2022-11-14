@@ -26,6 +26,10 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PacmanLoader from "react-spinners/PacmanLoader";
 
+const handleImgError = (e) => {
+  e.target.src = defaultUser;
+};
+
 export default function ProfileChange() {
   const {
     register,
@@ -122,7 +126,7 @@ export default function ProfileChange() {
         setResidence(data["address"]);
 
         setGender(data["gender"]);
-        setProfileImage(data["s3ImageUrl"]);
+        setProfileImage(data["s3ImageUrl"] ? data["s3ImageUrl"] : defaultUser);
       },
       onError: () => {},
     },
@@ -224,7 +228,11 @@ export default function ProfileChange() {
           <img
             alt="프로필사진"
             src={profileImage ? profileImage : defaultUser}
-            style={{ width: "200px", height: "180px" }}
+            onError={handleImgError}
+            style={{
+              width: "200px",
+              height: "180px",
+            }}
           />
           <File onClick={handleButtonClick} htmlFor="input-file">
             이미지 업로드
