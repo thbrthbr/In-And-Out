@@ -365,13 +365,10 @@ export default function Inout() {
       const api =
         tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL;
       try {
-        const res = await axios.delete(
-          api,
-          { data: itemIds },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        const res = await axios.delete(api, {
+          data: itemIds,
+          withCredentials: true,
+        });
         return res.data;
       } catch (err) {
         console.log(err);
