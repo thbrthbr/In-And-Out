@@ -247,6 +247,7 @@ export default function Report() {
     const newData = [];
     const newLabel = [];
 
+    fetchedData.sort((a, b) => b.categorySum - a.categorySum);
     fetchedData.forEach((element, idx) => {
       newData[idx] = Math.round(element.categoryRatio);
       newLabel[idx] = `${element.category} - ${element.categorySum}`;
@@ -420,6 +421,7 @@ export default function Report() {
         console.log(newData, newLabel);
         doughnutConfig.data.labels = newLabel;
         doughnutConfig.data.datasets[0].data = newData;
+        console.log(newData);
         barConfig.data.labels = newLabel;
         barConfig.data.datasets[0].data = newData;
         break;
