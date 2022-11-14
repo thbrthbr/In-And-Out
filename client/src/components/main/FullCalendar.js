@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import {
   format,
@@ -79,8 +79,16 @@ const CloseBtn = styled.div`
 `;
 
 const RenderHeader = (props) => {
-  const { currentMonth, setcurrentMonth, tabMonth, setTabMonth } =
-    calenderStore();
+  const {
+    currentMonth,
+    setcurrentMonth,
+    tabMonth,
+    setTabMonth,
+    sumIncome,
+    setSumIncome,
+    sumExpense,
+    setSumExpense,
+  } = calenderStore();
 
   const handleTabChange = (event, newValue) => {
     setTabMonth(newValue);
@@ -102,6 +110,29 @@ const RenderHeader = (props) => {
     setcurrentMonth(addMonths(currentMonth, 1));
   };
 
+  const commaMaker = (input) => {
+    input = input.toString();
+    let counter = 0;
+    let string = [];
+    for (let i = input.length - 1; i >= 0; i--) {
+      string.unshift(input[i]);
+      counter++;
+      if (counter === 3) {
+        string.unshift(",");
+        counter = 0;
+      }
+    }
+    if (string[0] === ",") {
+      string.shift();
+    }
+    string = string.join("");
+    return string;
+  };
+
+  let a = commaMaker(props.calendarData.calendarIncomeDtoList[0].amount);
+  let b = commaMaker(props.calendarData.calendarExpenseDtoList[0].amount);
+  //백 api 개발 끝나면 각각 incomeSum expenseSum으로 교체
+
   return (
     <div>
       <div style={{ width: "20px", height: "15px" }}></div>
@@ -111,6 +142,10 @@ const RenderHeader = (props) => {
             <span className="text month">{format(currentMonth, "M")}월</span>
             {format(currentMonth, "yyyy")}
           </span>
+        </div>
+        <div className="col col-center">
+          <div style={{ maxHeight: "20px" }}>수입합계: +{a}</div>
+          <div style={{ maxHeight: "20px" }}>지출합계: -{b}</div>
         </div>
         <div className="col col-end">
           <Icon
@@ -181,6 +216,25 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
   // };
 
   // const tempDiaryData = diaryData.filter((data) => data.date === diaryDate)[0];
+
+  const commaMaker = (input) => {
+    input = input.toString();
+    let counter = 0;
+    let string = [];
+    for (let i = input.length - 1; i >= 0; i--) {
+      string.unshift(input[i]);
+      counter++;
+      if (counter === 3) {
+        string.unshift(",");
+        counter = 0;
+      }
+    }
+    if (string[0] === ",") {
+      string.shift();
+    }
+    string = string.join("");
+    return string;
+  };
 
   const tempDiaryData = diaryDatas;
   const tempDiaryData2 = calendarData;
@@ -263,6 +317,9 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
             flexDirection: "column",
             justifyContent: "space-between",
             cursor: "pointer",
+            backgroundColor:
+              formattedDataForDiary === format(new Date(), "MM/dd/yy") &&
+              "#FFE4E1",
           }}
           id={cloneDay}
           onClick={(e) => {
@@ -372,23 +429,6 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                               }}
                             >
                               <h3 style={{ margin: "0px", padding: "0px" }}>
-                                &lt;수입&gt;
-                              </h3>
-                              <div>
-                                {tempDiaryData2.calendarIncomeDtoList.map(
-                                  (income) => {
-                                    if (formatter(income.incomeDt) == diaryDate)
-                                      return (
-                                        <div>
-                                          <span>{income.item}</span>
-                                          <span>&nbsp; : &nbsp;</span>
-                                          <span>{income.amount}</span>
-                                        </div>
-                                      );
-                                  }
-                                )}
-                              </div>
-                              <h3 style={{ margin: "0px", padding: "0px" }}>
                                 &lt;지출&gt;
                               </h3>
                               <div>
@@ -396,14 +436,37 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                                   (expense) => {
                                     if (
                                       formatter(expense.expenseDt) == diaryDate
-                                    )
+                                    ) {
+                                      let amount = commaMaker(expense.amount);
                                       return (
                                         <div>
                                           <span>{expense.item}</span>
                                           <span>&nbsp; : &nbsp;</span>
-                                          <span>{expense.amount}</span>
+                                          <span>{amount}</span>
                                         </div>
                                       );
+                                    }
+                                  }
+                                )}
+                              </div>
+                              <h3 style={{ margin: "0px", padding: "0px" }}>
+                                &lt;수입&gt;
+                              </h3>
+                              <div>
+                                {tempDiaryData2.calendarIncomeDtoList.map(
+                                  (income) => {
+                                    if (
+                                      formatter(income.incomeDt) == diaryDate
+                                    ) {
+                                      let amount = commaMaker(income.amount);
+                                      return (
+                                        <div>
+                                          <span>{income.item}</span>
+                                          <span>&nbsp; : &nbsp;</span>
+                                          <span>{amount}</span>
+                                        </div>
+                                      );
+                                    }
                                   }
                                 )}
                               </div>
@@ -432,23 +495,6 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                               }}
                             >
                               <h3 style={{ margin: "0px", padding: "0px" }}>
-                                &lt;수입&gt;
-                              </h3>
-                              <div>
-                                {tempDiaryData2.calendarIncomeDtoList.map(
-                                  (income) => {
-                                    if (formatter(income.incomeDt) == diaryDate)
-                                      return (
-                                        <div>
-                                          <span>{income.item}</span>
-                                          <span>&nbsp; : &nbsp;</span>
-                                          <span>{income.amount}</span>
-                                        </div>
-                                      );
-                                  }
-                                )}
-                              </div>
-                              <h3 style={{ margin: "0px", padding: "0px" }}>
                                 &lt;지출&gt;
                               </h3>
                               <div>
@@ -456,14 +502,37 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                                   (expense) => {
                                     if (
                                       formatter(expense.expenseDt) == diaryDate
-                                    )
+                                    ) {
+                                      let amount = commaMaker(expense.amount);
                                       return (
                                         <div>
                                           <span>{expense.item}</span>
                                           <span>&nbsp; : &nbsp;</span>
-                                          <span>{expense.amount}</span>
+                                          <span>{amount}</span>
                                         </div>
                                       );
+                                    }
+                                  }
+                                )}
+                              </div>
+                              <h3 style={{ margin: "0px", padding: "0px" }}>
+                                &lt;수입&gt;
+                              </h3>
+                              <div>
+                                {tempDiaryData2.calendarIncomeDtoList.map(
+                                  (income) => {
+                                    if (
+                                      formatter(income.incomeDt) == diaryDate
+                                    ) {
+                                      let amount = commaMaker(income.amount);
+                                      return (
+                                        <div>
+                                          <span>{income.item}</span>
+                                          <span>&nbsp; : &nbsp;</span>
+                                          <span>{amount}</span>
+                                        </div>
+                                      );
+                                    }
                                   }
                                 )}
                               </div>
@@ -497,12 +566,17 @@ export const FullCalendar = ({
   diaryDatas,
   changeValue,
   calendarData,
+  refetch,
   X,
   Y,
 }) => {
   return (
     <div className="calendar">
-      <RenderHeader changeValue={changeValue} />
+      <RenderHeader
+        refetch={refetch}
+        calendarData={calendarData}
+        changeValue={changeValue}
+      />
       <RenderDays />
       <RenderCells
         X={X}

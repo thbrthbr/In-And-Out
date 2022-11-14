@@ -194,6 +194,7 @@ export default function Calendar() {
     >
       <FullCalendar
         Y={y}
+        refetch={refetch}
         dateList={data[2]}
         changeValue={changeValue}
         diaryDatas={data[1]}
