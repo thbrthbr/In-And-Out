@@ -571,6 +571,25 @@ export default function Report() {
           next={nextMonth}
         />
         <ChartCanvas width={1000} height={500} ref={canvasRef} />
+        <Box
+          sx={{
+            mt: 10,
+            display: "flex",
+            width: "100%",
+            justifyContent: "flex-end",
+          }}
+        >
+          {costOption === "income" && (
+            <Button onClick={() => downloadToExcel("income")}>
+              엑셀 다운로드 (수입)
+            </Button>
+          )}
+          {costOption === "expense" && (
+            <Button onClick={() => downloadToExcel("expense")}>
+              엑셀 다운로드 (지출)
+            </Button>
+          )}
+        </Box>
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
@@ -605,12 +624,6 @@ export default function Report() {
           <div>
             <DataGrid columns={columns} rows={rows} height={500} />
             <Stack direction="row" spacing={2}>
-              {/* <Button onClick={() => downloadToExcel("income")}>
-                엑셀 다운로드 (수입)
-              </Button>
-              <Button onClick={() => downloadToExcel("expense")}>
-                엑셀 다운로드 (지출)
-              </Button> */}
               <Button onClick={() => downloadToExcel("year")}>
                 엑셀 다운로드 (연간 보고서)
               </Button>
