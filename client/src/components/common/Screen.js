@@ -21,6 +21,6 @@ const ScreenDefault = styled.div`
   width: 2048px;
 
   background-color: #d9d9d9;
-  font-size: 100px;
+  font-size: 15px;
   position: relative;
 `;
