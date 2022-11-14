@@ -15,6 +15,7 @@ import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import axios from "axios";
+import colors from "../../utils/color";
 
 const settings = ["Setting", "Logout"];
 
@@ -73,7 +74,7 @@ export default function Header() {
 
   return (
     <>
-      <AppBar position="static" style={{ background: "gray" }}>
+      <AppBar position="static" style={{ backgroundColor: colors.yellow100 }}>
         <Container maxWidth="100%">
           <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
             <img

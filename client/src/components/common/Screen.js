@@ -3,6 +3,7 @@ import styled from "styled-components";
 import ProfileChange from "../setting/ProfileChange";
 import PasswordChange from "../setting/PasswordChange";
 import Signout from "../setting/Signout";
+import colors from "../../utils/color";
 
 export default function Screen() {
   const loc = useLocation();
@@ -20,7 +21,7 @@ const ScreenDefault = styled.div`
   margin-top: 25px;
   width: 2048px;
 
-  background-color: #d9d9d9;
+  background-color: ${colors.blue300};
   font-size: 15px;
   position: relative;
 `;

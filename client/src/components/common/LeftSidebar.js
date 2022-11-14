@@ -2,6 +2,7 @@ import { Drawer } from "@mui/material";
 import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSnsLogStateStore } from "../../store/store.js";
+import colors from "../../utils/color.js";
 
 export function LeftSidebar({ width, sideBarMenuItems }) {
   const loc = useLocation();
@@ -19,7 +20,18 @@ export function LeftSidebar({ width, sideBarMenuItems }) {
         },
       }}
     >
-      <List style={{ margin: 0, padding: 0 }}>
+      <List
+        sx={{
+          // selected and (selected + hover) states
+          "&& .Mui-selected, && .Mui-selected:hover": {
+            bgcolor: colors.blue500,
+            "&, & .MuiListItemIcon-root": {
+              color: "pink",
+            },
+          },
+        }}
+        style={{ margin: 0, padding: 0 }}
+      >
         {sideBarMenuItems.map(
           (item) =>
             !snsLogState && (
