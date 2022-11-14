@@ -18,6 +18,7 @@ import {
 } from "@mui/material/";
 
 import { useStore2, useStore3, loginStore } from "../../store/store.js";
+import { useSnsLogStateStore } from "../../store/store.js";
 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import logo from "../../img/logo.png";
 import { useNavigate } from "react-router-dom";
-import { useStore, useStore2 } from "../../store/store.js";
+import { useStore, useStore2, useSnsLogStateStore } from "../../store/store.js";
 import defaultUser from "../../img/default-user.jpg";
 
 import AppBar from "@mui/material/AppBar";
@@ -22,13 +22,14 @@ export default function Header() {
   const { profileImage } = useStore();
   const navigate = useNavigate();
   const { logState, setLogState } = useStore2();
-
+  const { snsLogState, setSnsLogState } = useSnsLogStateStore();
   function loginHandler() {
     setLogState(true);
   }
 
   function logoutHandler() {
     setLogState(false);
+    setSnsLogState(false);
     sessionStorage.clear();
   }
 
@@ -42,6 +43,8 @@ export default function Header() {
     try {
       await axios.post("/api/signout");
       setLogState(false);
+      setSnsLogState(false);
+      sessionStorage.clear();
       setTimeout(() => {
         navigate("/");
       }, 0);

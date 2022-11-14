@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { recoverInitiateSchema } from "../../schema/form_validation";
-import { loginStore, useStore2 } from "../../store/store.js";
+import { useSnsLogStateStore } from "../../store/store.js";
 import { useNavigate } from "react-router-dom";
 
 import { toast, ToastContainer } from "react-toastify";
@@ -20,6 +20,7 @@ import {
 
 export default function Signout() {
   const navigate = useNavigate();
+  const { snsLogState, setSnsLogState } = useSnsLogStateStore();
 
   const {
     register,
@@ -58,7 +59,7 @@ export default function Signout() {
   };
   const onSubmit = (data) => {
     const passwordData = {
-      password: data.passwordConfirm,
+      password: !snsLogState ? data.passwordConfirm : "",
     };
 
     sendToServer(passwordData);
@@ -84,34 +85,36 @@ export default function Signout() {
         sx={{ mt: 3, display: "flex", justifyContent: "center" }}
       >
         <FormControl component="fieldset" variant="standard">
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                type="password"
-                id="password"
-                name="password"
-                label="비밀번호"
-                error={!!errors.pw}
-                {...register("pw")}
-                helperText={errors.pw?.message}
-              />
+          {!snsLogState && (
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  type="password"
+                  id="password"
+                  name="password"
+                  label="비밀번호"
+                  error={!!errors.pw}
+                  {...register("pw")}
+                  helperText={errors.pw?.message}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  type="password"
+                  id="rePassword"
+                  name="rePassword"
+                  label="비밀번호 확인"
+                  error={!!errors.passwordConfirm}
+                  {...register("passwordConfirm")}
+                  helperText={errors.passwordConfirm?.message}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                type="password"
-                id="rePassword"
-                name="rePassword"
-                label="비밀번호 확인"
-                error={!!errors.passwordConfirm}
-                {...register("passwordConfirm")}
-                helperText={errors.passwordConfirm?.message}
-              />
-            </Grid>
-          </Grid>
+          )}
           <Button
             type="submit"
             variant="contained"

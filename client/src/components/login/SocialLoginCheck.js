@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useStore2 } from "../../store/store.js";
+import { useStore2, useSnsLogStateStore } from "../../store/store.js";
 
 export default function SocialLoginCheck() {
   useEffect(() => {
@@ -12,6 +12,7 @@ export default function SocialLoginCheck() {
   }, []);
 
   const { setLogState } = useStore2();
+  const { snsLogState, setSnsLogState } = useSnsLogStateStore();
 
   const useQuery = () => new URLSearchParams(useLocation().search);
   const query = useQuery();
@@ -31,6 +32,7 @@ export default function SocialLoginCheck() {
 
       setTimeout(() => {
         setLogState(true);
+        setSnsLogState(true);
         navigate("/calendar");
       }, 2000);
     } catch (err) {

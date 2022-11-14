@@ -1,11 +1,14 @@
 import { Drawer } from "@mui/material";
 import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSnsLogStateStore } from "../../store/store.js";
 
 export function LeftSidebar({ width, sideBarMenuItems }) {
   const loc = useLocation();
   const navigate = useNavigate();
+  const { snsLogState, setSnsLogState } = useSnsLogStateStore();
 
+  console.log(snsLogState);
   return (
     <Drawer
       variant="permanent"
@@ -17,19 +20,39 @@ export function LeftSidebar({ width, sideBarMenuItems }) {
       }}
     >
       <List style={{ margin: 0, padding: 0 }}>
-        {sideBarMenuItems.map((item) => (
-          <ListItem
-            button
-            key={item.text}
-            onClick={() => {
-              navigate(item.path);
-            }}
-            selected={loc.pathname === item.path}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text}></ListItemText>
-          </ListItem>
-        ))}
+        {sideBarMenuItems.map(
+          (item) =>
+            !snsLogState && (
+              <ListItem
+                button
+                key={item.text}
+                onClick={() => {
+                  navigate(item.path);
+                }}
+                selected={loc.pathname === item.path}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text}></ListItemText>
+              </ListItem>
+            )
+        )}
+        {sideBarMenuItems.map((item) =>
+          snsLogState && item.path !== "/password_change" ? (
+            <ListItem
+              button
+              key={item.text}
+              onClick={() => {
+                navigate(item.path);
+              }}
+              selected={loc.pathname === item.path}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text}></ListItemText>
+            </ListItem>
+          ) : (
+            <></>
+          )
+        )}
       </List>
     </Drawer>
   );
