@@ -33,6 +33,19 @@ const useStore2 = create(
   )
 );
 
+const useSnsLogStateStore = create(
+  persist(
+    (set) => ({
+      snsLogState: false,
+      setSnsLogState: (input) => set({ snsLogState: input }),
+    }),
+    {
+      name: "snsLogState",
+      getStorage: () => sessionStorage,
+    }
+  )
+);
+
 const useStore3 = create((set) => ({
   async tempFunc(id, password) {
     const response = await fetch("http://localhost:4000/users");
@@ -153,6 +166,7 @@ export {
   useStore2,
   useStore3,
   loginStore,
+  useSnsLogStateStore,
   calenderStore,
   useCategoryDropDownItemStore,
 };

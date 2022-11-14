@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { identifyPhoneSchema } from "../../schema/form_validation";
@@ -14,7 +14,7 @@ import {
 
 import axios from "axios";
 
-import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useMutation } from "react-query";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -31,7 +31,6 @@ export default function IdentifyPhone() {
 
   const { state } = useLocation();
   const onSubmit = (data) => {
-    // console.log(data);
     phoneDataMutation.mutate(data.phone);
   };
 
@@ -48,7 +47,6 @@ export default function IdentifyPhone() {
     },
     {
       onSuccess: (e) => {
-        // navigate("/identify_phone");
         toast.success("이메일로 인증링크가 전송 되었습니다!", {
           position: toast.POSITION.TOP_CENTER,
         });

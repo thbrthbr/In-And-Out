@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -24,6 +24,11 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PacmanLoader from "react-spinners/PacmanLoader";
+
+const handleImgError = (e) => {
+  e.target.src = defaultUser;
+};
 
 export default function ProfileChange() {
   const {
@@ -37,7 +42,6 @@ export default function ProfileChange() {
   const { profileImage, setProfileImage } = useStore();
   const {
     id,
-    password,
     nickname,
     setNickname,
     phoneNumber,
@@ -52,7 +56,6 @@ export default function ProfileChange() {
 
   const fileInput = useRef();
   const [openPostcode, setOpenPostcode] = useState(false);
-  const [address, setAddress] = useState("");
   const queryClient = useQueryClient();
 
   const handleButtonClick = (e) => {
@@ -67,8 +70,6 @@ export default function ProfileChange() {
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       setProfileImage(reader.result);
-      // console.log(reader.result);
-      // ImagePut(reader.result);
     };
   };
 
@@ -89,78 +90,7 @@ export default function ProfileChange() {
     setGender(event.currentTarget.value);
   };
 
-  // async function ImagePut(e) {
-  //   const response = await fetch(`http://localhost:4000/users/${id}`, {
-  //     method: "PUT",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       password: password,
-  //       nickname: nickname,
-  //       phoneNumber: phoneNumber,
-  //       birthdate: birthdate,
-  //       residence: residence,
-  //       gender: gender,
-  //       profileImage: e == null ? profileImage : e,
-  //     }),
-  //   });
-
-  //   // console.log(response);
-
-  //   if (response.ok) {
-  //     alert("수정완료");
-  //   } else {
-  //     alert("오류");
-  //   }
-  // }
-
-  // async function put(e) {
-  //   console.log(e);
-  //   const response = await fetch(`http://localhost:4000/users/${id}`, {
-  //     method: "PUT",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       password: password,
-  //       nickname: e["name"],
-  //       phoneNumber: e["phone"],
-  //       birthdate: e["birthday"],
-  //       residence: e["residence"],
-  //       gender: e["gender"],
-  //       profileImage: profileImage,
-  //     }),
-  //   });
-
-  //   console.log(response);
-
-  //   if (response.ok) {
-  //     setNickname(e["name"]);
-  //     setPhoneNumber(e["phone"]);
-  //     setBirthdate(e["birthday"]);
-  //     setResidence(e["residence"]);
-  //     setGender(e["gender"] === "남" ? "male" : "female");
-  //     alert("수정완료");
-  //   } else {
-  //     alert("오류");
-  //   }
-  // }
-
   const onSubmit = async (e) => {
-    // put(e);
-    // password,
-    // console.log(e["name"]);
-    // console.log(e["phone"]);
-    // console.log(e["birthday"]);
-    // console.log(e["residence"]);
-    // console.log(e["gender"]);
-    // console.log(profileImage);
-    // e.address = e.residence;
-    // e.birth = e.birthday;
-    // e.nickname = e.name;
-    // e.memberPhotoUrl = "";
-    // delete e.email;
-    // delete e.residence;
-    // delete e.birthday;
-    // delete e.name;
-    // console.log("d", e);
     saveDataMutation.mutate(e);
   };
 
@@ -169,8 +99,7 @@ export default function ProfileChange() {
   };
 
   const handleAddressSelect = (data) => {
-    // console.log(data.address);
-    setAddress(data.address);
+    setResidence(data.address);
     setOpenPostcode(false);
   };
 
@@ -185,23 +114,24 @@ export default function ProfileChange() {
     return res.data;
   };
 
-  const { data, isLoading } = useQuery(["getProfileData"], getUserData, {
-    onSuccess: (data) => {
-      console.log(data);
-      setNickname(data["nickName"]);
-      setPhoneNumber(data["phone"]);
-      setBirthdate(data["birth"]);
-      // setResidence(data["address"]);
-      setAddress(data["address"]);
-      setGender(data["gender"] === "남" ? "male" : "female");
-      setProfileImage(data["s3ImageUrl"]);
+  const { isLoading } = useQuery(
+    ["getProfileData"],
+    getUserData,
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        setNickname(data["nickName"]);
+        setPhoneNumber(data["phone"]);
+        setBirthdate(data["birth"]);
+        setResidence(data["address"]);
+
+        setGender(data["gender"]);
+        setProfileImage(data["s3ImageUrl"] ? data["s3ImageUrl"] : defaultUser);
+      },
+      onError: () => {},
     },
-    onError: (data) => {
-      // toast.warn("회원 정보를 가져오는데 실패하였습니다.", {
-      //   position: toast.POSITION.TOP_CENTER,
-      // });
-    },
-  });
+    { staleTime: 500 }
+  );
 
   const saveDataMutation = useMutation(
     async (userData) => {
@@ -236,10 +166,14 @@ export default function ProfileChange() {
         console.log(value);
       }
 
-      const res = await axios.put("/api/member/info", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
+      const res = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/member/info`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
+      );
       return res.data;
     },
     {
@@ -256,6 +190,20 @@ export default function ProfileChange() {
       },
     }
   );
+
+  if (isLoading)
+    return (
+      <PacmanLoader
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+        color="#36d7b7"
+        size={50}
+      />
+    );
 
   return (
     <Box
@@ -280,7 +228,11 @@ export default function ProfileChange() {
           <img
             alt="프로필사진"
             src={profileImage ? profileImage : defaultUser}
-            style={{ width: "200px", height: "180px" }}
+            onError={handleImgError}
+            style={{
+              width: "200px",
+              height: "180px",
+            }}
           />
           <File onClick={handleButtonClick} htmlFor="input-file">
             이미지 업로드
@@ -293,7 +245,14 @@ export default function ProfileChange() {
             style={{ display: "none" }}
             onChange={handleChange}
           />
-          <button onClick={() => setProfileImage("")}>이미지 삭제</button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setProfileImage("");
+            }}
+          >
+            이미지 삭제
+          </button>
         </Photo>
         <FormControl component="fieldset" variant="standard">
           <Grid container spacing={2}>
@@ -358,11 +317,11 @@ export default function ProfileChange() {
                 name="residence"
                 label="거주지"
                 error={!!errors.residence}
-                value={address}
+                value={residence}
                 defaultValue={residence}
                 {...register("residence", {
                   onChange: (e) => {
-                    setAddress(e.target.value);
+                    setResidence(e.target.value);
                     onResidenceHandler(e);
                   },
                 })}

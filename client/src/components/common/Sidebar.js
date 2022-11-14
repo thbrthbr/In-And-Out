@@ -11,17 +11,6 @@ const Side = styled.div`
   background-color: #d9d9d9;
 `;
 
-// const Menu = styled.div`
-//   // margin-top: 30px;
-//   width: 200px;
-//   height: 500px;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   // justify-content: center;
-//   background-color: red;
-// `;
-
 const SideButton = styled.div`
   width: 180px;
   height: 50px;

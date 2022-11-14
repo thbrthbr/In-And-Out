@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signInSchema } from "../../schema/form_validation";
 
-import { loginStore, useStore2 } from "../../store/store.js";
+import { loginStore } from "../../store/store.js";
 import DaumPostcode from "react-daum-postcode";
 import axios from "axios";
 
@@ -45,7 +44,6 @@ export default function Signin() {
     setGender,
   } = loginStore();
 
-  const { setLogState } = useStore2();
   const navigate = useNavigate();
   const [openPostcode, setOpenPostcode] = useState(false);
   const [address, setAddress] = useState("");
@@ -64,7 +62,6 @@ export default function Signin() {
   };
 
   const handleAddressSelect = (data) => {
-    // console.log(data.address);
     setAddress(data.address);
     setOpenPostcode(false);
   };
@@ -93,7 +90,6 @@ export default function Signin() {
       });
       setLoading(false);
       setTimeout(() => {
-        // setLogState(true);
         navigate("/");
       }, 5000);
     } catch (error) {
@@ -109,7 +105,6 @@ export default function Signin() {
   const onSubmit = (data) => {
     sendUserDataToServer();
     setLoading(true);
-    // console.log(id);
   };
 
   const onEmailHandler = (event) => {
