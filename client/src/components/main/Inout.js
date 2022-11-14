@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 import "react-data-grid/lib/styles.css";
 import DataGrid, { SelectColumn, textEditor } from "react-data-grid";
@@ -157,6 +157,8 @@ export default function Inout() {
     setTabValue(newValue);
   };
 
+  const gridRef = useRef(null);
+
   const formatDate = (date) => {
     return `${date.getFullYear()}-${(date.getMonth() + 1)
       .toString()
@@ -287,7 +289,14 @@ export default function Inout() {
       tabValue === TabSelected.INCOME ? newIncomeData : newExpenseData;
 
     setRows([...rows, newData]);
+    scrollToBottom();
   }
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      gridRef.current.scrollToRow(rows.length);
+    }, 50);
+  };
 
   const saveDataMutation = useMutation(
     async (rowData) => {
@@ -451,6 +460,8 @@ export default function Inout() {
           next={nextMonth}
         />
         <DataGrid
+          style={{ height: 500 }}
+          ref={gridRef}
           columns={incomeColumns}
           rows={rows}
           rowGetter={(i) => rows[i]}
@@ -473,6 +484,8 @@ export default function Inout() {
           next={nextMonth}
         />
         <DataGrid
+          style={{ height: 500 }}
+          ref={gridRef}
           columns={expenseColumns}
           rows={rows}
           rowGetter={(i) => rows[i]}
