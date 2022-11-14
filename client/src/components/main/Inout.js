@@ -7,7 +7,14 @@ import DateEditor from "../../editor/DateEditor";
 
 import axios from "axios";
 
-import { startOfMonth, endOfMonth, addMonths, subMonths } from "date-fns";
+import {
+  startOfMonth,
+  endOfMonth,
+  addMonths,
+  subMonths,
+  getMonth,
+  getYear,
+} from "date-fns";
 
 import DateHeader from "../common/DateHeader";
 
@@ -208,6 +215,8 @@ export default function Inout() {
             (category) =>
               category.detailIncomeCategoryId === item.detailIncomeCategoryId
           ).detailIncomeCategoryName;
+          item.year = getYear(new Date(item.date));
+          item.month = getMonth(new Date(item.date));
           return item;
         });
 
@@ -230,6 +239,8 @@ export default function Inout() {
             (category) =>
               category.detailExpenseCategoryId === item.detailExpenseCategoryId
           ).detailExpenseCategoryName;
+          item.year = getYear(new Date(item.date));
+          item.month = getMonth(new Date(item.date));
           return item;
         });
 
@@ -253,19 +264,23 @@ export default function Inout() {
     const newIncomeData = {
       incomeDt: "",
       incomeItem: "",
-      incomeAmount: "",
+      incomeAmount: "0",
       detailIncomeCategoryId: "",
       incomeMemo: "",
+      month: getMonth(currentMonth),
+      year: getYear(currentMonth),
       key: Math.floor(Math.random() * 1000),
     };
 
     const newExpenseData = {
       expenseDt: "",
       expenseItem: "",
-      expenseCash: "",
-      expenseCard: "",
+      expenseCash: "0",
+      expenseCard: "0",
       detailExpenseCategoryId: "",
       expenseMemo: "",
+      month: getMonth(currentMonth),
+      year: getYear(currentMonth),
       key: Math.floor(Math.random() * 1000),
     };
     let newData =

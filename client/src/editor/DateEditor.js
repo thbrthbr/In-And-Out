@@ -3,10 +3,12 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-export default function DateEditor({ row, onRowChange }) {
+export default function DateEditor({ row, onRowChange, current }) {
+  const startDate = new Date(row.year, row.month, 1);
   return (
     <DatePicker
       name="startDate"
+      selected={startDate}
       portalId="root-portal"
       placeholder="Date"
       dateFormat="yyyy-MM-dd"

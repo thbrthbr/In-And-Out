@@ -180,7 +180,7 @@ export default function Report() {
 
     try {
       const obj = {
-        yearlyExcelDtoList: [rows[0]],
+        yearlyExcelDtoList: rows,
       };
       await axios(url, {
         method: type === "year" ? "POST" : "GET",
