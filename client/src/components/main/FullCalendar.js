@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Icon } from "@iconify/react";
+import colors from "../../utils/color";
+
 import {
   format,
   addMonths,
@@ -25,8 +27,9 @@ const InstanceTable = styled.div`
   min-height: 200px;
   max-height: 300px;
   max-width: 245px;
-  border: 1px solid black;
-  background-color: white;
+  // border: 1px solid black;
+  background-color: rgba(248, 249, 215, 1);
+  box-shadow: 5px 5px 5px 5px gray;
   position: absolute;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -49,8 +52,9 @@ const InstanceTable2 = styled.div`
   min-height: 200px;
   max-height: 300px;
   max-width: 245px;
-  border: 1px solid black;
-  background-color: white;
+  // border: 1px solid black;
+  background-color: rgba(248, 249, 215, 1);
+  box-shadow: 5px 5px 5px 5px gray;
   position: absolute;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -79,16 +83,8 @@ const CloseBtn = styled.div`
 `;
 
 const RenderHeader = (props) => {
-  const {
-    currentMonth,
-    setcurrentMonth,
-    tabMonth,
-    setTabMonth,
-    sumIncome,
-    setSumIncome,
-    sumExpense,
-    setSumExpense,
-  } = calenderStore();
+  const { currentMonth, setcurrentMonth, tabMonth, setTabMonth } =
+    calenderStore();
 
   const handleTabChange = (event, newValue) => {
     setTabMonth(newValue);
@@ -129,9 +125,8 @@ const RenderHeader = (props) => {
     return string;
   };
 
-  let a = commaMaker(props.calendarData.calendarIncomeDtoList[0].amount);
-  let b = commaMaker(props.calendarData.calendarExpenseDtoList[0].amount);
-  //백 api 개발 끝나면 각각 incomeSum expenseSum으로 교체
+  let a = commaMaker(props.calendarData.incomeSum);
+  let b = commaMaker(props.calendarData.expenseSum);
 
   return (
     <div>
@@ -144,18 +139,46 @@ const RenderHeader = (props) => {
           </span>
         </div>
         <div className="col col-center">
-          <div style={{ maxHeight: "20px" }}>수입합계: +{a}</div>
-          <div style={{ maxHeight: "20px" }}>지출합계: -{b}</div>
+          <div
+            style={{
+              marginTop: "5px",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: "600",
+                color: "rgba(109, 73,129, 1)",
+                maxHeight: "20px",
+              }}
+            >
+              in
+            </div>
+            <div
+              style={{
+                fontWeight: "600",
+                color: "rgba(109, 73,129, 1)",
+                maxHeight: "20px",
+              }}
+            >
+              out
+            </div>
+          </div>
+          <div style={{ marginTop: "5px", marginLeft: "10px" }}>
+            <div style={{ maxHeight: "20px" }}>+{a}</div>
+            <div style={{ maxHeight: "20px" }}>-{b}</div>
+          </div>
         </div>
         <div className="col col-end">
           <Icon
             icon="bi:arrow-left-circle-fill"
+            style={{ color: "#F2D7D9" }}
             value={tabMonth}
             onChange={handleTabChange}
             onClick={prevMonth}
           />
           <Icon
             icon="bi:arrow-right-circle-fill"
+            style={{ color: "#F2D7D9" }}
             value={tabMonth}
             onChange={handleTabChange}
             onClick={nextMonth}
@@ -319,7 +342,7 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
             cursor: "pointer",
             backgroundColor:
               formattedDataForDiary === format(new Date(), "MM/dd/yy") &&
-              "#FFE4E1",
+              "#FFE7CC",
           }}
           id={cloneDay}
           onClick={(e) => {

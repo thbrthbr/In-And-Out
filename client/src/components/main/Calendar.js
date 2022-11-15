@@ -11,6 +11,8 @@ import { calenderStore } from "../../store/store.js";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import PacmanLoader from "react-spinners/PacmanLoader";
+import { Triangle } from "react-loader-spinner";
+
 // import useMouse from "@react-hook/mouse-position";
 
 const Container = styled.div`
@@ -42,12 +44,6 @@ const useMouseMovement = () => {
 
 export default function Calendar() {
   const { x, y } = useMouseMovement();
-
-  // const mouseMoveArea = useRef();
-  // const mouse = useMouse(mouseMoveArea, {
-  //   enterDelay: 100,
-  //   leaveDelay: 100,
-  // });
 
   const {
     showDiary,
@@ -179,12 +175,38 @@ export default function Calendar() {
     refetch();
   }, []);
 
-  const { data, isLoading, refetch } = useQuery(["getCalendarData"], getData, {
-    staleTime: Infinity,
-  });
+  const { data, isLoading, isFetching, refetch } = useQuery(
+    ["getCalendarData"],
+    getData,
+    {
+      staleTime: Infinity,
+    }
+  );
 
   if (isLoading) return <PacmanLoader color="#36d7b7" />;
-  // console.log("data", data);
+  // if (isFetching) return <PacmanLoader color="#36d7b7" />;
+  if (isFetching)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          backgroundColor: "transparent",
+        }}
+      >
+        <Triangle
+          height="200"
+          width="200"
+          color="rgba(109, 73,129, 1)"
+          ariaLabel="triangle-loading"
+          wrapperStyle={{}}
+          wrapperClassName=""
+          visible={true}
+        />
+      </div>
+    );
 
   return (
     <Container

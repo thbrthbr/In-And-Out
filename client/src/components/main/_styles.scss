@@ -23,15 +23,17 @@
       }
       .text.month {
         margin-right: 5px;
-        font-size: 1.8em;
+        font-size: 3em;
         font-weight: 600;
       }
     }
     .col.col-center {
+      display: flex;
+      flex-direction: row;
       width: 30%;
       font-size: 15px;
       position: absolute;
-      margin-left: 100px;
+      margin-left: 150px;
       margin-top: -10px;
     }
     .col.col-end {
@@ -50,7 +52,7 @@
           cursor: pointer;
           transition: 0.2s ease-in-out;
           transform: scale(1.15);
-          color: #686868;
+          color: #f2d7d9;
           // background-image: url( "images/bg-house.png" );
         }
       }
@@ -75,8 +77,9 @@
       justify-content: flex-end;
       align-items: flex-start;
       padding-left: 1%;
-      background: transparentize(#ebcfc6, 0.6);
+      background: #9cb4cc;
       border-radius: 10px;
+      color: white;
     }
   }
   .body {
@@ -121,7 +124,7 @@
           box-shadow: 1.5px 1.5px 0px 0px transparentize(#686868, 0.1);
           transform: scale(1.01);
           border: none;
-          background: transparentize(#c4c4c4, 0.5);
+          background: #d3cedf;
         }
         svg {
           &:hover {
