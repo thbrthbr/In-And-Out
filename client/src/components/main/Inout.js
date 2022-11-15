@@ -408,12 +408,16 @@ export default function Inout() {
 
   const params = {};
   setParam();
-  const { isLoading, refetch } = useQuery(["getInoutData", tabValue], () => {
-    handleInoutData(
-      tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL,
-      params
-    );
-  });
+  const { isLoading, refetch } = useQuery(
+    ["getInoutData", tabValue],
+    () => {
+      handleInoutData(
+        tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL,
+        params
+      );
+    },
+    { refetchOnWindowFocus: false }
+  );
 
   if (isLoading)
     return (
