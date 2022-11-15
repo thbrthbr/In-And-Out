@@ -137,7 +137,7 @@ const Pyo = styled.div`
   }
   &::-webkit-scrollbar-thumb {
     height: 20%;
-    background: #c0c0c0;
+    background: #748da6;
     border-radius: 10px;
   }
 `;
@@ -152,7 +152,7 @@ const DeleteImage = styled.div`
   color: rgb(186, 186, 186);
   opacity: 70%;
   // border: 1px solid rgb(186, 186, 186);
-  background-color: #f5f5f5;
+  background-color: transparent;
   border-radius: 50%;
   &:active {
     background-color: rgb(186, 186, 186);
@@ -165,6 +165,7 @@ const WriteButton = styled.button`
   width: 80px;
   margin-top: -28px;
   border: 0px;
+  background-color: transparent;
   cursor: pointer;
   &:active {
     color: white;
@@ -203,7 +204,7 @@ const DiaryContext = styled.div`
   }
   &::-webkit-scrollbar-thumb {
     height: 20%;
-    background: #c0c0c0;
+    background: #748da6;
 
     border-radius: 10px;
   }
@@ -673,7 +674,7 @@ export default function Diary({
           </Pyo>
           <DiaryContext>
             {edit ? (
-              specificDate
+              <div>&lt;{specificDate}&gt;</div>
             ) : (
               <DateMover>
                 <DatePicker
@@ -772,6 +773,7 @@ export default function Diary({
                     marginTop: "13px",
                     marginLeft: "180px",
                     cursor: "pointer",
+                    color: "#F2D7D9",
                   }}
                   // value={tabMonth}
                   // onChange={handleTabChange}
@@ -784,6 +786,7 @@ export default function Diary({
                     marginTop: "13px",
                     marginLeft: "331px",
                     cursor: "pointer",
+                    color: "#F2D7D9",
                   }}
                   // value={tabMonth}
                   // onChange={handleTabChange}
