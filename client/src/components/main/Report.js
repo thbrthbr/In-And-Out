@@ -511,7 +511,7 @@ export default function Report() {
       yearlyOption,
     ],
     () => handleReportData(API_URL, params),
-    { staleTime: 0, cacheTime: 0 }
+    { staleTime: 0, cacheTime: 0, refetchOnWindowFocus: false }
   );
 
   if (isLoading)

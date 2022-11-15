@@ -17,8 +17,12 @@ import {
   Typography,
 } from "@mui/material/";
 
-import { useStore2, useStore3, loginStore } from "../../store/store.js";
-import { useSnsLogStateStore } from "../../store/store.js";
+import {
+  useStore,
+  useStore2,
+  useStore3,
+  loginStore,
+} from "../../store/store.js";
 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -34,6 +38,7 @@ export default function Login() {
 
   const navigate = useNavigate();
 
+  const { profileImage, setProfileImage } = useStore();
   const { logState, setLogState } = useStore2();
   const { tempFunc } = useStore3();
   const {
@@ -50,7 +55,7 @@ export default function Login() {
 
   const onSubmit = async (e) => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_API_URL}/api/signin`,
         {
           email: e["email"],
@@ -60,6 +65,15 @@ export default function Login() {
           withCredentials: true,
         }
       );
+
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/member/info`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      res.data["s3ImageUrl"] && setProfileImage(res.data["s3ImageUrl"]);
 
       setLogState(true);
       setTimeout(() => {

@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/esm/locale";
 
 export default function DateEditor({ row, onRowChange, current }) {
-  const startDate = new Date(row.year, row.month, 1);
+  const startDate = new Date();
   return (
     <DatePicker
       locale={ko}

@@ -51,7 +51,7 @@ const incomeColumns = [
   },
   {
     key: "incomeItem",
-    name: "사용내역",
+    name: "수입내역",
     width: 200,
     editor: textEditor,
   },
@@ -298,6 +298,10 @@ export default function Inout() {
     }, 50);
   };
 
+  const isNumber = (value) => {
+    return typeof value === "number" && isFinite(value);
+  };
+
   const saveDataMutation = useMutation(
     async (rowData) => {
       let diff = rowData.filter((ele) => !prevRows.includes(ele));
@@ -307,24 +311,27 @@ export default function Inout() {
           ? { ...ele, incomeDt: ele.date }
           : { ...ele, expenseDt: ele.date }
       );
+
       switch (tabValue) {
         case TabSelected.INCOME:
-          diff.forEach(
-            (item) =>
-              (item.detailIncomeCategoryId = incomeCategoryList.find(
-                (category) =>
-                  category.detailIncomeCategoryName === item.category
-              ).detailIncomeCategoryId)
-          );
+          diff.forEach((item) => {
+            item.detailIncomeCategoryId = incomeCategoryList.find(
+              (category) => category.detailIncomeCategoryName === item.category
+            ).detailIncomeCategoryId;
+            if (!isNumber(item.incomeAmount / 1)) item.incomeAmount = "0";
+            item.incomeAmount = Math.abs(item.incomeAmount);
+          });
           break;
         case TabSelected.EXPENSE:
-          diff.forEach(
-            (item) =>
-              (item.detailExpenseCategoryId = expenseCategoryList.find(
-                (category) =>
-                  category.detailExpenseCategoryName === item.category
-              ).detailExpenseCategoryId)
-          );
+          diff.forEach((item) => {
+            item.detailExpenseCategoryId = expenseCategoryList.find(
+              (category) => category.detailExpenseCategoryName === item.category
+            ).detailExpenseCategoryId;
+            if (!isNumber(item.expenseCard / 1)) item.expenseCard = "0";
+            if (!isNumber(item.expenseCash / 1)) item.expenseCash = "0";
+            item.expenseCard = Math.abs(item.expenseCard);
+            item.expenseCash = Math.abs(item.expenseCash);
+          });
           break;
         default:
           break;
@@ -408,12 +415,16 @@ export default function Inout() {
 
   const params = {};
   setParam();
-  const { isLoading, refetch } = useQuery(["getInoutData", tabValue], () => {
-    handleInoutData(
-      tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL,
-      params
-    );
-  });
+  const { isLoading, refetch } = useQuery(
+    ["getInoutData", tabValue],
+    () => {
+      handleInoutData(
+        tabValue === TabSelected.INCOME ? INCOME_API_URL : EXPENSE_API_URL,
+        params
+      );
+    },
+    { refetchOnWindowFocus: false }
+  );
 
   if (isLoading)
     return (
