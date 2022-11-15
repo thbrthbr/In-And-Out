@@ -51,7 +51,7 @@ const incomeColumns = [
   },
   {
     key: "incomeItem",
-    name: "사용내역",
+    name: "수입내역",
     width: 200,
     editor: textEditor,
   },
