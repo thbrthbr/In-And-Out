@@ -141,7 +141,7 @@ const RenderHeader = (props) => {
         <div className="col col-center">
           <div
             style={{
-              marginTop: "5px",
+              marginTop: "12px",
             }}
           >
             <div
@@ -163,7 +163,15 @@ const RenderHeader = (props) => {
               out
             </div>
           </div>
-          <div style={{ marginTop: "5px", marginLeft: "10px" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              marginTop: "12px",
+              marginLeft: "10px",
+            }}
+          >
             <div style={{ maxHeight: "20px" }}>+{a}</div>
             <div style={{ maxHeight: "20px" }}>-{b}</div>
           </div>
