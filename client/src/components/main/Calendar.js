@@ -12,6 +12,8 @@ import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import PacmanLoader from "react-spinners/PacmanLoader";
 import { Triangle } from "react-loader-spinner";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // import useMouse from "@react-hook/mouse-position";
 
@@ -120,6 +122,9 @@ export default function Calendar() {
     },
     {
       onSuccess: () => {
+        // toast.success("일기가 등록 되었습니다!", {
+        //   position: toast.POSITION.TOP_CENTER,
+        // });
         queryClient.invalidateQueries("getCalendarData");
       },
     }
@@ -142,6 +147,9 @@ export default function Calendar() {
     },
     {
       onSuccess: () => {
+        // toast.success("일기가 수정 되었습니다!", {
+        //   position: toast.POSITION.TOP_CENTER,
+        // });
         queryClient.invalidateQueries("getCalendarData");
       },
     }
@@ -164,6 +172,9 @@ export default function Calendar() {
     },
     {
       onSuccess: () => {
+        // toast.success("일기가 삭제 되었습니다!", {
+        //   position: toast.POSITION.TOP_CENTER,
+        // });
         queryClient.invalidateQueries("getCalendarData");
       },
     }
@@ -183,9 +194,7 @@ export default function Calendar() {
     }
   );
 
-  if (isLoading) return <PacmanLoader color="#36d7b7" />;
-  // if (isFetching) return <PacmanLoader color="#36d7b7" />;
-  if (isFetching)
+  if (isLoading)
     return (
       <div
         style={{
@@ -193,6 +202,23 @@ export default function Calendar() {
           justifyContent: "center",
           alignItems: "center",
           width: "100%",
+          backgroundColor: "transparent",
+        }}
+      >
+        <PacmanLoader color="#36d7b7" />
+      </div>
+    );
+  // if (isFetching) return <PacmanLoader color="#36d7b7" />;
+  if (isFetching)
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          color: "rgba(109, 73,129, 1)",
           backgroundColor: "transparent",
         }}
       >
@@ -205,6 +231,7 @@ export default function Calendar() {
           wrapperClassName=""
           visible={true}
         />
+        {/* <div> 처리중입니다 </div> */}
       </div>
     );
 
@@ -214,6 +241,7 @@ export default function Calendar() {
         setShowInstanceTable(false);
       }}
     >
+      {/* <ToastContainer /> */}
       <FullCalendar
         Y={y}
         refetch={refetch}
