@@ -74,7 +74,7 @@ export default function Header() {
 
   return (
     <>
-      <AppBar position="static" style={{ backgroundColor: colors.yellow100 }}>
+      <AppBar position="static" style={{ backgroundColor: "#eef1ff" }}>
         <Container maxWidth="100%">
           <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
             <img
@@ -83,11 +83,11 @@ export default function Header() {
               style={{ width: "200px", cursor: "pointer" }}
               src={logo}
             />
-            {logState ? (
+            {/* {logState ? (
               <button onClick={logoutHandler}>logoutState</button>
             ) : (
               <button onClick={loginHandler}>loginState</button>
-            )}
+            )} */}
             {logState && (
               <Box sx={{ flexDirection: "row" }}>
                 <Tooltip title="Open">
