@@ -247,10 +247,10 @@ export default function Report() {
   const getMonthlyData = (fetchedData) => {
     const newData = [];
     const newLabel = [];
-
+    console.log(fetchedData);
     fetchedData.sort((a, b) => b.categorySum - a.categorySum);
     fetchedData.forEach((element, idx) => {
-      newData[idx] = Math.round(element.categoryRatio);
+      newData[idx] = Math.round(element.categoryRatio * 100);
       newLabel[idx] = `${element.category} - ${element.categorySum}`;
     });
 
