@@ -50,6 +50,9 @@ export default function Header() {
         navigate("/");
       }, 0);
     } catch (err) {
+      setLogState(false);
+      setSnsLogState(false);
+      sessionStorage.clear();
       console.log(err);
     }
   };
