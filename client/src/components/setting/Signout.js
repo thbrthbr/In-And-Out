@@ -1,7 +1,11 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { recoverInitiateSchema } from "../../schema/form_validation";
-import { useSnsLogStateStore, useStore2 } from "../../store/store.js";
+import {
+  useSnsLogStateStore,
+  useStore2,
+  loginStore,
+} from "../../store/store.js";
 import { useNavigate } from "react-router-dom";
 
 import { toast, ToastContainer } from "react-toastify";
@@ -22,6 +26,7 @@ export default function Signout() {
   const navigate = useNavigate();
   const { snsLogState, setSnsLogState } = useSnsLogStateStore();
   const { logState, setLogState } = useStore2();
+  const { id } = loginStore();
 
   const {
     register,
@@ -59,9 +64,9 @@ export default function Signout() {
     }
   };
   const onSubmit = (data) => {
-    console.log(data);
+    console.log(data, id);
     const passwordData = {
-      password: !snsLogState ? data.passwordConfirm : "",
+      password: !snsLogState ? data.passwordConfirm : id,
     };
 
     sendToServer(passwordData);
