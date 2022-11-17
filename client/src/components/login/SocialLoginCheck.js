@@ -4,7 +4,11 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useStore2, useSnsLogStateStore } from "../../store/store.js";
+import {
+  useStore2,
+  useSnsLogStateStore,
+  loginStore,
+} from "../../store/store.js";
 
 export default function SocialLoginCheck() {
   useEffect(() => {
@@ -13,6 +17,7 @@ export default function SocialLoginCheck() {
 
   const { setLogState } = useStore2();
   const { snsLogState, setSnsLogState } = useSnsLogStateStore();
+  const { id, setId } = loginStore();
 
   const useQuery = () => new URLSearchParams(useLocation().search);
   const query = useQuery();
@@ -29,6 +34,7 @@ export default function SocialLoginCheck() {
       toast.success("성공적으로 로그인 되었습니다!", {
         position: toast.POSITION.TOP_CENTER,
       });
+      setId(uuid);
 
       setTimeout(() => {
         setLogState(true);

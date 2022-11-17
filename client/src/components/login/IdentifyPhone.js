@@ -47,11 +47,12 @@ export default function IdentifyPhone() {
         headers: { "Content-Type": "application/json" },
       });
       console.log(res);
-      setLoading(false);
+
       return res.data;
     },
     {
       onSuccess: (e) => {
+        setLoading(false);
         setTimeout(
           () =>
             toast.success("이메일로 인증링크가 전송 되었습니다!", {
@@ -61,11 +62,16 @@ export default function IdentifyPhone() {
         );
       },
       onError: (error) => {
-        toast.warn(
-          "서버와 연결이 문제가 있거나 등록되지 않은 전화번호 입니다!",
-          {
-            position: toast.POSITION.TOP_CENTER,
-          }
+        setLoading(false);
+        setTimeout(
+          () =>
+            toast.warn(
+              "서버와 연결이 문제가 있거나 등록되지 않은 전화번호 입니다!",
+              {
+                position: toast.POSITION.TOP_CENTER,
+              }
+            ),
+          50
         );
       },
     }

@@ -6,7 +6,7 @@ export default function DropDownEditor({ row, onRowChange }) {
 
   return (
     <Dropdown
-      position={row.day <= 15 ? "down-left" : "top-left"}
+      position={row.rowNum <= row.totalRow / 2 ? "down-left" : "top-left"}
       title={row.category}
       style={{ width: 200 }}
     >

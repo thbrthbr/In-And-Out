@@ -227,7 +227,7 @@ export default function Inout() {
         // setCategoryItemList(["", ...incomeCategoryNames]);
         setMainCategoryList(categoryItemList);
 
-        const incomeData = data.incomeDtoList.map((item) => {
+        const incomeData = data.incomeDtoList.map((item, i) => {
           item.date = item.incomeDt;
           item.category = incomeCategoryList.find(
             (category) =>
@@ -235,7 +235,8 @@ export default function Inout() {
           ).detailIncomeCategoryName;
           item.year = getYear(new Date(item.date));
           item.month = getMonth(new Date(item.date));
-          item.day = getDate(new Date(item.date));
+          item.rowNum = i;
+          item.totalRow = data.incomeDtoList.length;
           return item;
         });
 
@@ -259,7 +260,7 @@ export default function Inout() {
         // setCategoryItemList(["", ...incomeCategoryNames]);
         setMainCategoryList(categoryItemList);
 
-        const expenseData = data.expenseDtos.map((item) => {
+        const expenseData = data.expenseDtos.map((item, i) => {
           item.date = item.expenseDt;
           item.category = expenseCategoryList.find(
             (category) =>
@@ -267,7 +268,8 @@ export default function Inout() {
           ).detailExpenseCategoryName;
           item.year = getYear(new Date(item.date));
           item.month = getMonth(new Date(item.date));
-          item.day = getDate(new Date(item.date));
+          item.rowNum = i;
+          item.totalRow = data.expenseDtos.length;
           return item;
         });
 
@@ -440,7 +442,7 @@ export default function Inout() {
 
   const params = {};
   setParam();
-  const { isLoading, refetch } = useQuery(
+  const { isLoading, refetch, isFetching } = useQuery(
     ["getInoutData", tabValue],
     () => {
       handleInoutData(
@@ -448,10 +450,24 @@ export default function Inout() {
         params
       );
     },
-    { refetchOnWindowFocus: false }
+    { cacheTime: 0, refetchOnWindowFocus: false }
   );
 
   if (isLoading)
+    return (
+      <PacmanLoader
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+        color="#36d7b7"
+        size={50}
+      />
+    );
+
+  if (isFetching)
     return (
       <PacmanLoader
         style={{
@@ -492,6 +508,7 @@ export default function Inout() {
           prev={prevMonth}
           next={nextMonth}
         />
+
         <DataGrid
           style={{ height: 700 }}
           ref={gridRef}

@@ -1,7 +1,11 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { recoverInitiateSchema } from "../../schema/form_validation";
-import { useSnsLogStateStore } from "../../store/store.js";
+import {
+  useSnsLogStateStore,
+  useStore2,
+  loginStore,
+} from "../../store/store.js";
 import { useNavigate } from "react-router-dom";
 
 import { toast, ToastContainer } from "react-toastify";
@@ -21,6 +25,8 @@ import {
 export default function Signout() {
   const navigate = useNavigate();
   const { snsLogState, setSnsLogState } = useSnsLogStateStore();
+  const { logState, setLogState } = useStore2();
+  const { id } = loginStore();
 
   const {
     register,
@@ -31,24 +37,24 @@ export default function Signout() {
   });
 
   const sendToServer = async (passwordData) => {
+    console.log(passwordData);
     try {
       const res = await axios.delete(
         `${process.env.REACT_APP_API_URL}/api/member/info`,
         { data: passwordData, withCredentials: true }
       );
 
-      toast.success(
-        "회원탈퇴가 성공적으로 처리됐습니다! 3초후에 메인페이지로 이동합니다",
-        {
-          position: toast.POSITION.TOP_CENTER,
-        }
-      );
+      toast.success("회원탈퇴가 성공적으로 처리됐습니다! ", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+
+      setLogState(false);
+      setSnsLogState(false);
+      sessionStorage.clear();
 
       setTimeout(() => {
-        sessionStorage.clear();
-
         navigate("/");
-      }, 3000);
+      }, 0);
       return res.data;
     } catch (err) {
       console.log(err);
@@ -58,8 +64,9 @@ export default function Signout() {
     }
   };
   const onSubmit = (data) => {
+    console.log(data, id);
     const passwordData = {
-      password: !snsLogState ? data.passwordConfirm : "",
+      password: !snsLogState ? data.passwordConfirm : id,
     };
 
     sendToServer(passwordData);
@@ -86,43 +93,58 @@ export default function Signout() {
       >
         <FormControl component="fieldset" variant="standard">
           {!snsLogState && (
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  type="password"
-                  id="password"
-                  name="password"
-                  label="비밀번호"
-                  error={!!errors.pw}
-                  {...register("pw")}
-                  helperText={errors.pw?.message}
-                />
+            <>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    type="password"
+                    id="password"
+                    name="password"
+                    label="비밀번호"
+                    error={!!errors.pw}
+                    {...register("pw")}
+                    helperText={errors.pw?.message}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    type="password"
+                    id="rePassword"
+                    name="rePassword"
+                    label="비밀번호 확인"
+                    error={!!errors.passwordConfirm}
+                    {...register("passwordConfirm")}
+                    helperText={errors.passwordConfirm?.message}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  type="password"
-                  id="rePassword"
-                  name="rePassword"
-                  label="비밀번호 확인"
-                  error={!!errors.passwordConfirm}
-                  {...register("passwordConfirm")}
-                  helperText={errors.passwordConfirm?.message}
-                />
-              </Grid>
-            </Grid>
+
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ mt: 3, mb: 2, width: "100%" }}
+                size="large"
+              >
+                탈퇴
+              </Button>
+            </>
           )}
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ mt: 3, mb: 2, width: "100%" }}
-            size="large"
-          >
-            탈퇴
-          </Button>
+
+          {snsLogState && (
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ mt: 3, mb: 2, width: "100%" }}
+              size="large"
+              onClick={onSubmit}
+            >
+              탈퇴
+            </Button>
+          )}
         </FormControl>
       </Box>
     </Box>
