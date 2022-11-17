@@ -32,6 +32,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.38.0",
     "react-loader-spinner": "^5.3.4",
+    "react-multilevel-dropdown": "^3.0.3",
     "react-query": "^3.39.2",
     "react-redux": "^8.0.4",
     "react-router-dom": "^6.4.2",
