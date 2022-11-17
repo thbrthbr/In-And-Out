@@ -1,26 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
 import DatePicker from "react-datepicker";
 import { Icon } from "@iconify/react";
-
 import { calenderStore } from "../../store/store.js";
-
-import defaultUser from "../../img/default-user.jpg";
 import none from "../../img/none.png";
-
-import axios from "axios";
-
 import {
   addMonths,
   subMonths,
   addDays,
   subDays,
-  addYears,
-  subYears,
   startOfMonth,
   endOfMonth,
-  startOfYear,
-  endOfYear,
   format,
 } from "date-fns";
 import { ko } from "date-fns/esm/locale";
@@ -28,15 +18,6 @@ import Form from "react-bootstrap/Form";
 
 Date.prototype.format = function (f) {
   if (!this.valueOf()) return " ";
-  var weekName = [
-    "일요일",
-    "월요일",
-    "화요일",
-    "수요일",
-    "목요일",
-    "금요일",
-    "토요일",
-  ];
   var d = this;
   return f.replace(/(yyyy|yy|MM|dd|E|hh|mm|ss|a\/p)/gi, function ($1) {
     switch ($1) {
@@ -104,7 +85,6 @@ const TextArea = styled.textarea`
     outline: none;
   }
   overflow-y: scroll;
-
   &::-webkit-scrollbar {
     width: 5x;
   }
@@ -112,15 +92,12 @@ const TextArea = styled.textarea`
   &::-webkit-scrollbar-thumb {
     height: 30%;
     background: #c0c0c0;
-
     border-radius: 10px;
   }
 `;
 
 const Pre = styled.pre`
-  // height: 450px;
   width: 400px;
-
   resize: none;
   white-space: pre-wrap;
   font-family: "OTWelcomeRA";
@@ -151,7 +128,6 @@ const DeleteImage = styled.div`
   font-size: 25px;
   color: rgb(186, 186, 186);
   opacity: 70%;
-  // border: 1px solid rgb(186, 186, 186);
   background-color: transparent;
   border-radius: 50%;
   &:active {
@@ -205,7 +181,6 @@ const DiaryContext = styled.div`
   &::-webkit-scrollbar-thumb {
     height: 20%;
     background: #748da6;
-
     border-radius: 10px;
   }
 `;
@@ -239,6 +214,8 @@ export default function Diary({
     setSendingImage,
     currentMonth,
     showDiary,
+    commaMaker,
+    formatter,
   } = calenderStore();
 
   const handleSetValue = (e) => {
@@ -298,10 +275,6 @@ export default function Diary({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // if (text === "") {
-    //   alert("내용을 입력해주세요");
-    //   return;
-    // }
     const body2 = new FormData();
 
     if (edit !== true) {
@@ -347,31 +320,6 @@ export default function Diary({
       closeModal();
     }
   };
-
-  const commaMaker = (input) => {
-    input = input.toString();
-    let counter = 0;
-    let string = [];
-    for (let i = input.length - 1; i >= 0; i--) {
-      string.unshift(input[i]);
-      counter++;
-      if (counter === 3) {
-        string.unshift(",");
-        counter = 0;
-      }
-    }
-    if (string[0] == ",") {
-      string.shift();
-    }
-    string = string.join("");
-    return string;
-  };
-
-  function formatter(e) {
-    let a = e;
-    let string = a[5] + a[6] + "/" + a[8] + a[9] + "/" + a[2] + a[3];
-    return string;
-  }
 
   let basicImg = null;
   let basicText = "";
@@ -493,7 +441,6 @@ export default function Diary({
                           }
                         }
                       } else {
-                        // let amount = commaMaker(expense.amount);
                         temp2.push(amount);
                       }
                       return (
@@ -611,10 +558,8 @@ export default function Diary({
                           }
                         }
                       } else {
-                        // let amount = commaMaker(income.amount);
                         temp2.push(amount);
                       }
-                      console.log(temp2);
                       return (
                         <div>
                           {temp1.map((data) => {
@@ -775,8 +720,6 @@ export default function Diary({
                     cursor: "pointer",
                     color: "#F2D7D9",
                   }}
-                  // value={tabMonth}
-                  // onChange={handleTabChange}
                   onClick={prevDay}
                 />
                 <Icon
@@ -788,8 +731,6 @@ export default function Diary({
                     cursor: "pointer",
                     color: "#F2D7D9",
                   }}
-                  // value={tabMonth}
-                  // onChange={handleTabChange}
                   onClick={nextDay}
                 />
               </DateMover>
@@ -842,7 +783,6 @@ export default function Diary({
                   >
                     <div>
                       <TextArea
-                        // placeholder="여기에 입력하세요"
                         value={text}
                         onChange={(e) => handleSetValue(e)}
                         style={{ resize: "none" }}
