@@ -85,10 +85,13 @@ export default function Signin() {
 
       console.log(response);
 
-      toast.success("회원가입 성공! 이메일로 인증 해주세요", {
-        position: toast.POSITION.TOP_CENTER,
-      });
       setLoading(false);
+      setTimeout(() => {
+        toast.success("회원가입 성공! 이메일로 인증 해주세요", {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      }, 50);
+
       setTimeout(() => {
         navigate("/");
       }, 5000);
