@@ -1,7 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { Icon } from "@iconify/react";
-import colors from "../../utils/color";
-
 import {
   format,
   addMonths,
@@ -13,11 +11,8 @@ import {
   isSameMonth,
   isSameDay,
   addDays,
-  parse,
 } from "date-fns";
-
 import styled from "styled-components";
-
 import { calenderStore } from "../../store/store.js";
 
 const InstanceTable = styled.div`
@@ -83,13 +78,7 @@ const CloseBtn = styled.div`
 `;
 
 const RenderHeader = (props) => {
-  const { currentMonth, setcurrentMonth, tabMonth, setTabMonth } =
-    calenderStore();
-
-  const handleTabChange = (event, newValue) => {
-    setTabMonth(newValue);
-    // console.log(currentMonth);
-  };
+  const { currentMonth, setcurrentMonth, commaMaker } = calenderStore();
 
   const prevMonth = () => {
     props.changeValue(
@@ -106,27 +95,8 @@ const RenderHeader = (props) => {
     setcurrentMonth(addMonths(currentMonth, 1));
   };
 
-  const commaMaker = (input) => {
-    input = input.toString();
-    let counter = 0;
-    let string = [];
-    for (let i = input.length - 1; i >= 0; i--) {
-      string.unshift(input[i]);
-      counter++;
-      if (counter === 3) {
-        string.unshift(",");
-        counter = 0;
-      }
-    }
-    if (string[0] === ",") {
-      string.shift();
-    }
-    string = string.join("");
-    return string;
-  };
-
-  let a = commaMaker(props.calendarData.incomeSum);
-  let b = commaMaker(props.calendarData.expenseSum);
+  let incomeSum = commaMaker(props.calendarData.incomeSum);
+  let expenseSum = commaMaker(props.calendarData.expenseSum);
 
   return (
     <div>
@@ -172,23 +142,19 @@ const RenderHeader = (props) => {
               marginLeft: "10px",
             }}
           >
-            <div style={{ maxHeight: "20px" }}>+{a}</div>
-            <div style={{ maxHeight: "20px" }}>-{b}</div>
+            <div style={{ maxHeight: "20px" }}>+{incomeSum}</div>
+            <div style={{ maxHeight: "20px" }}>-{expenseSum}</div>
           </div>
         </div>
         <div className="col col-end">
           <Icon
             icon="bi:arrow-left-circle-fill"
             style={{ color: "#F2D7D9" }}
-            value={tabMonth}
-            onChange={handleTabChange}
             onClick={prevMonth}
           />
           <Icon
             icon="bi:arrow-right-circle-fill"
             style={{ color: "#F2D7D9" }}
-            value={tabMonth}
-            onChange={handleTabChange}
             onClick={nextMonth}
           />
         </div>
@@ -212,60 +178,24 @@ const RenderDays = () => {
   return <div className="days row">{days}</div>;
 };
 
-const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
+const RenderCells = ({ diaryDatas, calendarData, Y }) => {
   const {
     showDiary,
     setShowDiary,
-    setCalendarImage,
-    showWrittenDiary,
-    setShowWrittenDiary,
     diaryDate,
     setDiaryDate,
     setDetailDate,
     selectedDate,
-    setSelectedDate,
     currentMonth,
-    setCurrentMonth,
-    showNewDiary,
-    setShowNewDiary,
-    specificDate,
     setSpecificDate,
     showInstanceTable,
     setShowInstanceTable,
-    dateOrigin,
     setDateOrigin,
-    setText,
-    setDiaryImage,
-    setDiaryId,
     position,
     setPosition,
+    commaMaker,
+    formatter,
   } = calenderStore();
-
-  // const onDateClick = (day) => {
-  //   console.log(1, day);
-  //   setSelectedDate(day);
-  // };
-
-  // const tempDiaryData = diaryData.filter((data) => data.date === diaryDate)[0];
-
-  const commaMaker = (input) => {
-    input = input.toString();
-    let counter = 0;
-    let string = [];
-    for (let i = input.length - 1; i >= 0; i--) {
-      string.unshift(input[i]);
-      counter++;
-      if (counter === 3) {
-        string.unshift(",");
-        counter = 0;
-      }
-    }
-    if (string[0] === ",") {
-      string.shift();
-    }
-    string = string.join("");
-    return string;
-  };
 
   const tempDiaryData = diaryDatas;
   const tempDiaryData2 = calendarData;
@@ -273,12 +203,6 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
   let expenseDT = [];
 
   let incomeDT = [];
-
-  function formatter(e) {
-    let a = e;
-    let string = a[5] + a[6] + "/" + a[8] + a[9] + "/" + a[2] + a[3];
-    return string;
-  }
 
   if (tempDiaryData2.calendarExpenseDtoList.length) {
     tempDiaryData2.calendarExpenseDtoList.map((data) => {
@@ -288,8 +212,6 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
     });
   }
 
-  // console.log(tempDiaryData2.calendarIncomeDtoList.length);
-
   if (tempDiaryData2.calendarIncomeDtoList.length) {
     tempDiaryData2.calendarIncomeDtoList.map((data) => {
       let a = data.incomeDt;
@@ -298,15 +220,9 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
     });
   }
 
-  // console.log(tempDiaryData2);
-  // console.log(expenseDT);
-  // console.log(incomeDT);
-
   let dateArr = expenseDT.concat(incomeDT);
   let set = new Set(dateArr);
   dateArr = Array.from(set);
-
-  // console.log(dateArr[0].format("MM/dd/yy"));
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -322,12 +238,9 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
     setPosition(Y);
   };
 
-  // console.log(startDate.format("MM/dd/yy"));
-
   while (day <= endDate) {
     for (let i = 0; i < 7; i++) {
       formattedDate = format(day, "d");
-      // console.log(day.format("yyyy-MM-dd"));
       const cloneDay = day.format("yyyy-MM-dd");
       const formattedDataForDiary = day.format("MM/dd/yy");
       days.push(
@@ -342,7 +255,6 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
               : "valid"
           }`}
           key={formattedDataForDiary}
-          // onClick={() => onDateClick(parse(cloneDay, "YYYYMMDD", new Date()))}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -425,14 +337,11 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
                         id={formattedDataForDiary}
                         key={data.date}
                         onClick={(e) => {
-                          // console.log(diaryData);
                           e.stopPropagation();
-                          console.log(Y);
                           fixPosition();
                           setDetailDate(e.target.id);
                           setShowInstanceTable(!showInstanceTable);
                           setDiaryDate(formattedDataForDiary);
-                          // console.log(showInstanceTable);
                         }}
                       ></Icon>
                       {showInstanceTable &&
@@ -593,28 +502,12 @@ const RenderCells = ({ diaryDatas, calendarData, X, Y }) => {
   return <div className="body">{rows}</div>;
 };
 
-export const FullCalendar = ({
-  diaryDatas,
-  changeValue,
-  calendarData,
-  refetch,
-  X,
-  Y,
-}) => {
+export const FullCalendar = ({ diaryDatas, changeValue, calendarData, Y }) => {
   return (
     <div className="calendar">
-      <RenderHeader
-        refetch={refetch}
-        calendarData={calendarData}
-        changeValue={changeValue}
-      />
+      <RenderHeader calendarData={calendarData} changeValue={changeValue} />
       <RenderDays />
-      <RenderCells
-        X={X}
-        Y={Y}
-        diaryDatas={diaryDatas}
-        calendarData={calendarData}
-      />
+      <RenderCells Y={Y} diaryDatas={diaryDatas} calendarData={calendarData} />
     </div>
   );
 };
