@@ -9,6 +9,8 @@ import {
 } from "date-fns";
 
 const useCategoryDropDownItemStore = create((set) => ({
+  mainCategoryList: [""],
+  setMainCategoryList: (input) => set({ mainCategoryList: input }),
   categoryItemList: [""],
   setCategoryItemList: (input) => set({ categoryItemList: input }),
 }));

@@ -14,6 +14,7 @@ import {
   subMonths,
   getMonth,
   getYear,
+  getDate,
 } from "date-fns";
 
 import DateHeader from "../common/DateHeader";
@@ -34,6 +35,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { useCategoryDropDownItemStore } from "../../store/store.js";
+import { isVisible } from "@testing-library/user-event/dist/utils";
 
 const INCOME_API_URL = `${process.env.REACT_APP_API_URL}/api/income`;
 const EXPENSE_API_URL = `${process.env.REACT_APP_API_URL}/api/expense`;
@@ -63,6 +65,7 @@ const incomeColumns = [
   {
     key: "incomeCategoryName",
     name: "분류",
+    width: 200,
     formatter(props) {
       return <>{props.row.category}</>;
     },
@@ -110,6 +113,7 @@ const expenseColumns = [
   {
     key: "expenseCategoryName",
     name: "분류",
+    width: 200,
     formatter(props) {
       return <>{props.row.category}</>;
     },
@@ -150,7 +154,7 @@ export default function Inout() {
   const [selectedRows, setSelectedRows] = useState(() => new Set());
   const queryClient = useQueryClient();
   const [tabValue, setTabValue] = useState(0);
-  const { categoryItemList, setCategoryItemList } =
+  const { categoryItemList, setCategoryItemList, setMainCategoryList } =
     useCategoryDropDownItemStore();
 
   const handleTabChange = (event, newValue) => {
@@ -199,17 +203,29 @@ export default function Inout() {
   }
 
   const setInoutDataWith = (data) => {
+    let categoryItemList = {};
     switch (tabValue) {
       case TabSelected.INCOME:
         incomeCategoryList = data.incomeCategoryDtoList
           .map((item) => item.detailIncomeCategoryDtoList)
           .reduce((acc, cur) => [...acc, ...cur]);
-        const incomeCategoryNames = incomeCategoryList.map(
-          (item) => item.detailIncomeCategoryName
-        );
-        console.log(incomeCategoryList);
+        // const incomeCategoryNames = incomeCategoryList.map(
+        //   (item) => item.detailIncomeCategoryName
+        // );
+        // const mainIncomeCategoryNames = data.incomeCategoryDtoList.map(
+        //   (item) => item.incomeCategoryName
+        // );
+        // console.log(data.incomeCategoryDtoList);
+        data.incomeCategoryDtoList.forEach((item) => {
+          categoryItemList[item.incomeCategoryName] =
+            item.detailIncomeCategoryDtoList.map(
+              (detail) => detail.detailIncomeCategoryName
+            );
+        });
+        console.log(categoryItemList);
 
-        setCategoryItemList(["", ...incomeCategoryNames]);
+        // setCategoryItemList(["", ...incomeCategoryNames]);
+        setMainCategoryList(categoryItemList);
 
         const incomeData = data.incomeDtoList.map((item) => {
           item.date = item.incomeDt;
@@ -219,6 +235,7 @@ export default function Inout() {
           ).detailIncomeCategoryName;
           item.year = getYear(new Date(item.date));
           item.month = getMonth(new Date(item.date));
+          item.day = getDate(new Date(item.date));
           return item;
         });
 
@@ -229,11 +246,18 @@ export default function Inout() {
         expenseCategoryList = data.expenseCategoryDtos
           .map((item) => item.detailExpenseCategoryDtos)
           .reduce((acc, cur) => [...acc, ...cur]);
-        const expenseCategoryNames = expenseCategoryList.map(
-          (item) => item.detailExpenseCategoryName
-        );
 
-        setCategoryItemList(["", ...expenseCategoryNames]);
+        console.log(data);
+        data.expenseCategoryDtos.forEach((item) => {
+          categoryItemList[item.expenseCategoryName] =
+            item.detailExpenseCategoryDtos.map(
+              (detail) => detail.detailExpenseCategoryName
+            );
+        });
+        console.log(categoryItemList);
+
+        // setCategoryItemList(["", ...incomeCategoryNames]);
+        setMainCategoryList(categoryItemList);
 
         const expenseData = data.expenseDtos.map((item) => {
           item.date = item.expenseDt;
@@ -243,6 +267,7 @@ export default function Inout() {
           ).detailExpenseCategoryName;
           item.year = getYear(new Date(item.date));
           item.month = getMonth(new Date(item.date));
+          item.day = getDate(new Date(item.date));
           return item;
         });
 
@@ -468,7 +493,7 @@ export default function Inout() {
           next={nextMonth}
         />
         <DataGrid
-          style={{ height: 500 }}
+          style={{ height: 700 }}
           ref={gridRef}
           columns={incomeColumns}
           rows={rows}
@@ -492,7 +517,7 @@ export default function Inout() {
           next={nextMonth}
         />
         <DataGrid
-          style={{ height: 500 }}
+          style={{ height: 700 }}
           ref={gridRef}
           columns={expenseColumns}
           rows={rows}
