@@ -17,7 +17,7 @@ import MenuItem from "@mui/material/MenuItem";
 import axios from "axios";
 import colors from "../../utils/color";
 
-const settings = ["Setting", "Logout"];
+const settings = ["Main", "Setting", "Logout"];
 
 export default function Header() {
   const { profileImage } = useStore();
@@ -62,9 +62,12 @@ export default function Header() {
         navigate("/profile_change");
         break;
 
+      case "Main":
+        navigate("/calendar");
+        break;
+
       case "Logout":
         requestLogout();
-
         break;
 
       default:

@@ -1,12 +1,6 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
-import {
-  format,
-  addMonths,
-  subMonths,
-  startOfMonth,
-  endOfMonth,
-} from "date-fns";
+import { addMonths, subMonths } from "date-fns";
 
 const useCategoryDropDownItemStore = create((set) => ({
   categoryItemList: [""],
@@ -96,12 +90,6 @@ const calenderStore = create((set, get) => ({
   showDiary: false,
   setShowDiary: (input) => set({ showDiary: input }),
 
-  showWrittenDiary: false,
-  setShowWrittenDiary: (input) => set({ showWrittenDiary: input }),
-
-  showNewDiary: false,
-  setShowNewDiary: (input) => set({ showNewDiary: input }),
-
   diaryDate: "",
   setDiaryDate: (input) => set({ diaryDate: input }),
 
@@ -130,9 +118,6 @@ const calenderStore = create((set, get) => ({
   calendarImage: null,
   setCalendarImage: (input) => set({ calendarImage: input }),
 
-  tabMonth: 0,
-  setTabMonth: (input) => set({ tabMonth: input }),
-
   dateOrigin: null,
   setDateOrigin: (input) => set({ dateOrigin: input }),
 
@@ -153,6 +138,31 @@ const calenderStore = create((set, get) => ({
 
   position: 0,
   setPosition: (input) => set({ position: input }),
+
+  commaMaker(input) {
+    input = input.toString();
+    let counter = 0;
+    let string = [];
+    for (let i = input.length - 1; i >= 0; i--) {
+      string.unshift(input[i]);
+      counter++;
+      if (counter === 3) {
+        string.unshift(",");
+        counter = 0;
+      }
+    }
+    if (string[0] === ",") {
+      string.shift();
+    }
+    string = string.join("");
+    return string;
+  },
+
+  formatter(e) {
+    let a = e;
+    let string = a[5] + a[6] + "/" + a[8] + a[9] + "/" + a[2] + a[3];
+    return string;
+  },
 }));
 
 export {
