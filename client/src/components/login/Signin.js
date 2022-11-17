@@ -96,9 +96,11 @@ export default function Signin() {
         navigate("/");
       }, 5000);
     } catch (error) {
-      toast.warn(error.response.data.message, {
-        position: toast.POSITION.TOP_CENTER,
-      });
+      setTimeout(() => {
+        toast.warn(error.response.data.message, {
+          position: toast.POSITION.TOP_CENTER,
+        });
+      }, 50);
 
       console.log(error);
       setLoading(false);
