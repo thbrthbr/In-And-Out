@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -17,6 +18,7 @@ import axios from "axios";
 import { useMutation } from "react-query";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PacmanLoader from "react-spinners/PacmanLoader";
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api/password/email/phone`;
 
@@ -29,9 +31,12 @@ export default function IdentifyPhone() {
     resolver: yupResolver(identifyPhoneSchema),
   });
 
+  const [loading, setLoading] = useState(false);
+
   const { state } = useLocation();
   const onSubmit = (data) => {
     phoneDataMutation.mutate(data.phone);
+    setLoading(true);
   };
 
   const phoneDataMutation = useMutation(
@@ -42,14 +47,18 @@ export default function IdentifyPhone() {
         headers: { "Content-Type": "application/json" },
       });
       console.log(res);
-
+      setLoading(false);
       return res.data;
     },
     {
       onSuccess: (e) => {
-        toast.success("이메일로 인증링크가 전송 되었습니다!", {
-          position: toast.POSITION.TOP_CENTER,
-        });
+        setTimeout(
+          () =>
+            toast.success("이메일로 인증링크가 전송 되었습니다!", {
+              position: toast.POSITION.TOP_CENTER,
+            }),
+          50
+        );
       },
       onError: (error) => {
         toast.warn(
@@ -61,6 +70,20 @@ export default function IdentifyPhone() {
       },
     }
   );
+
+  if (loading)
+    return (
+      <PacmanLoader
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+        color="#36d7b7"
+        size={50}
+      />
+    );
 
   return (
     <Box

@@ -57,6 +57,7 @@ export default function ProfileChange() {
   const fileInput = useRef();
   const [openPostcode, setOpenPostcode] = useState(false);
   const queryClient = useQueryClient();
+  const [imageDelete, setImageDelete] = useState(false);
 
   const handleButtonClick = (e) => {
     e.preventDefault();
@@ -64,12 +65,13 @@ export default function ProfileChange() {
   };
 
   const handleChange = async (e) => {
+    e.preventDefault();
     const reader = new FileReader();
     const file = fileInput.current.files[0];
 
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      setProfileImage(reader.result);
+      setTimeout(() => setProfileImage(reader.result), 1000);
     };
   };
 
@@ -130,15 +132,22 @@ export default function ProfileChange() {
       },
       onError: () => {},
     },
-    { staleTime: 500 }
+    { staleTime: 10000, refetchOnWindowFocus: false }
   );
 
   const saveDataMutation = useMutation(
     async (userData) => {
-      const file =
-        fileInput.current.files[0] === undefined
-          ? fileInput.current.files[0]
-          : fileInput.current.files[0];
+      let file = fileInput.current.files[0];
+      console.log(file);
+      console.log(defaultUser);
+      if (!file || file === defaultUser)
+        file = new File([110, 117, 108, 108], "null");
+
+      if (imageDelete) {
+        file = new File([100, 101, 108, 101, 116, 101], "delete");
+        setImageDelete(false);
+      }
+      console.log(profileImage);
       userData = {
         ...userData,
         address: userData.residence,
@@ -148,9 +157,15 @@ export default function ProfileChange() {
       delete userData.residence;
       delete userData.birthday;
       delete userData.name;
-      console.log("data", userData, file, new Blob([file]));
+      console.log(
+        "data",
+        userData,
+        file
+        // new File([110, 117, 108, 108], "null")
+      );
       const formData = new FormData();
-      formData.append("file", new Blob([file]));
+
+      formData.append("file", file);
       formData.append(
         "input",
         new Blob([JSON.stringify(userData)], { type: "application/json" })
@@ -174,6 +189,7 @@ export default function ProfileChange() {
           withCredentials: true,
         }
       );
+
       return res.data;
     },
     {
@@ -181,6 +197,7 @@ export default function ProfileChange() {
         toast.success("프로필 변경이 성공적으로 처리됐습니다!", {
           position: toast.POSITION.TOP_CENTER,
         });
+        setProfileImage(null);
         queryClient.invalidateQueries("getProfileData");
       },
       onError: (data, variables, context) => {
@@ -214,7 +231,7 @@ export default function ProfileChange() {
         alignItems: "center",
       }}
     >
-      <ToastContainer />
+      <ToastContainer pauseOnHover={false} />
       <Typography component="h1" variant="h5">
         프로필 변경
       </Typography>
@@ -234,9 +251,9 @@ export default function ProfileChange() {
               height: "180px",
             }}
           />
-          <File onClick={handleButtonClick} htmlFor="input-file">
+          <FileImage onClick={handleButtonClick} htmlFor="input-file">
             이미지 업로드
-          </File>
+          </FileImage>
           <input
             type="file"
             id="input-file"
@@ -248,7 +265,8 @@ export default function ProfileChange() {
           <button
             onClick={(e) => {
               e.preventDefault();
-              setProfileImage("");
+              setProfileImage(null);
+              setImageDelete(true);
             }}
           >
             이미지 삭제
@@ -380,7 +398,7 @@ export default function ProfileChange() {
   );
 }
 
-const File = styled.button`
+const FileImage = styled.button`
   font-size: 15px;
   width: 200px;
   height: 30px;
